@@ -48,50 +48,37 @@ if ($_SESSION['profil'] == 'user') {
     </div>
     <nav class="header-nav-wrap">
       <ul class="header-nav">
-        <?php if (($_SESSION['profil'] == 'paiement') && isset($_SESSION['classe'])) { ?>
+        <?php if (($_SESSION['profil'] == 'admin')) { ?>
           <li class="nav-item">
-            <a class="nav-link" href="paiement.php" title="Paiement de caution">Paiement</a>
+            <a class="nav-link" href="http://localhost/COUD/panne/profils/dasboard.php" title="Paiement de caution">Accueil</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="../personnels/niveau.php" title="Changer de niveau de formation ">Changer-Classe</a>
+            <a class="nav-link" href="http://localhost/COUD/panne/profils/admin/users.php" title="Changer de niveau de formation ">Utilisateurs</a>
           </li>
         <?php } ?>
-        <?php if (($_SESSION['profil'] == 'validation') && isset($_SESSION['classe'])) { ?>
-          <li class="nav-item">
-            <a class="nav-link" href="validation.php" title="Paiement de caution">Validation</a>
+        <?php if (($_SESSION['profil'] == 'residence')) { ?>
+           <li class="nav-item">
+            <a class="nav-link" href="http://localhost/COUD/panne/profils/dasboard.php" title="Paiement de caution">Accueil</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="../personnels/niveau.php" title="Changer de niveau de formation ">Changer-Classe</a>
+            <a class="nav-link" href="http://localhost/COUD/panne/profils/residence/listPannes.php" title="Changer de niveau de formation ">Gestion</a>
           </li>
         <?php } ?>
-        <?php if (($_SESSION['profil'] == 'quota') && isset($_SESSION['classe'])) { ?>
-          <li class="nav-item active">
-            <a class="nav-link" href="listeLits.php" title="Revenir à la page d'accueil">Accueil <span></span></a>
+        <?php if (($_SESSION['profil'] == 'dst') || ($_SESSION['profil'] == 'atelier')) { ?>
+          <li class="nav-item">
+            <a class="nav-link" href="http://localhost/COUD/panne/profils/dasboard.php" title="Paiement de caution">Accueil</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="detailsLits.php" title="Détail des lits affecté à cette classe">Détail</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="niveau.php" title="Changer de niveau de formation ">Changer-Classe</a>
+            <a class="nav-link" href="http://localhost/COUD/panne/profils/dst/listPannes.php" title="Changer de niveau de formation ">Gestion</a>
           </li>
         <?php } ?>
-        <?php if ($_SESSION['profil'] == 'user') { ?>
-          <li class="nav-item active">
-            <a class="nav-link" href="../etudiants/resultat.php" title="Revenir à la page d'accueil">Accueil</a>
+        <?php if ($_SESSION['profil'] == 'section') { ?>
+           <li class="nav-item">
+            <a class="nav-link" href="http://localhost/COUD/panne/profils/dasboard.php" title="Paiement de caution">Accueil</a>
           </li>
-          <?php
-          if ($affecter == 0) {
-            $_SESSION['lit_choisi'] = ''; ?>
-            <li class="nav-item active">
-              <a class="nav-link" href="../etudiants/codifier.php" title="Aller à la page des codifications">Codifier</a>
-            </li>
-          <?php } else {
-            while ($rows = $resultatReqLitEtu->fetch_assoc()) {
-              $_SESSION['lit_choisi'] = $rows['lit'];
-              $_SESSION['id_lit'] = $rows['id_lit'];
-            }
-          }
-          ?>
+          <li class="nav-item">
+            <a class="nav-link" href="http://localhost/COUD/panne/profils/section/listPannes.php" title="Changer de niveau de formation ">Gestion</a>
+          </li>
         <?php } ?>
         <li class="nav-item">
           <a class="nav-link" href="/COUD/panne/" title="Déconnexion"><i class="fa fa-sign-out" aria-hidden="true"></i> Déconnexion</a>
@@ -104,7 +91,7 @@ if ($_SESSION['profil'] == 'user') {
   <!-- end s-header -->
 </body>
 <section id="homedesigne" class="s-homedesigne">
-  <?php if (($_SESSION['profil'] == 'quota') || ($_SESSION['profil'] == 'paiement') || ($_SESSION['profil'] == 'validation') || ($_SESSION['profil'] == 'chef_pavillon') || ($_SESSION['profil'] == 'residence')|| ($_SESSION['profil'] == 'dst') || ($_SESSION['profil'] == 'residence')|| ($_SESSION['profil'] == 'admin') || ($_SESSION['profil'] == 'residence') || ($_SESSION['profil'] == 'section') || ($_SESSION['profil'] == 'atelier')) { ?>
+  <?php if (($_SESSION['profil'] == 'residence') || ($_SESSION['profil'] == 'dst') || ($_SESSION['profil'] == 'residence')|| ($_SESSION['profil'] == 'admin') || ($_SESSION['profil'] == 'residence') || ($_SESSION['profil'] == 'section') || ($_SESSION['profil'] == 'atelier')) { ?>
     <p class="lead">Espace Administration: Bienvenue! <br> <span>
         (<?= $_SESSION['prenom'] . "  " . $_SESSION['nom'] . " | " . $_SESSION['profil2'] ?>)
       </span></p>

@@ -783,3 +783,85 @@ function getChambresByCampusPavillon($connexion, $campusPavillon) {
     
     return array_column($chambres, 'chambre');
 }
+
+// Compter le nombre total d'utilisateurs
+function countUsers($connexion) {
+    $query = "SELECT COUNT(*) as total FROM utilisateur";
+    $result = mysqli_query($connexion, $query);
+    $row = mysqli_fetch_assoc($result);
+    return $row['total'];
+}
+
+// Compter le nombre total de pannes
+function countTotalPannes($connexion) {
+    $query = "SELECT COUNT(*) as total FROM panne";
+    $result = mysqli_query($connexion, $query);
+    $row = mysqli_fetch_assoc($result);
+    return $row['total'];
+}
+
+// Compter les pannes en cours
+function countPannesEnCours($connexion) {
+    $query = "SELECT COUNT(*) as total FROM intervention WHERE resultat = 'En cours'";
+    $result = mysqli_query($connexion, $query);
+    $row = mysqli_fetch_assoc($result);
+    return $row['total'];
+}
+
+// Compter les pannes résolues
+function countPannesResolues($connexion) {
+    $query = "SELECT COUNT(*) as total FROM intervention WHERE resultat = 'depanner'";
+    $result = mysqli_query($connexion, $query);
+    $row = mysqli_fetch_assoc($result);
+    return $row['total'];
+}
+
+// Fonction pour générer une couleur aléatoire
+function getRandomColor() {
+    return sprintf('#%06X', mt_rand(0, 0xFFFFFF));
+}
+
+// Fonction pour récupérer les statistiques mensuelles
+function getMonthlyStats($connexion, $months = 6) {
+    $stats = [];
+    $types = [];
+    
+    // D'abord récupérer tous les types de pannes existants
+    $query = "SELECT DISTINCT type_panne FROM panne";
+    $result = mysqli_query($connexion, $query);
+    while ($row = mysqli_fetch_assoc($result)) {
+        $types[] = $row['type_panne'];
+    }
+    
+    // Ensuite récupérer les données pour chaque mois
+    for ($i = $months - 1; $i >= 0; $i--) {
+        $month = date('Y-m', strtotime("-$i months"));
+        $monthName = date('M Y', strtotime($month));
+        
+        $query = "SELECT type_panne, COUNT(*) as count 
+                  FROM panne 
+                  WHERE DATE_FORMAT(date_enregistrement, '%Y-%m') = '$month'
+                  GROUP BY type_panne";
+        $result = mysqli_query($connexion, $query);
+        
+        $monthData = [];
+        while ($row = mysqli_fetch_assoc($result)) {
+            $monthData[$row['type_panne']] = $row['count'];
+        }
+        
+        // On s'assure que tous les types sont présents (avec 0 si nécessaire)
+        foreach ($types as $type) {
+            if (!isset($monthData[$type])) {
+                $monthData[$type] = 0;
+            }
+        }
+        
+        $stats[$monthName] = $monthData;
+    }
+    
+    return [
+        'months' => array_keys($stats),
+        'types' => $types,
+        'data' => $stats
+    ];
+}

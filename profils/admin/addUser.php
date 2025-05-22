@@ -258,7 +258,7 @@ if ($user_id) {
 
             <!-- Boutons de soumission -->
             <div class="d-flex justify-content-between mt-4">
-                <a href="javascript:history.back()" class="back-link">
+                <a href="users.php" class="back-link">
                     <i class="fas fa-arrow-left me-2"></i>Retour
                 </a>
                 <button type="submit" class="btn btn-primary-custom">
