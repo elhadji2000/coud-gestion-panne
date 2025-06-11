@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : lun. 12 mai 2025 à 14:09
+-- Généré le : jeu. 12 juin 2025 à 00:43
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -9834,8 +9834,11 @@ CREATE TABLE `panne` (
 --
 
 INSERT INTO `panne` (`id`, `type_panne`, `date_enregistrement`, `description`, `localisation`, `niveau_urgence`, `id_chef_residence`) VALUES
-(28, 'Plomberie', '11/05/2025', 'un tuyau cassè ', 'Grand_Campus | B | Chambre 90B', 'Élevée', 1),
-(29, 'Plomberie', '12/05/2025', 'fuite d\'eau...', 'E.S.P | H(ESP) | Toilettes 1er étage', 'Élevée', 18);
+(28, 'Plomberie', '11/02/2025', 'un tuyau cassè ', 'Grand_Campus | B | Chambre 90B', 'Élevée', 1),
+(29, 'Plomberie', '12/05/2025', 'fuite d\'eau...', 'E.S.P | H(ESP) | Toilettes 1er étage', 'Élevée', 18),
+(30, 'Maçonnerie', '14/05/2025', 'scenage svp...', 'Grand_Campus | A0 | Chambre 101A0', 'Élevée', 17),
+(31, 'Électricité', '14/05/2025', 'ampoul endomager...', 'Grand_Campus | A0 | Toilettes RDC', 'Moyenne', 17),
+(32, 'Froid', '14/05/2025', 'climatisation a probleme...', 'Grand_Campus | A0 | Hall d\'entrée', 'Moyenne', 17);
 
 -- --------------------------------------------------------
 
@@ -9958,7 +9961,7 @@ ALTER TABLE `observation`
 -- AUTO_INCREMENT pour la table `panne`
 --
 ALTER TABLE `panne`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT pour la table `utilisateur`
