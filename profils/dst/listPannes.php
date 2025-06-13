@@ -172,7 +172,7 @@ $allPannes = $result['pannes'];
                         <th>Urgence</th>
                         <th>Date</th>
                         <th>État</th>
-                        <th>Actions</th>
+                        <th>Details</th>
                         <?php if ($_SESSION['profil'] == 'sem' || $_SESSION['profil'] == 'dst') : ?>
                         <th>Imputation</th>
                         <?php endif; ?>

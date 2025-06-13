@@ -239,5 +239,26 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+//########################### pour Enregistrer une Imputation #######################################
+elseif ($_SERVER['REQUEST_METHOD'] == 'POST' &&
+    isset($_POST['article_id']) && isset($_POST['intervention_id']) &&
+    isset($_POST['quantite']) && isset($_POST['date_sortie']) && isset($_POST['remarque'])) {
+
+    $article_id = $_POST['article_id'];
+    $intervention_id = $_POST['intervention_id'];
+    $quantite = $_POST['quantite'];
+    $date_sortie = $_POST['date_sortie'];
+    $remarque = $_POST['remarque'];
+
+    if (enregistrerSortie($connexion, $article_id, $intervention_id, $quantite, $date_sortie, $remarque)) {
+        header('Location: /COUD/panne/profils/stock/nouvelle_sortie?success=2');
+        exit();
+    } else {
+        header('Location: /COUD/panne/profils/stock/nouvelle_sortie');
+        exit();
+    }
+}
+//########################### FIN Enregistrer une Imputation #######################################
+
     
 ?>

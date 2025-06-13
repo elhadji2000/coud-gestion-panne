@@ -6,7 +6,6 @@ if (empty($_SESSION['username']) && empty($_SESSION['mdp'])) {
 require_once(__DIR__ . '/traitement/fonction.php');
 if ($_SESSION['profil'] == 'user') {
   $inforequeteAffectEtu = getStudentChoiseLit($_SESSION['id_etu']);
-
   $affecter = 0;
   while ($row = $inforequeteAffectEtu->fetch_assoc()) {
     $affecter++;
@@ -15,89 +14,52 @@ if ($_SESSION['profil'] == 'user') {
 }
 ?>
 
+<!DOCTYPE html>
+<html lang="fr">
 <head>
-  <!--- basic page needs================================================== -->
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
   <title>GESCOUD</title>
-  <meta name="description" content="" />
-  <meta name="author" content="" />
-
-  <!-- mobile specific metas================================================== -->
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- CSS================================================== -->
-  <link rel="stylesheet" href="http://localhost/COUD/panne/assets/css/base.css" />
-  <link rel="stylesheet" href="http://localhost/COUD/panne/assets/css/vendor.css" />
-  <link rel="stylesheet" href="http://localhost/COUD/panne/assets/css/main.css" />
-
-  <!-- script================================================== -->
-  <script src="http://localhost/COUD/panne/assets/js/modernizr.js"></script>
-  <script src="http://localhost/COUD/panne/assets/js/pace.min.js"></script>
-
-  <!-- favicons================================================== -->
-  <link rel="shortcut icon" href="log.gif" type="image/x-icon" />
-  <link rel="icon" href="log.gif" type="image/x-icon" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="http://localhost/COUD/panne/assets/css/main.css">
+  <link rel="icon" href="log.gif" type="image/x-icon">
 </head>
 
-<body id="top">
-  <!-- header================================================== -->
-  <header class="s-header">
-    <div class="header-logo">
-      <a class="site-logo" href="#"><img src="http://localhost/COUD/panne/assets/images/logo.png" alt="Homepage" /></a>
-      GESCOUD
+<body>
+  <header style="display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #f8f9fa; border-bottom: 1px solid #ddd;">
+    <div style="display: flex; align-items: center;">
+      <img src="http://localhost/COUD/panne/assets/images/logo.png" alt="Logo" style="height: 40px;">
+      <span style="margin-left: 10px; font-weight: bold; font-size: 18px;">GESCOUD</span>
     </div>
-    <nav class="header-nav-wrap">
-      <ul class="header-nav">
-        <?php if (($_SESSION['profil'] == 'admin')) { ?>
-          <li class="nav-item">
-            <a class="nav-link" href="http://localhost/COUD/panne/profils/dasboard.php" title="Paiement de caution">Accueil</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="http://localhost/COUD/panne/profils/admin/users.php" title="Changer de niveau de formation ">Utilisateurs</a>
-          </li>
+    
+    <nav>
+      <ul style="display: flex; list-style: none; margin: 0; padding: 0;">
+        <?php if ($_SESSION['profil'] == 'admin') { ?>
+          <li style="margin: 0 10px;"><a href="http://localhost/COUD/panne/profils/dasboard.php">Accueil</a></li>
+          <li style="margin: 0 10px;"><a href="http://localhost/COUD/panne/profils/stock/gestion.php">Stock</a></li>
+          <li style="margin: 0 10px;"><a href="http://localhost/COUD/panne/profils/admin/users.php">Utilisateurs</a></li>
+        <?php } elseif ($_SESSION['profil'] == 'residence') { ?>
+          <li style="margin: 0 10px;"><a href="http://localhost/COUD/panne/profils/dasboard.php">Accueil</a></li>
+          <li style="margin: 0 10px;"><a href="http://localhost/COUD/panne/profils/residence/listPannes.php">Gestion Pannes</a></li>
+        <?php } elseif (($_SESSION['profil'] == 'dst') || ($_SESSION['profil'] == 'atelier')) { ?>
+          <li style="margin: 0 10px;"><a href="http://localhost/COUD/panne/profils/dasboard.php">Accueil</a></li>
+          <li style="margin: 0 10px;"><a href="http://localhost/COUD/panne/profils/dst/listPannes.php">Gestion Pannes</a></li>
+          <li style="margin: 0 10px;"><a href="http://localhost/COUD/panne/profils/stock/gestion.php">Stock</a></li>
+        <?php } elseif ($_SESSION['profil'] == 'section') { ?>
+          <li style="margin: 0 10px;"><a href="http://localhost/COUD/panne/profils/dasboard.php">Accueil</a></li>
+          <li style="margin: 0 10px;"><a href="http://localhost/COUD/panne/profils/section/listPannes.php">Gestion Pannes</a></li>
         <?php } ?>
-        <?php if (($_SESSION['profil'] == 'residence')) { ?>
-           <li class="nav-item">
-            <a class="nav-link" href="http://localhost/COUD/panne/profils/dasboard.php" title="Paiement de caution">Accueil</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="http://localhost/COUD/panne/profils/residence/listPannes.php" title="Changer de niveau de formation ">Gestion</a>
-          </li>
-        <?php } ?>
-        <?php if (($_SESSION['profil'] == 'dst') || ($_SESSION['profil'] == 'atelier')) { ?>
-          <li class="nav-item">
-            <a class="nav-link" href="http://localhost/COUD/panne/profils/dasboard.php" title="Paiement de caution">Accueil</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="http://localhost/COUD/panne/profils/dst/listPannes.php" title="Changer de niveau de formation ">Gestion</a>
-          </li>
-        <?php } ?>
-        <?php if ($_SESSION['profil'] == 'section') { ?>
-           <li class="nav-item">
-            <a class="nav-link" href="http://localhost/COUD/panne/profils/dasboard.php" title="Paiement de caution">Accueil</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="http://localhost/COUD/panne/profils/section/listPannes.php" title="Changer de niveau de formation ">Gestion</a>
-          </li>
-        <?php } ?>
-        <li class="nav-item">
-          <a class="nav-link" href="/COUD/panne/" title="Déconnexion"><i class="fa fa-sign-out" aria-hidden="true"></i> Déconnexion</a>
-        </li>
+        <li style="margin: 0 10px;"><a href="/COUD/panne/"><i class="fa fa-sign-out"></i> Déconnexion</a></li>
       </ul>
     </nav>
-
-    <a class="header-menu-toggle" href="#0"><span>Menu</span></a>
   </header>
-  <!-- end s-header -->
-</body>
-<section id="homedesigne" class="s-homedesigne">
-  <?php if (($_SESSION['profil'] == 'residence') || ($_SESSION['profil'] == 'dst') || ($_SESSION['profil'] == 'residence')|| ($_SESSION['profil'] == 'admin') || ($_SESSION['profil'] == 'residence') || ($_SESSION['profil'] == 'section') || ($_SESSION['profil'] == 'atelier')) { ?>
-    <p class="lead">Espace Administration: Bienvenue! <br> <span>
-        (<?= $_SESSION['prenom'] . "  " . $_SESSION['nom'] . " | " . $_SESSION['profil2'] ?>)
-      </span></p>
-  <?php } elseif ($_SESSION['profil'] == 'user') { ?>
-    <p class="lead">Espace etudiant: Bienvenue! <br> <br> <span>
-        (<?= $_SESSION['prenom'] . "  " . $_SESSION['nom'] ?>)
-      </span><br><span><?= $_SESSION['classe']; ?></span></p>
-  <?php } ?>
-</section>
+
+  <div style="text-align: center; padding: 10px; background: #3777B0;color:white;">
+    <?php if (in_array($_SESSION['profil'], ['residence', 'dst', 'admin', 'section', 'atelier'])) { ?>
+      <p>Espace Administration: Bienvenue!<br>
+      <span>(<?= $_SESSION['prenom'] . " " . $_SESSION['nom'] . " | " . $_SESSION['profil2'] ?>)</span></p>
+    <?php } elseif ($_SESSION['profil'] == 'user') { ?>
+      <p>Espace étudiant: Bienvenue!<br>
+      <span>(<?= $_SESSION['prenom'] . " " . $_SESSION['nom'] ?>)</span><br>
+      <span><?= $_SESSION['classe'] ?></span></p>
+    <?php } ?>
+  </div>

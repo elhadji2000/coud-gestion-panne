@@ -20,22 +20,22 @@ if (!empty($_GET['username_user']) && !empty($_GET['password_user'])) {
             exit();
         } 
         else if ($row['profil1'] == 'residence') {
-            header('Location: /COUD/panne/profils/residence/listPannes.php');
+            header('Location: /COUD/panne/profils/dasboard.php');
             exit();
         }else if ($row['profil1'] == 'dst') {
-            header('Location: /COUD/panne/profils/dst/listPannes.php');
+            header('Location: /COUD/panne/profils/dasboard.php');
             exit();
         }else if ($row['profil1'] == 'sem') {
-            header('Location: /COUD/panne/profils/dst/listPannes.php');
+            header('Location: /COUD/panne/profils/dasboard.php');
             exit();
         }else if ($row['profil1'] == 'atelier') {
-            header('Location: /COUD/panne/profils/dst/listPannes.php');
+            header('Location: /COUD/panne/profils/dasboard.php');
             exit();
         }else if ($row['profil1'] == 'admin') {
             header('Location: /COUD/panne/profils/admin/users.php');
             exit();
         }else if ($row['profil1'] == 'section') {
-            header('Location: /COUD/panne/profils/section/listPannes.php');
+            header('Location: /COUD/panne/profils/dasboard.php');
             exit();
         }  else {
             header('Location: /COUD/panne');

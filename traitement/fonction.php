@@ -3,12 +3,18 @@
 function connexionBD()
 {
     $connexion = mysqli_connect("localhost", "root", "", "supercoud_panne");
+
     // Vérifiez la connexion
     if ($connexion === false) {
         die("Erreur : Impossible de se connecter. " . mysqli_connect_error());
     }
+
+    // Fix UTF-8 pour les caractères spéciaux
+    mysqli_set_charset($connexion, "utf8mb4");
+
     return $connexion;
 }
+
 $connexion = connexionBD();
 //####################### Fonction pour obtenir les pannes enregistrées par l'utilisateur connecté ###########################
 function allPannesByUser($connexion, $user_id, $page = 1, $limit = 10) {
@@ -704,7 +710,7 @@ function enregistrerUtilisateur($connexion, $username, $nom, $prenom, $email, $t
     return true;
 }
 // Fonction pour modifier un Utilisateur
-function updateUtilisateur($connexion, $id, $username, $nom, $prenom, $email, $telephone, $motDePasse = null, $profil1, $profil2) {
+function updateUtilisateur($connexion, $id, $username, $nom, $prenom, $email, $telephone, $profil1, $profil2) {
     // Vérifier si l'email existe déjà pour un autre utilisateur
     $sqlCheck = "SELECT COUNT(*) AS count FROM Utilisateur WHERE email = ? AND id != ?";
     $stmtCheck = $connexion->prepare($sqlCheck);
@@ -864,4 +870,178 @@ function getMonthlyStats($connexion, $months = 6) {
         'types' => $types,
         'data' => $stats
     ];
+}
+
+/**
+ * Retourne le nombre total d'articles différents en stock
+ * @param mysqli $connexion Connexion MySQL
+ * @return int Nombre d'articles
+ */
+function nombreArticles($connexion) {
+    $sql = "SELECT COUNT(*) as total FROM articles";
+    $result = mysqli_query($connexion, $sql);
+    $row = mysqli_fetch_assoc($result);
+    return $row['total'];
+}
+
+/**
+ * Retourne le nombre d'entrées en stock pour le mois en cours
+ * @param mysqli $connexion Connexion MySQL
+ * @return int Nombre d'entrées ce mois
+ */
+function entreesMois($connexion) {
+    $sql = "SELECT COUNT(*) as total FROM entree_stock 
+            WHERE MONTH(date_entree) = MONTH(CURRENT_DATE()) 
+            AND YEAR(date_entree) = YEAR(CURRENT_DATE())";
+    $result = mysqli_query($connexion, $sql);
+    $row = mysqli_fetch_assoc($result);
+    return $row['total'];
+}
+
+/**
+ * Retourne le nombre de sorties de stock pour le mois en cours
+ * @param mysqli $connexion Connexion MySQL
+ * @return int Nombre de sorties ce mois
+ */
+function sortiesMois($connexion) {
+    $sql = "SELECT COUNT(*) as total FROM sortie_stock 
+            WHERE MONTH(date_sortie) = MONTH(CURRENT_DATE()) 
+            AND YEAR(date_sortie) = YEAR(CURRENT_DATE())";
+    $result = mysqli_query($connexion, $sql);
+    $row = mysqli_fetch_assoc($result);
+    return $row['total'];
+}
+/**
+ * Retourne les articles avec leur stock actuel
+ * @param mysqli $connexion Connexion MySQL
+ * @return array Liste des articles avec leur stock
+ */
+function getStockArticles($connexion) {
+    $sql = "SELECT a.id, a.nom, a.references as reference, 
+                   COALESCE(SUM(e.quantite), 0) - COALESCE(SUM(s.quantite), 0) as quantite
+            FROM articles a
+            LEFT JOIN entree_stock e ON e.article_id = a.id
+            LEFT JOIN sortie_stock s ON s.article_id = a.id
+            GROUP BY a.id";
+    
+    $result = mysqli_query($connexion, $sql);
+    $stocks = [];
+    
+    while ($row = mysqli_fetch_assoc($result)) {
+        $stocks[] = $row;
+    }
+    
+    return $stocks;
+}
+/**
+ * Retourne les dernières activités de stock
+ * @param mysqli $connexion Connexion MySQL
+ * @param int $limit Nombre d'activités à retourner (par défaut 10)
+ * @return array Liste des activités
+ */
+function getActivitesRecent($connexion, $limit = 10) {
+    $sql = "(SELECT e.id, e.date_entree as date, 'entree' as type, 
+                    e.reference, u.nom as utilisateur
+             FROM entree_stock e
+             JOIN utilisateur u ON e.utilisateur_id = u.id
+             ORDER BY e.date_entree DESC LIMIT $limit)
+            
+            UNION ALL
+            
+            (SELECT s.id, s.date_sortie as date, 'sortie' as type,
+                    s.reference, u.nom as utilisateur
+             FROM sortie_stock s
+             JOIN utilisateur u ON s.utilisateur_id = u.id
+             ORDER BY s.date_sortie DESC LIMIT $limit)
+            
+            ORDER BY date DESC LIMIT $limit";
+    
+    $result = mysqli_query($connexion, $sql);
+    $activites = [];
+    
+    while ($row = mysqli_fetch_assoc($result)) {
+        $activites[] = $row;
+    }
+    
+    return $activites;
+}
+
+function listeArticles($connexion) {
+    $sql = "SELECT a.id, a.description, a.references, a.nom, a.categorie 
+            FROM articles a
+            ORDER BY a.id DESC";
+    
+    $result = mysqli_query($connexion, $sql);
+    $stocks = [];
+    
+    while ($row = mysqli_fetch_assoc($result)) {
+        $stocks[] = $row;
+    }
+    
+    return $stocks;
+}
+function getInterventions($connexion) {
+    $sql = "SELECT i.id, i.description_action, i.resultat
+            FROM intervention i
+            ORDER BY i.id DESC";
+    
+    $result = mysqli_query($connexion, $sql);
+    $interventions = [];
+
+    while ($row = mysqli_fetch_assoc($result)) {
+        $interventions[] = $row;
+    }
+
+    return $interventions;
+}
+
+function enregistrerSortie($connexion, $article_id, $intervention_id, $quantite, $date_sortie, $remarque) {
+    $sql = "INSERT INTO sortie_stock (article_id, intervention_id, quantite, date_sortie, remarque) 
+            VALUES (?, ?, ?, ?, ?)";
+
+    $stmt = mysqli_prepare($connexion, $sql);
+    if ($stmt) {
+        mysqli_stmt_bind_param($stmt, "iiiss", $article_id, $intervention_id, $quantite, $date_sortie, $remarque);
+        return mysqli_stmt_execute($stmt);
+    }
+
+    return false;
+}
+function enregistrerArticles($connexion, $nom, $categorie, $description, $references) {
+    $sql = "INSERT INTO articles (nom, categorie, description, `references`) 
+            VALUES (?, ?, ?, ?)";
+
+    $stmt = mysqli_prepare($connexion, $sql);
+    if ($stmt) {
+        mysqli_stmt_bind_param($stmt, "ssss", $nom, $categorie, $description, $references);
+        return mysqli_stmt_execute($stmt);
+    }
+
+    return false;
+}
+
+
+function listeSorties($connexion) {
+    $sql = "SELECT 
+    s.id AS sortie_id,
+    a.nom AS article,
+    a.references,
+    s.quantite,
+    s.date_sortie,
+    s.remarque,
+    s.intervention_id
+FROM sortie_stock s
+JOIN articles a ON s.article_id = a.id
+JOIN intervention i ON s.intervention_id = i.id
+ORDER BY s.date_sortie DESC;
+";
+    
+    $result = mysqli_query($connexion, $sql);
+    $stocks = [];
+    
+    while ($row = mysqli_fetch_assoc($result)) {
+        $stocks[] = $row;
+    }
+    
+    return $stocks;
 }

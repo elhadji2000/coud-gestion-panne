@@ -1,29 +1,17 @@
-<footer>
-    <div class="row">
-        <div class="col-full">
-
-            <div class="footer-logo">
-                <a class="footer-site-logo" href="#0"><img src="/COUD/panne/assets/images/logo.png" alt="Homepage"></a>
-            </div>
-
-
-
-        </div>
+<footer style="padding: 20px 0; overflow-x: hidden; text-align: center;">
+    <div>
+        <a class="footer-site-logo" href="#0" style="display: inline-block;">
+            <img src="/COUD/panne/assets/images/logo.png" alt="Homepage" style="max-width: 150px; height: auto; display: block; margin: 0 auto;">
+        </a>
     </div>
 
-    <div class="row footer-bottom">
+    <div style="margin-top: 10px;">
+        <span>&copy; COUD 2024</span>
+    </div>
 
-        <div class="col-twelve">
-            <div class="copyright">
-                <span>©Copyright COUD@2024</span>
-            </div>
-
-            <div class="go-top">
-                <a class="smoothscroll" title="Back to Top" href="#top"><i class="im im-arrow-up"
-                        aria-hidden="true"></i></a>
-            </div>
-        </div>
-
-    </div> <!-- end footer-bottom -->
-
+    <div style="margin-top: 10px;">
+        <a class="smoothscroll" title="Back to Top" href="#top" style="font-size: 20px;">
+            <i class="im im-arrow-up" aria-hidden="true"></i>
+        </a>
+    </div>
 </footer>
