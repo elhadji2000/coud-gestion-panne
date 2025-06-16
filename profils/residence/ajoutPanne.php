@@ -62,7 +62,7 @@ include('../../activite.php');
         margin-bottom: 10px;
         /* Espacement accru */
         color: #2c3e50;
-        font-size: 1.5rem;
+        font-size: 1.4rem;
         /* Libellés plus grands */
     }
 
@@ -74,7 +74,7 @@ include('../../activite.php');
         border-radius: 8px !important;
         border: 1px solid #dee2e6 !important;
         transition: all 0.3s !important;
-        font-size: 1.8rem !important;
+        font-size: 1.3rem !important;
         /* Texte plus lisible */
         min-height: 48px !important;
         /* Hauteur uniforme */
@@ -84,14 +84,14 @@ include('../../activite.php');
     .select2-container--focus .select2-selection {
         border-color: #3498db !important;
         box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25) !important;
-        font-size: 1.8rem !important;
+        font-size: 1.3rem !important;
     }
 
     /* Styles pour le textarea */
     textarea.form-control {
         min-height: 120px;
         resize: vertical;
-        font-size: 1.8rem;
+        font-size: 1.3rem;
         /* Texte plus lisible */
         padding: 12px 15px !important;
     }
@@ -270,7 +270,7 @@ include('../../activite.php');
                 </button>
 
                 <!-- Lien de retour -->
-                <a href="javascript:history.back()" class="back-link">
+                <a href="listPannes.php" class="back-link">
                     <i class="fas fa-arrow-left me-2"></i>Retour
                 </a>
             </form>

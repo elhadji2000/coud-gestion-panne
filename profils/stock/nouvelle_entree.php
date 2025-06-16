@@ -9,30 +9,28 @@ include('../../traitement/fonction.php');
 include('../../traitement/requete.php');
 include('../../activite.php');
 
-//########################### pour Enregistrer une Imputation #######################################
+//########################### pour Enregistrer une Entrée #######################################
 if ($_SERVER['REQUEST_METHOD'] == 'POST' &&
-    isset($_POST['article_id']) && isset($_POST['intervention_id']) &&
-    isset($_POST['quantite']) && isset($_POST['date_sortie']) && isset($_POST['remarque'])) {
+    isset($_POST['article_id']) && isset($_POST['quantite']) && 
+    isset($_POST['date_entree']) && isset($_POST['remarque'])) {
 
     $article_id = $_POST['article_id'];
-    $intervention_id = $_POST['intervention_id'];
     $quantite = $_POST['quantite'];
-    $date_sortie = $_POST['date_sortie'];
+    $date_entree = $_POST['date_entree'];
     $remarque = $_POST['remarque'];
 
-    if (enregistrerSortie($connexion, $article_id, $intervention_id, $quantite, $date_sortie, $remarque)) {
-        header('Location: /COUD/panne/profils/stock/nouvelle_sortie?success=2');
+    if (enregistrerEntree($connexion, $article_id, $quantite, $date_entree, $remarque)) {
+        header('Location: /COUD/panne/profils/stock/nouvelle_entree?success=2');
         exit();
     } else {
-        header('Location: /COUD/panne/profils/stock/nouvelle_sortie');
+        header('Location: /COUD/panne/profils/stock/nouvelle_entree');
         exit();
     }
 }
-//########################### FIN Enregistrer une Imputation #######################################
+//########################### FIN Enregistrer une Entrée #######################################
 
-// Récupérer la liste des articles et interventions
+// Récupérer la liste des articles
 $articles = listeArticles($connexion);
-$interventions = getInterventions($connexion);
 ?>
 
 <!DOCTYPE html>
@@ -41,7 +39,7 @@ $interventions = getInterventions($connexion);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des Sorties | Stock</title>
+    <title>Gestion des Entrées | Stock</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -157,9 +155,9 @@ $interventions = getInterventions($connexion);
 
     <div class="container py-4">
         <div class="form-container">
-            <h3 class="form-title"><i class="fas fa-box-open me-2"></i>Sortie de Stock</h3>
+            <h3 class="form-title"><i class="fas fa-box me-2"></i>Entrée en Stock</h3>
 
-            <form id="sortieForm" method="POST" action="nouvelle_sortie">
+            <form id="entreeForm" method="POST" action="nouvelle_entree">
                 <!-- Section Article -->
                 <div class="mb-4">
                     <label for="article_id" class="form-label required-field">Article</label>
@@ -194,43 +192,15 @@ $interventions = getInterventions($connexion);
 
                 <hr class="section-divider">
 
-                <!-- Section Intervention -->
-                <div class="mb-4">
-                    <label for="intervention_id" class="form-label required-field">Intervention</label>
-                    <select class="form-select select2-intervention" id="intervention_id" name="intervention_id" required>
-                        <option value="">Sélectionner une intervention</option>
-                        <?php foreach ($interventions as $intervention): ?>
-                        <option value="<?= $intervention['id'] ?>"
-                            data-description="<?= htmlspecialchars($intervention['description_action']) ?>"
-                            data-resultat="<?= htmlspecialchars($intervention['resultat']) ?>">
-                            Intervention #<?= $intervention['id'] ?> - <?= htmlspecialchars(substr($intervention['description_action'], 0, 30)) ?>...
-                        </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-
-                <div class="row g-3 mb-4">
-                    <div class="col-md-6">
-                        <label for="description_intervention" class="form-label">Description</label>
-                        <textarea class="form-control readonly-field" id="description_intervention" rows="3" readonly></textarea>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="resultat_intervention" class="form-label">Résultat attendu</label>
-                        <textarea class="form-control readonly-field" id="resultat_intervention" rows="3" readonly></textarea>
-                    </div>
-                </div>
-
-                <hr class="section-divider">
-
-                <!-- Section Sortie -->
+                <!-- Section Entrée -->
                 <div class="row g-3">
                     <div class="col-md-4">
                         <label for="quantite" class="form-label required-field">Quantité</label>
                         <input type="number" class="form-control" id="quantite" name="quantite" min="1" required>
                     </div>
                     <div class="col-md-4">
-                        <label for="date_sortie" class="form-label required-field">Date de sortie</label>
-                        <input type="date" class="form-control" id="date_sortie" name="date_sortie" required>
+                        <label for="date_entree" class="form-label required-field">Date d'entrée</label>
+                        <input type="date" class="form-control" id="date_entree" name="date_entree" required>
                     </div>
                     <div class="col-md-4">
                         <label for="remarque" class="form-label">Remarques</label>
@@ -250,7 +220,7 @@ $interventions = getInterventions($connexion);
         </div>
         <br>
         <div class="text-center">
-            <a href="sortie_stock.php" class="btn btn-success back-btn">
+            <a href="entree_stock.php" class="btn btn-success back-btn">
                 <i class="fas fa-arrow-left me-2"></i>Retour
             </a>
         </div>
@@ -269,13 +239,8 @@ $interventions = getInterventions($connexion);
             allowClear: true
         });
 
-        $('.select2-intervention').select2({
-            placeholder: "Rechercher une intervention...",
-            allowClear: true
-        });
-
         // Définir la date du jour par défaut
-        $('#date_sortie').val(new Date().toISOString().substr(0, 10));
+        $('#date_entree').val(new Date().toISOString().substr(0, 10));
 
         // Gérer le changement d'article
         $('#article_id').change(function() {
@@ -283,13 +248,6 @@ $interventions = getInterventions($connexion);
             $('#nom_article').val(selectedOption.data('nom') || '');
             $('#reference_article').val(selectedOption.data('reference') || '');
             $('#description_article').val(selectedOption.data('description') || '');
-        });
-
-        // Gérer le changement d'intervention
-        $('#intervention_id').change(function() {
-            const selectedOption = $(this).find('option:selected');
-            $('#description_intervention').val(selectedOption.data('description') || '');
-            $('#resultat_intervention').val(selectedOption.data('resultat') || '');
         });
     });
     </script>
@@ -303,7 +261,7 @@ $interventions = getInterventions($connexion);
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Sortie enregistrée avec succès !
+                    Entrèe enregistrée avec succès !
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-info" data-bs-dismiss="modal">Fermer</button>

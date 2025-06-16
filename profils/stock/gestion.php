@@ -161,7 +161,7 @@ include('../../activite.php');
                 </a>
             </div>
             <div class="col-md-3 col-6">
-                <a href="nouvelle_entree.php" class="text-decoration-none">
+                <a href="entree_stock.php" class="text-decoration-none">
                     <div class="action-card">
                         <div class="action-icon text-success">
                             <i class="fas fa-arrow-down"></i>
@@ -205,14 +205,14 @@ include('../../activite.php');
                 <div class="stat-card success">
                     <p class="stat-title">Entrées ce mois</p>
                     <h2 class="stat-value"><?= entreesMois($connexion) ?></h2>
-                    <a href="entrees.php" class="btn btn-sm btn-outline-success">Voir détails</a>
+                    <a href="entree_stock.php" class="btn btn-sm btn-outline-success">Voir détails</a>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="stat-card warning">
                     <p class="stat-title">Sorties ce mois</p>
                     <h2 class="stat-value"><?= sortiesMois($connexion) ?></h2>
-                    <a href="sorties.php" class="btn btn-sm btn-outline-warning">Voir détails</a>
+                    <a href="sortie_stock.php" class="btn btn-sm btn-outline-warning">Voir détails</a>
                 </div>
             </div>
         </div>

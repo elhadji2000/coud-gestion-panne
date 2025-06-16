@@ -9,8 +9,8 @@ include('../../traitement/fonction.php');
 include('../../traitement/requete.php');
 include('../../activite.php');
 
-// Récupérer la liste des articles
-$articles = listeArticles($connexion);
+// Récupérer la liste des entrées
+$entrees = listeEntrees($connexion);
 ?>
 
 <!DOCTYPE html>
@@ -19,7 +19,7 @@ $articles = listeArticles($connexion);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des Articles | Stock</title>
+    <title>Gestion des Entrées | Stock</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -63,6 +63,7 @@ $articles = listeArticles($connexion);
         padding: 0.5rem 1.25rem;
         border-radius: 6px;
         font-weight: 500;
+        border: none;
     }
 
     .btn-add:hover {
@@ -75,6 +76,7 @@ $articles = listeArticles($connexion);
         border-radius: 8px;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         padding: 1.5rem;
+        overflow-x: auto;
     }
 
     .table th {
@@ -82,31 +84,31 @@ $articles = listeArticles($connexion);
         font-weight: 600;
         color: var(--secondary);
         border-bottom-width: 1px;
+        white-space: nowrap;
         font-size: 1.2rem;
     }
     .table td {
         font-size: 1.2rem;
     }
 
-    .badge-stock {
-        padding: 0.35rem 0.65rem;
-        font-weight: 500;
-        border-radius: 4px;
-    }
-
-    .badge-low {
-        background-color: #fff3cd;
-        color: #856404;
-    }
-
-    .badge-ok {
-        background-color: #d4edda;
-        color: #155724;
-    }
-
     .action-btn {
         padding: 0.25rem 0.5rem;
         font-size: 0.875rem;
+        margin-right: 0.25rem;
+    }
+
+    .search-filter {
+        background: white;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    @media (max-width: 768px) {
+        .table-responsive {
+            border: none;
+        }
     }
     </style>
 </head>
@@ -117,16 +119,16 @@ $articles = listeArticles($connexion);
     <!-- En-tête de page -->
     <div class="page-header">
         <div class="container">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div class="mb-2 mb-md-0">
                     <h1 class="page-title">
-                        <i class="fas fa-boxes me-2"></i>Gestion des Articles
+                        <i class="fas fa-box me-2"></i>Gestion des Entrées
                     </h1>
-                    <p class="text-muted mb-0">Liste complète des articles</p>
+                    <p class="text-muted mb-0">Historique des entrées en stock</p>
                 </div>
                 <div>
-                    <a href="nouvel_article.php" class="btn btn-add">
-                        <i class="fas fa-plus me-2"></i>Nouvel Article
+                    <a href="nouvelle_entree.php" class="btn btn-add">
+                        <i class="fas fa-plus me-2"></i>Nouvelle Entrée
                     </a>
                 </div>
             </div>
@@ -135,30 +137,32 @@ $articles = listeArticles($connexion);
 
     <!-- Contenu principal -->
     <div class="container mb-5">
+
+        <!-- Tableau des entrées -->
         <div class="table-container">
-            <table id="articlesTable" class="table table-hover" style="width:100%">
+            <table id="entreesTable" class="table table-hover" style="width:100%">
                 <thead>
                     <tr>
-                        <th>N°</th>
+                        <th>N° Entrée</th>
+                        <th>Date</th>
                         <th>Référence</th>
-                        <th>Désignation</th>
-                        <th>nom</th>
-                        <th>Categorie</th>
+                        <th>Article</th>
+                        <th>Quantité</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach($articles as $article): ?>
+                    <?php foreach($entrees as $entree): ?>
                     <tr>
-                        <td><?= htmlspecialchars($article['id']) ?></td>
-                        <td><?= htmlspecialchars($article['references']) ?></td>
-                        <td><?= htmlspecialchars($article['description']) ?></td>
-                        <td><?= htmlspecialchars($article['nom']) ?></td>
-                        <td><?= htmlspecialchars($article['categorie']) ?></td>
+                        <td><?= htmlspecialchars($entree['id']) ?></td>
+                        <td><?= date('d/m/Y', strtotime($entree['date_entree'])) ?></td>
+                        <td><?= htmlspecialchars($entree['references']) ?></td>
+                        <td><?= htmlspecialchars($entree['article']) ?></td>
+                        <td><?= htmlspecialchars($entree['quantite']) ?></td>
                         <td>
-                            <a href="../../traitement/supprimer_article.php?id=<?= $article['id'] ?>"
+                            <a href="supprimer_entree.php?id=<?= $entree['entree_id'] ?>"
                                 class="btn btn-sm btn-outline-danger action-btn" title="Supprimer"
-                                onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?')">
+                                onclick="return confirm('Confirmer la suppression ?')">
                                 <i>supprimer</i>
                             </a>
                         </td>
@@ -174,6 +178,17 @@ $articles = listeArticles($connexion);
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+    $(document).ready(function() {
+        $('#entreesTable').DataTable({
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/fr-FR.json'
+            },
+            order: [[1, 'desc']]
+        });
+    });
+    </script>
 
     <?php include('../../footer.php'); ?>
 </body>

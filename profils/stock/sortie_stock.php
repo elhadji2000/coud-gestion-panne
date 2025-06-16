@@ -85,6 +85,10 @@ $sorties = listeSorties($connexion);
         color: var(--secondary);
         border-bottom-width: 1px;
         white-space: nowrap;
+        font-size: 1.2rem;
+    }
+    .table td {
+        font-size: 1.2rem;
     }
 
     .badge-status {
@@ -158,7 +162,7 @@ $sorties = listeSorties($connexion);
 
         <!-- Tableau des sorties -->
         <div class="table-container">
-            <table id="sortiesTable" class="table table-hover" style="width:100%">
+            <table id="entreesTable" class="table table-hover" style="width:100%">
                 <thead>
                     <tr>
                         <th>N° Sortie</th>
@@ -172,7 +176,7 @@ $sorties = listeSorties($connexion);
                 <tbody>
                     <?php foreach($sorties as $sortie): ?>
                     <tr>
-                        <td><?= htmlspecialchars($sortie['sortie_id']) ?></td>
+                        <td><?= htmlspecialchars($sortie['id']) ?></td>
                         <td><?= date('d/m/Y', strtotime($sortie['date_sortie'])) ?></td>
                         <td><?= htmlspecialchars($sortie['references']) ?></td>
                         <td><?= htmlspecialchars($sortie['article']) ?></td>
@@ -191,11 +195,22 @@ $sorties = listeSorties($connexion);
         </div>
     </div>
 
-    <!-- Scripts -->
+  <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+    $(document).ready(function() {
+        $('#entreesTable').DataTable({
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/fr-FR.json'
+            },
+            order: [[1, 'desc']]
+        });
+    });
+    </script>
 
     <?php include('../../footer.php'); ?>
 </body>

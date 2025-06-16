@@ -1007,6 +1007,18 @@ function enregistrerSortie($connexion, $article_id, $intervention_id, $quantite,
 
     return false;
 }
+function enregistrerEntree($connexion, $article_id, $quantite, $date_entree, $remarque){
+     $sql = "INSERT INTO entree_stock (article_id, quantite, date_entree, remarque) 
+            VALUES (?, ?, ?, ?)";
+
+    $stmt = mysqli_prepare($connexion, $sql);
+    if ($stmt) {
+        mysqli_stmt_bind_param($stmt, "iiss", $article_id, $quantite, $date_entree, $remarque);
+        return mysqli_stmt_execute($stmt);
+    }
+
+    return false;
+}
 function enregistrerArticles($connexion, $nom, $categorie, $description, $references) {
     $sql = "INSERT INTO articles (nom, categorie, description, `references`) 
             VALUES (?, ?, ?, ?)";
@@ -1023,8 +1035,10 @@ function enregistrerArticles($connexion, $nom, $categorie, $description, $refere
 
 function listeSorties($connexion) {
     $sql = "SELECT 
-    s.id AS sortie_id,
+    s.id AS id,
     a.nom AS article,
+    a.id AS article_id,
+    i.resultat AS intervention,
     a.references,
     s.quantite,
     s.date_sortie,
@@ -1044,4 +1058,99 @@ ORDER BY s.date_sortie DESC;
     }
     
     return $stocks;
+}
+function listeEntrees($connexion) {
+    $sql = "SELECT 
+    s.id AS id,
+    a.nom AS article,
+    a.id AS article_id,
+    a.references,
+    s.quantite,
+    s.date_entree,
+    s.remarque
+FROM entree_stock s
+JOIN articles a ON s.article_id = a.id
+ORDER BY s.date_entree DESC;
+";
+    
+    $result = mysqli_query($connexion, $sql);
+    $stocks = [];
+    
+    while ($row = mysqli_fetch_assoc($result)) {
+        $stocks[] = $row;
+    }
+    
+    return $stocks;
+}
+
+function getStatsGlobales($connexion) {
+    $stats = [
+        'total_entrees' => 0,
+        'total_sorties' => 0,
+        'total_articles' => 0,
+        'total_mouvements' => 0
+    ];
+
+    // Total des entrées
+    $query = "SELECT SUM(quantite) as total FROM entree_stock";
+    $result = $connexion->query($query);
+    if ($result && $row = $result->fetch_assoc()) {
+        $stats['total_entrees'] = $row['total'] ?? 0;
+    }
+
+    // Total des sorties
+    $query = "SELECT SUM(quantite) as total FROM sortie_stock";
+    $result = $connexion->query($query);
+    if ($result && $row = $result->fetch_assoc()) {
+        $stats['total_sorties'] = $row['total'] ?? 0;
+    }
+
+    // Total des articles
+    $query = "SELECT COUNT(*) as total FROM articles";
+    $result = $connexion->query($query);
+    if ($result && $row = $result->fetch_assoc()) {
+        $stats['total_articles'] = $row['total'] ?? 0;
+    }
+
+    // Total des mouvements
+    $stats['total_mouvements'] = $stats['total_entrees'] + $stats['total_sorties'];
+
+    return $stats;
+}
+
+function getStatsArticle($connexion, $article_id) {
+    $stats = [
+        'stock_initial' => 0,
+        'total_entrees' => 0,
+        'total_sorties' => 0,
+        'stock_actuel' => 0
+    ];
+
+    // Stock initial (vous devrez peut-être adapter cette partie selon votre logique)
+    $stats['stock_initial'] = 0; // À remplacer par votre logique de stock initial
+
+    // Total des entrées pour cet article
+    $query = "SELECT SUM(quantite) as total FROM entree_stock WHERE article_id = ?";
+    $stmt = $connexion->prepare($query);
+    $stmt->bind_param("i", $article_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($row = $result->fetch_assoc()) {
+        $stats['total_entrees'] = $row['total'] ?? 0;
+    }
+
+    // Total des sorties pour cet article
+    $query = "SELECT SUM(quantite) as total FROM sortie_stock WHERE article_id = ?";
+    $stmt = $connexion->prepare($query);
+    $stmt->bind_param("i", $article_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($row = $result->fetch_assoc()) {
+        $stats['total_sorties'] = $row['total'] ?? 0;
+    }
+
+    // Stock actuel
+    $stats['stock_actuel'] = $stats['stock_initial'] + $stats['total_entrees'] - $stats['total_sorties'];
+
+    return $stats;
 }

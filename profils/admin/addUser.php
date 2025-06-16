@@ -89,7 +89,7 @@ if ($user_id) {
         border-radius: 6px;
         border: 1px solid #ced4da;
         transition: all 0.3s;
-        font-size: 1.6rem;
+        font-size: 1.2rem;
     }
 
     .form-control:focus,

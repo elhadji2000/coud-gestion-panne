@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : jeu. 12 juin 2025 à 00:43
+-- Généré le : lun. 16 juin 2025 à 16:05
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -20,6 +20,30 @@ SET time_zone = "+00:00";
 --
 -- Base de données : `supercoud_panne`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `articles`
+--
+
+CREATE TABLE `articles` (
+  `id` int(11) NOT NULL,
+  `nom` varchar(100) NOT NULL,
+  `description` text DEFAULT NULL,
+  `date_creation` datetime DEFAULT current_timestamp(),
+  `references` varchar(100) DEFAULT NULL,
+  `categorie` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `articles`
+--
+
+INSERT INTO `articles` (`id`, `nom`, `description`, `date_creation`, `references`, `categorie`) VALUES
+(1, 'chaisse', 'les chaisse de bureau', '2025-06-12 15:17:46', 'chbr11', 'Menuiserie bois'),
+(2, 'seau', 'asdf', '2025-06-13 10:57:20', 'sett23-66', 'Peinture'),
+(3, 'ordinateur', 'ordinateur de bureau', '2025-06-16 10:25:36', 'hp-2309A', 'Électricité');
 
 -- --------------------------------------------------------
 
@@ -9746,6 +9770,29 @@ INSERT INTO `codif_lit_complet` (`id_lit`, `pavillon`, `chambre`, `lit`, `campus
 -- --------------------------------------------------------
 
 --
+-- Structure de la table `entree_stock`
+--
+
+CREATE TABLE `entree_stock` (
+  `id` int(11) NOT NULL,
+  `article_id` int(11) NOT NULL,
+  `quantite` int(11) NOT NULL,
+  `date_entree` date NOT NULL,
+  `remarque` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `entree_stock`
+--
+
+INSERT INTO `entree_stock` (`id`, `article_id`, `quantite`, `date_entree`, `remarque`, `created_at`, `updated_at`) VALUES
+(1, 3, 12, '2025-06-16', 'aaaaaaaaaaa', '2025-06-16 11:18:17', '2025-06-16 11:18:17');
+
+-- --------------------------------------------------------
+
+--
 -- Structure de la table `imputation`
 --
 
@@ -9843,6 +9890,29 @@ INSERT INTO `panne` (`id`, `type_panne`, `date_enregistrement`, `description`, `
 -- --------------------------------------------------------
 
 --
+-- Structure de la table `sortie_stock`
+--
+
+CREATE TABLE `sortie_stock` (
+  `id` int(11) NOT NULL,
+  `article_id` int(11) NOT NULL,
+  `intervention_id` int(11) NOT NULL,
+  `quantite` int(11) NOT NULL,
+  `date_sortie` datetime DEFAULT current_timestamp(),
+  `remarque` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `sortie_stock`
+--
+
+INSERT INTO `sortie_stock` (`id`, `article_id`, `intervention_id`, `quantite`, `date_sortie`, `remarque`) VALUES
+(1, 1, 13, 4, '2025-06-12 15:49:52', 'travail fait'),
+(2, 1, 13, 3, '2025-06-13 00:00:00', 'aaaaaaaaaaa');
+
+-- --------------------------------------------------------
+
+--
 -- Structure de la table `utilisateur`
 --
 
@@ -9885,11 +9955,24 @@ INSERT INTO `utilisateur` (`id`, `username`, `password`, `statut`, `email`, `tel
 --
 
 --
+-- Index pour la table `articles`
+--
+ALTER TABLE `articles`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Index pour la table `codif_lit_complet`
 --
 ALTER TABLE `codif_lit_complet`
   ADD PRIMARY KEY (`id_lit`),
   ADD UNIQUE KEY `lit` (`lit`);
+
+--
+-- Index pour la table `entree_stock`
+--
+ALTER TABLE `entree_stock`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `article_id` (`article_id`);
 
 --
 -- Index pour la table `imputation`
@@ -9924,6 +10007,14 @@ ALTER TABLE `panne`
   ADD KEY `id_chef_residence` (`id_chef_residence`);
 
 --
+-- Index pour la table `sortie_stock`
+--
+ALTER TABLE `sortie_stock`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `article_id` (`article_id`),
+  ADD KEY `intervention_id` (`intervention_id`);
+
+--
 -- Index pour la table `utilisateur`
 --
 ALTER TABLE `utilisateur`
@@ -9934,10 +10025,22 @@ ALTER TABLE `utilisateur`
 --
 
 --
+-- AUTO_INCREMENT pour la table `articles`
+--
+ALTER TABLE `articles`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT pour la table `codif_lit_complet`
 --
 ALTER TABLE `codif_lit_complet`
   MODIFY `id_lit` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9695;
+
+--
+-- AUTO_INCREMENT pour la table `entree_stock`
+--
+ALTER TABLE `entree_stock`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT pour la table `imputation`
@@ -9964,6 +10067,12 @@ ALTER TABLE `panne`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
+-- AUTO_INCREMENT pour la table `sortie_stock`
+--
+ALTER TABLE `sortie_stock`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
 -- AUTO_INCREMENT pour la table `utilisateur`
 --
 ALTER TABLE `utilisateur`
@@ -9972,6 +10081,12 @@ ALTER TABLE `utilisateur`
 --
 -- Contraintes pour les tables déchargées
 --
+
+--
+-- Contraintes pour la table `entree_stock`
+--
+ALTER TABLE `entree_stock`
+  ADD CONSTRAINT `entree_stock_ibfk_1` FOREIGN KEY (`article_id`) REFERENCES `articles` (`id`) ON DELETE CASCADE;
 
 --
 -- Contraintes pour la table `imputation`
@@ -10000,6 +10115,13 @@ ALTER TABLE `observation`
 --
 ALTER TABLE `panne`
   ADD CONSTRAINT `panne_ibfk_1` FOREIGN KEY (`id_chef_residence`) REFERENCES `utilisateur` (`id`);
+
+--
+-- Contraintes pour la table `sortie_stock`
+--
+ALTER TABLE `sortie_stock`
+  ADD CONSTRAINT `sortie_stock_ibfk_1` FOREIGN KEY (`article_id`) REFERENCES `articles` (`id`),
+  ADD CONSTRAINT `sortie_stock_ibfk_2` FOREIGN KEY (`intervention_id`) REFERENCES `intervention` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

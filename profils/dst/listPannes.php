@@ -33,65 +33,87 @@ $allPannes = $result['pannes'];
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
+    :root {
+        --primary: #3498db;
+        --secondary: #2c3e50;
+        --success: #28a745;
+        --light: #f8f9fa;
+    }
+
     body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background-color: #f8f9fa;
-        font-size: 1.05rem;
-        padding: 0;
-        margin: 0;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        background-color: #f8fafc;
+        color: var(--secondary);
     }
 
-    .container-fluid {
-        width: 100%;
-        padding: 2rem;
+    .page-header {
+        background-color: white;
+        padding: 1.5rem 0;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid #e2e8f0;
     }
 
-    .search-container {
-        max-width: 500px;
-        margin: 15px auto;
+    .page-title {
+        font-weight: 600;
+        color: var(--secondary);
+        margin-bottom: 0.5rem;
     }
 
-    .input-group-text,
-    .form-control {
-        padding: 1rem 1rem;
-        font-size: 1.5rem;
+    .btn-add {
+        background-color: var(--success);
+        color: white;
+        padding: 0.5rem 1.25rem;
+        border-radius: 6px;
+        font-weight: 500;
+    }
+
+    .btn-add:hover {
+        background-color: #218838;
+        color: white;
     }
 
     .table-container {
-        background-color: #ffffff;
+        background: white;
         border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         padding: 1.5rem;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        overflow-x: auto;
     }
 
-    .table {
-        width: 100%;
-        margin-bottom: 1.5rem;
-        font-size: 1.1rem;
-        border-collapse: separate;
-        border-spacing: 0;
+    .table th {
+        background-color: #f8fafc;
+        font-weight: 600;
+        color: var(--secondary);
+        border-bottom-width: 1px;
+        font-size: 1.2rem;
     }
-
-    .table th,
     .table td {
-        padding: 1rem 1.25rem;
-        vertical-align: middle;
-        text-align: center;
-        border-top: 1px solid #dee2e6;
-        font-size: 1.5rem;
+        font-size: 1.2rem;
     }
 
-    .table thead th {
-        background-color: #3777B0;
-        color: #ffffff;
+    .badge-stock {
+        padding: 0.35rem 0.65rem;
         font-weight: 500;
-        border-bottom: 2px solid #2c3e50;
+        border-radius: 4px;
+    }
+
+    .badge-low {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .badge-ok {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .action-btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
     }
 
     .badge-urgence {
-        padding: 0.5rem 0.75rem;
-        border-radius: 20px;
+        padding: 0.2rem 0.5rem;
+        border-radius: 10px;
         font-size: 0.95rem;
     }
 
@@ -111,8 +133,8 @@ $allPannes = $result['pannes'];
     }
 
     .badge-etat {
-        padding: 0.5rem 0.75rem;
-        border-radius: 20px;
+        padding: 0.2rem 0.5rem;
+        border-radius: 10px;
         font-size: 0.95rem;
     }
 
@@ -161,9 +183,9 @@ $allPannes = $result['pannes'];
         </div>
     </div>
 
-    <div class="container-fluid">
+    <div class="container-fluid mb-5">
         <div class="table-container">
-            <table class="table table-hover">
+            <table id="articlesTable" class="table table-hover" style="width:100%">
                 <thead>
                     <tr>
                         <th>N°</th>

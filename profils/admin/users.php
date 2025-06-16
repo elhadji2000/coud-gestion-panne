@@ -17,143 +17,149 @@ $allUsers = allUtilisateurs($connexion);
 <html lang="fr">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Articles | Stock</title>
+
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+
     <style>
-    .search-container {
-        max-width: 600px;
-        margin: 20px auto;
+    :root {
+        --primary: #3498db;
+        --secondary: #2c3e50;
+        --success: #28a745;
+        --light: #f8f9fa;
     }
 
-    .search-box {
-        position: relative;
+    body {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        background-color: #f8fafc;
+        color: var(--secondary);
     }
 
-    #resetSearch {
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        background: transparent;
-        border: none;
-        color: #6c757d;
-        cursor: pointer;
-        display: none;
+    .page-header {
+        background-color: white;
+        padding: 1.5rem 0;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid #e2e8f0;
     }
 
-    #resetSearch:hover {
-        color: #495057;
+    .page-title {
+        font-weight: 600;
+        color: var(--secondary);
+        margin-bottom: 0.5rem;
     }
 
-    .table {
-        width: 100%;
-        margin-bottom: 1.5rem;
-        font-size: 1.1rem;
-        border-collapse: separate;
-        border-spacing: 0;
-    }
-
-    .table th,
-    .table td {
-        padding: 1rem 1.25rem;
-        vertical-align: middle;
-        text-align: center;
-        border-top: 1px solid #dee2e6;
-        font-size: 1.5rem;
-    }
-
-    .table thead th {
-        background-color: #3777B0;
-        color: #ffffff;
+    .btn-add {
+        background-color: var(--success);
+        color: white;
+        padding: 0.5rem 1.25rem;
+        border-radius: 6px;
         font-weight: 500;
-        border-bottom: 2px solid #2c3e50;
     }
 
-    .status-checkbox {
-        transform: scale(1.5);
-        cursor: pointer;
+    .btn-add:hover {
+        background-color: #218838;
+        color: white;
+    }
+
+    .table-container {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        padding: 1.5rem;
+    }
+
+    .table th {
+        background-color: #f8fafc;
+        font-weight: 600;
+        color: var(--secondary);
+        border-bottom-width: 1px;
+        font-size: 1.2rem;
+    }
+    .table td {
+        font-size: 1.2rem;
+    }
+
+    .badge-stock {
+        padding: 0.35rem 0.65rem;
+        font-weight: 500;
+        border-radius: 4px;
+    }
+
+    .badge-low {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .badge-ok {
+        background-color: #d4edda;
+        color: #155724;
     }
 
     .action-btn {
-        padding: 5px 10px;
-        margin: 0 2px;
-    }
-
-    .container-fluid {
-        width: 100%;
-        padding: 2rem;
-    }
-
-    .search-container {
-        max-width: 500px;
-        margin: 15px auto;
-    }
-
-    .input-group-text,
-    .form-control {
-        padding: 1rem 1rem;
-        font-size: 1.5rem;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
     }
     </style>
 </head>
 
 <body>
     <?php include('../../head.php'); ?>
-    <br>
-    <div class="container">
-        <div class="row mb-4">
-            <div class="col-12 text-center">
-                <h1><i class="fas fa-users me-2"></i>Gestion des Utilisateurs</h1>
-            </div>
-        </div>
 
-        <!-- Remplacez la partie recherche dans le body par ce code -->
-        <div class="row mb-4">
-            <div class="col-8">
-                <div class="search-container">
-                    <div class="search-box mx-auto">
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-search"></i></span>
-                            <input type="text" id="searchInput" class="form-control"
-                                placeholder="Rechercher un utilisateur...">
-                            <button id="resetSearch" type="button" class="btn-close" aria-label="Reset"></button>
-                        </div>
-                    </div>
+    <!-- En-tête de page -->
+    <div class="page-header">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="page-title">
+                        <i class="fas fa-users me-2"></i>Gestion des Utilisateurs
+                    </h1>
+                    <p class="text-muted mb-0">Liste complète des Utilisateurs</p>
+                </div>
+                <div>
+                    <a href="addUser.php" class="btn btn-add">
+                        <i class="fas fa-plus me-2"></i>Nouvel Utilisateur
+                    </a>
                 </div>
             </div>
-            <div class="col-3 d-flex justify-content-end search-container">
-            <a href="addUser" class="btn btn-success form-control">
-                <i class="fas fa-plus me-2"></i>Ajouter Utilisateur
-            </a>
-        </div>
         </div>
     </div>
-    <div class="container-fluid">
+
+    <!-- Contenu principal -->
+    <div class="container-fluid mb-5">
         <div class="table-container">
-            <table class="table table-hover">
+            <table id="articlesTable" class="table table-hover" style="width:100%">
                 <thead>
                     <tr>
                         <th>N°</th>
                         <th>Username</th>
-                        <th>Email</th>
-                        <th>Téléphone</th>
+                        <th>email</th>
+                        <th>Telephone</th>
+                        <th>Prenom</th>
                         <th>Nom</th>
-                        <th>Prénom</th>
-                        <th>Profil 1</th>
-                        <th>Profil 2</th>
+                        <th>Profile 1</th>
+                        <th>Profile 2</th>
                         <th>Statut</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
-                <tbody id="usersTable">
-                    <?php foreach ($allUsers as $user): ?>
+                <tbody>
+                    <?php foreach($allUsers as $user): ?>
                     <tr>
                         <td><?= htmlspecialchars($user['id']) ?></td>
                         <td><?= htmlspecialchars($user['username']) ?></td>
                         <td><?= htmlspecialchars($user['email']) ?></td>
                         <td><?= htmlspecialchars($user['telephone']) ?></td>
-                        <td><?= htmlspecialchars(strtoupper($user['nom'])) ?></td>
                         <td><?= htmlspecialchars($user['prenom']) ?></td>
+                        <td><?= htmlspecialchars(strtoupper($user['nom'])) ?></td>
                         <td><?= htmlspecialchars($user['profil1']) ?></td>
                         <td><?= htmlspecialchars($user['profil2']) ?></td>
                         <td>
@@ -164,8 +170,9 @@ $allUsers = allUtilisateurs($connexion);
                         </td>
                         <td>
                             <a href="addUser.php?user_id=<?= htmlspecialchars($user['id']) ?>"
-                                class="btn btn-primary btn-action" title="Modifier">
-                                <i class="fas fa-pencil-alt"></i>
+                                class="btn btn-sm btn-outline-danger action-btn" title="modifier"
+                                onclick="return confirm('Êtes-vous sûr de vouloir modifier cet article ?')">
+                                <i>modifier</i>
                             </a>
                         </td>
                     </tr>
@@ -204,64 +211,64 @@ $allUsers = allUtilisateurs($connexion);
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- Remplacez le script JavaScript par cette version améliorée -->
-<script>
-$(document).ready(function() {
-    const $searchInput = $('#searchInput');
-    const $resetSearch = $('#resetSearch');
-    const $usersTable = $('#usersTable');
-    const $rows = $usersTable.find('tr');
-    
-    // Fonction de recherche
-    function performSearch() {
-        const value = $searchInput.val().toLowerCase().trim();
-        
-        if (value.length > 0) {
-            $resetSearch.show();
-        } else {
-            $resetSearch.hide();
+    <script>
+    $(document).ready(function() {
+        const $searchInput = $('#searchInput');
+        const $resetSearch = $('#resetSearch');
+        const $usersTable = $('#usersTable');
+        const $rows = $usersTable.find('tr');
+
+        // Fonction de recherche
+        function performSearch() {
+            const value = $searchInput.val().toLowerCase().trim();
+
+            if (value.length > 0) {
+                $resetSearch.show();
+            } else {
+                $resetSearch.hide();
+            }
+
+            $rows.each(function() {
+                const $row = $(this);
+                const text = $row.text().toLowerCase();
+                $row.toggle(text.includes(value));
+            });
         }
-        
-        $rows.each(function() {
-            const $row = $(this);
-            const text = $row.text().toLowerCase();
-            $row.toggle(text.includes(value));
+
+        // Recherche en temps réel avec délai
+        let searchTimeout;
+        $searchInput.on('keyup', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(performSearch, 300);
         });
-    }
-    
-    // Recherche en temps réel avec délai
-    let searchTimeout;
-    $searchInput.on('keyup', function() {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(performSearch, 300);
-    });
-    
-    // Réinitialisation de la recherche
-    $resetSearch.on('click', function() {
-        $searchInput.val('').focus();
-        $resetSearch.hide();
-        $rows.show();
-    });
-    
-    // Afficher/masquer le bouton de réinitialisation
-    $searchInput.on('input', function() {
-        if ($(this).val().length > 0) {
-            $resetSearch.show();
-        } else {
+
+        // Réinitialisation de la recherche
+        $resetSearch.on('click', function() {
+            $searchInput.val('').focus();
             $resetSearch.hide();
-        }
+            $rows.show();
+        });
+
+        // Afficher/masquer le bouton de réinitialisation
+        $searchInput.on('input', function() {
+            if ($(this).val().length > 0) {
+                $resetSearch.show();
+            } else {
+                $resetSearch.hide();
+            }
+        });
+
+        // Gestion des checkboxes de statut
+        $('.change-status').on('change', function() {
+            const isChecked = $(this).is(':checked');
+            const userId = $(this).data('user-id');
+
+            $('#statusActionText').text(isChecked ? 'activer' : 'désactiver');
+            $('#statusUserIdInput').val(userId);
+            $('#newStatusInput').val(isChecked ? 1 : 0);
+        });
     });
-    
-    // Gestion des checkboxes de statut
-    $('.change-status').on('change', function() {
-        const isChecked = $(this).is(':checked');
-        const userId = $(this).data('user-id');
-        
-        $('#statusActionText').text(isChecked ? 'activer' : 'désactiver');
-        $('#statusUserIdInput').val(userId);
-        $('#newStatusInput').val(isChecked ? 1 : 0);
-    });
-});
-</script>
+    </script>
 
     <?php include('../../footer.php'); ?>
 </body>

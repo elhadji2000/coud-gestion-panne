@@ -32,7 +32,7 @@ if (!empty($_GET['username_user']) && !empty($_GET['password_user'])) {
             header('Location: /COUD/panne/profils/dasboard.php');
             exit();
         }else if ($row['profil1'] == 'admin') {
-            header('Location: /COUD/panne/profils/admin/users.php');
+            header('Location: /COUD/panne/profils/dasboard.php');
             exit();
         }else if ($row['profil1'] == 'section') {
             header('Location: /COUD/panne/profils/dasboard.php');
