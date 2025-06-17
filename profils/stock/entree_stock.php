@@ -160,7 +160,7 @@ $entrees = listeEntrees($connexion);
                         <td><?= htmlspecialchars($entree['article']) ?></td>
                         <td><?= htmlspecialchars($entree['quantite']) ?></td>
                         <td>
-                            <a href="supprimer_entree.php?id=<?= $entree['entree_id'] ?>"
+                            <a href="supprimer_entree.php?id=<?= $entree['id'] ?>"
                                 class="btn btn-sm btn-outline-danger action-btn" title="Supprimer"
                                 onclick="return confirm('Confirmer la suppression ?')">
                                 <i>supprimer</i>

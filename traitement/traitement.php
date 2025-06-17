@@ -56,32 +56,47 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'POST' &&
 //#################################### FIN Enregister une Observation #####################################################
 
 //#################################### DEBUT Enregister une Intervention #####################################################
-elseif ($_SERVER['REQUEST_METHOD'] == 'POST' &&
-    isset($_POST['agent']) && isset($_POST['details']) &&
-    isset($_POST['idPanne']) && isset($_POST['date_intervention']) && isset($_POST['intervention_id']) ) {
+elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Vérification de la présence des champs nécessaires
+    if (
+        isset($_POST['agent'], $_POST['details'], $_POST['idPanne'], $_POST['date_intervention'])
+    ) {
+        // Sécurisation des données
+        $personne_agent = trim($_POST['agent']);
+        $description_action = trim($_POST['details']);
+        $id_chef_atelier = $_SESSION['id_user'] ?? null;
+        $id_panne = (int) $_POST['idPanne'];
+        $intervention_id = isset($_POST['intervention_id']) && is_numeric($_POST['intervention_id']) && $_POST['intervention_id'] > 0
+            ? (int) $_POST['intervention_id']
+            : null;
 
-    $personne_agent = $_POST['agent'];
-    $description_action = $_POST['details'];
-    $id_chef_atelier = $_SESSION['id_user'];
-    $id_panne = $_POST['idPanne'];
-    $date_intervention = $_POST['date_intervention'];
-    // Convertir la date au format français
-    $date_intervention = date('d/m/Y', strtotime($date_intervention));
+        // Gestion des dates (convertir la date reçue en format MySQL : YYYY-MM-DD)
+        $date_intervention = date('d/m/Y', strtotime($date_intervention));
+        $date_sys = date('d/m/Y');
 
-    $intervention_id = isset($_POST['intervention_id']) ? $_POST['intervention_id'] : null;
-    $date_sys = date('d/m/Y');
+        $resultat = "en cours";
 
+        // Création ou mise à jour ?
+        $isCreation = is_null($intervention_id);
 
-    $resultat = "en cours";
+        // Exécution de la requête selon le cas
+        $success = $isCreation
+            ? enregistrerIntervention($connexion, $date_intervention, $description_action, $personne_agent, $date_sys, $resultat, $id_chef_atelier, $id_panne)
+            : updateIntervention($connexion, $date_intervention, $description_action, $personne_agent, $date_sys, $resultat, $id_chef_atelier, $id_panne, $intervention_id);
 
-    if ( enregistrerIntervention($connexion, $date_intervention, $description_action, $personne_agent, $date_sys, $resultat, $id_chef_atelier, $id_panne, $intervention_id)) {
-        header('Location: /COUD/panne/profils/dst/listPannes');
+        // Redirection
+        if ($success) {
+            header('Location: /COUD/panne/profils/dst/listPannes');
+        } else {
+            header('Location: /COUD/panne/profils/dst/intervention');
+        }
         exit();
     } else {
-        header('Location: /COUD/panne/profils/dst/intervention');
-        exit();
+        // Champs manquants
+        echo "Erreur : Tous les champs requis ne sont pas remplis.";
     }
 }
+
 //#################################### FIN Enregister une Intervention #####################################################
 
 //########################## pour supprimer Intervention ######################################################
@@ -124,26 +139,38 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['panneDelete'])) {
 // ##################################################################################################
 
 //########################### pour Enregistrer une Imputation #######################################
-elseif ($_SERVER['REQUEST_METHOD'] == 'POST' &&
-    isset($_POST['idPanne']) && isset($_POST['instruction']) &&
-    isset($_POST['userId']) && isset($_POST['imputation_id']) && isset($_POST['type_panne'])) {
+elseif ($_SERVER['REQUEST_METHOD'] === 'POST' &&
+    isset($_POST['idPanne'], $_POST['instruction'], $_POST['userId'], $_POST['type_panne'], $_POST['imputation_id'])) {
 
-    $idChefDst = $_POST['userId'];
-    $instruction = $_POST['instruction'];
-    $idPanne = $_POST['idPanne'];
-    $type_panne = $_POST['type_panne'];
-    $imputationId = isset($_POST['imputation_id']) ? $_POST['imputation_id'] : null;
+    $idPanne = (int) $_POST['idPanne'];
+    $idChefDst = (int) $_POST['userId'];
+    $instruction = trim($_POST['instruction']);
+    $type_panne = htmlspecialchars($_POST['type_panne']);
     $dateImputation = date('d/m/Y');
     $resultat = "imputer";
 
-    if (enregistrerImputation($connexion, $idPanne, $idChefDst, $instruction, $resultat, $dateImputation, $imputationId)) {
-        header('Location: /COUD/panne/profils/dst/listPannes?success=2&type_panne='. $type_panne);
-        exit();
-    } else {
-        header('Location: /COUD/panne/profils/dst/imputation');
+    // Vérifie que imputation_id est défini et numérique
+    $imputationId = null;
+    if (!empty($_POST['imputation_id']) && is_numeric($_POST['imputation_id'])) {
+        $imputationId = (int) $_POST['imputation_id'];
+    }
+
+    try {
+        $success = enregistrerImputation($connexion, $idPanne, $idChefDst, $instruction, $resultat, $dateImputation, $imputationId);
+
+        if ($success) {
+            header("Location: /COUD/panne/profils/dst/listPannes?success=2&type_panne=" . urlencode($type_panne));
+            exit();
+        } else {
+            throw new Exception("Échec de l'enregistrement de l'imputation.");
+        }
+    } catch (Exception $e) {
+        // Tu peux enregistrer l’erreur dans un log ici si besoin
+        header("Location: /COUD/panne/profils/dst/imputation?error=" . urlencode($e->getMessage()));
         exit();
     }
-}
+} 
+
 //########################### FIN Enregistrer une Imputation #######################################
 //############### pour supprimer imputation ##################################
 
@@ -219,7 +246,7 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'POST' &&
 
 //############### pour supprimer Utilisateur ##################################
 elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['action']) && $_POST['action'] === 'changeUserStatus') {
+    if (isset($_POST['action']) && $_POST['action'] == 'changeUserStatus') {
         $userId = $_POST['userStatusChange'];
         $newStatus = $_POST['newStatus'];
 

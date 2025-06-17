@@ -137,7 +137,7 @@ include('../../activite.php');
         <div class="container">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <h1 class="dashboard-title">Tableau de Bord</h1>
+                    <h1 class="dashboard-title">Gestion de Stock</h1>
                     <p class="dashboard-subtitle mb-0">Résumé de votre activité</p>
                 </div>
                 <div class="date-badge">

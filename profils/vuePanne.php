@@ -244,7 +244,7 @@ $pannes = obtenirPanneParId($connexion, $idPanne);
                     </div>
                 </div>
                 
-                <?php if ($_SESSION['profil'] == 'sem'): ?>
+                <?php if ($_SESSION['profil'] == 'dst'): ?>
                 <div class="row mt-4">
                     <div class="col-12 text-end">
                         <button class="btn btn-primary action-btn" 
@@ -441,7 +441,7 @@ $pannes = obtenirPanneParId($connexion, $idPanne);
                 }
             }
         }
-        if (userRoles === 'sem') {
+        if (userRoles === 'dst') {
             // Comportement pour les autres rôles
             if (resultat == 'en cours' || resultat == 'depanner') {
                 showInterventionModal();

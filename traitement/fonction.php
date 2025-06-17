@@ -497,8 +497,35 @@ function allPannes($connexion, $page = 1, $limit = 10, $profil2 = null, $search 
 // ###############       FIN DE LA FONCTION      ####################
 
 //######################### DEBUT la fonction pour enregistrer des interventions ####################################
-function enregistrerIntervention($connexion, $date_intervention, $description_action, $personne_agent, $date_sys, $resultat, $id_chef_atelier, $id_panne, $intervention_id = null) {
-    if ($intervention_id) {
+function enregistrerIntervention($connexion, $date_intervention, $description_action, $personne_agent, $date_sys, $resultat, $id_chef_atelier, $id_panne) {
+    // Requête d'insertion pour ajouter une nouvelle intervention
+    $sql = "
+        INSERT INTO Intervention (date_intervention, date_sys, description_action, resultat, personne_agent, id_chef_atelier, id_panne)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    ";
+
+    // Préparer la requête
+    $stmt = $connexion->prepare($sql);
+
+    if (!$stmt) {
+        error_log("Erreur de préparation : " . $connexion->error);
+        return false;
+    }
+
+    // Lier les paramètres
+    $stmt->bind_param('sssssii', $date_intervention, $date_sys, $description_action, $resultat, $personne_agent, $id_chef_atelier, $id_panne);
+
+    // Exécuter la requête
+    if ($stmt->execute()) {
+        return $stmt->insert_id; // Retourne l'ID de l'intervention créée
+    } else {
+        error_log("Erreur d'exécution : " . $stmt->error);
+        return false;
+    }
+}
+
+
+function updateIntervention($connexion, $date_intervention, $description_action, $personne_agent, $date_sys, $resultat, $id_chef_atelier, $id_panne, $intervention_id) {
         // Requête de mise à jour pour modifier uniquement les champs spécifiés
         $sql = "
             UPDATE Intervention
@@ -511,19 +538,7 @@ function enregistrerIntervention($connexion, $date_intervention, $description_ac
 
         // Lier les paramètres
         $stmt->bind_param('sssi', $date_intervention, $description_action, $personne_agent, $intervention_id);
-    } else {
-        // Requête d'insertion pour ajouter une nouvelle intervention
-        $sql = "
-            INSERT INTO Intervention (date_intervention, date_sys, description_action, resultat, personne_agent, id_chef_atelier, id_panne)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        ";
-
-        // Préparer la requête
-        $stmt = $connexion->prepare($sql);
-
-        // Lier les paramètres
-        $stmt->bind_param('sssssii', $date_intervention, $date_sys, $description_action, $resultat, $personne_agent, $id_chef_atelier, $id_panne);
-    }
+     
 
     // Exécuter la requête
     if ($stmt->execute()) {
@@ -540,55 +555,55 @@ function enregistrerIntervention($connexion, $date_intervention, $description_ac
 
 //######################### DEBUT la fonction pour enregistrer des Imputation ####################################
 function enregistrerImputation($connexion, $idPanne, $idChefDst, $instruction, $resultat, $dateImputation, $imputationId = null) {
-    if ($imputationId != null) {
-        // Préparer la requête de mise à jour pour le champ instruction uniquement
+    // Vérification préalable des types attendus
+    if (!is_int($idPanne) || !is_int($idChefDst)) {
+        throw new InvalidArgumentException("idPanne et idChefDst doivent être des entiers.");
+    }
+
+    if (!is_string($instruction) || !is_string($resultat) || !is_string($dateImputation)) {
+        throw new InvalidArgumentException("instruction, resultat et dateImputation doivent être des chaînes de caractères.");
+    }
+
+    // Si un ID d'imputation est fourni et valide (entier > 0), on met à jour uniquement l'instruction
+    if (!empty($imputationId) && is_numeric($imputationId) && $imputationId > 0) {
+        $imputationId = (int)$imputationId;
+
         $sql = "UPDATE Imputation SET instruction = ? WHERE id = ?";
 
-        // Préparer la requête
         $stmt = $connexion->prepare($sql);
-
-        // Vérifier si la préparation de la requête a échoué
         if ($stmt === false) {
             throw new Exception('Échec de la préparation de la requête : ' . $connexion->error);
         }
 
-        // Lier les paramètres
         $stmt->bind_param('si', $instruction, $imputationId);
 
-        // Exécuter la requête
         if ($stmt->execute() === false) {
-            throw new Exception('Échec de l\'exécution de la requête : ' . $stmt->error);
+            throw new Exception('Échec de l\'exécution de la requête UPDATE : ' . $stmt->error);
         }
 
-        // Fermer la requête
         $stmt->close();
         return true;
-    } 
-
-    // Préparer la requête d'insertion
-    $sql = "INSERT INTO Imputation (id_panne, id_chef_dst, instruction, resultat, date_imputation) VALUES (?, ?, ?, ?, ?)";
-
-    // Préparer la requête
-    $stmt = $connexion->prepare($sql);
-
-    // Vérifier si la préparation de la requête a échoué
-    if ($stmt === false) {
-        throw new Exception('Échec de la préparation de la requête : ' . $connexion->error);
     }
 
-    // Lier les paramètres
+    // Sinon, on procède à une insertion
+    $sql = "INSERT INTO Imputation (id_panne, id_chef_dst, instruction, resultat, date_imputation) 
+            VALUES (?, ?, ?, ?, ?)";
+
+    $stmt = $connexion->prepare($sql);
+    if ($stmt === false) {
+        throw new Exception('Échec de la préparation de la requête INSERT : ' . $connexion->error);
+    }
+
     $stmt->bind_param('iisss', $idPanne, $idChefDst, $instruction, $resultat, $dateImputation);
 
-    // Exécuter la requête
     if ($stmt->execute() === false) {
-        throw new Exception('Échec de l\'exécution de la requête : ' . $stmt->error);
+        throw new Exception('Échec de l\'exécution de la requête INSERT : ' . $stmt->error);
     }
 
-    // Fermer la requête
     $stmt->close();
-
-    return true; // Retourner vrai si l'insertion a réussi
+    return true;
 }
+
 //######################### FIN la fonction pour enregistrer des Imputation ####################################
 
 // ####################### supprimer imputation ######################################################
@@ -1153,4 +1168,40 @@ function getStatsArticle($connexion, $article_id) {
     $stats['stock_actuel'] = $stats['stock_initial'] + $stats['total_entrees'] - $stats['total_sorties'];
 
     return $stats;
+}
+
+// Fonction pour récupérer un article par son ID
+function getArticleById($connexion, $id) {
+    $query = "SELECT * FROM articles WHERE id = ?";
+    $stmt = $connexion->prepare($query);
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_assoc();
+}
+
+// Fonction pour modifier un article
+function modifierArticle($connexion, $id, $nom, $categorie, $description, $reference) {
+    $query = "UPDATE articles SET nom = ?, categorie = ?, description = ?, `references` = ? WHERE id = ?";
+    $stmt = $connexion->prepare($query);
+    $stmt->bind_param("ssssi", $nom, $categorie, $description, $reference, $id);
+    return $stmt->execute();
+}
+function supprimerArticle($connexion, $id) {
+    // Vérifier d'abord si l'article existe
+    $check = "SELECT id FROM articles WHERE id = ?";
+    $stmt = $connexion->prepare($check);
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $stmt->store_result();
+    
+    if ($stmt->num_rows === 0) {
+        return false; // Article non trouvé
+    }
+    
+    // Si l'article existe, procéder à la suppression
+    $query = "DELETE FROM articles WHERE id = ?";
+    $stmt = $connexion->prepare($query);
+    $stmt->bind_param("i", $id);
+    return $stmt->execute();
 }

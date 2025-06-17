@@ -10,10 +10,45 @@ include('../../traitement/fonction.php');
 include('../../traitement/requete.php');
 include('../../activite.php');
 
+if ($_SERVER['REQUEST_METHOD'] === 'GET' &&
+    isset($_GET['idPanne'], $_GET['instruction'], $_GET['userId'], $_GET['type_panne'], $_GET['imputation_id'])) {
+
+    $idPanne = (int) $_GET['idPanne'];
+    $idChefDst = (int) $_GET['userId'];
+    $instruction = trim($_GET['instruction']);
+    $type_panne = htmlspecialchars($_GET['type_panne']);
+    $dateImputation = date('d/m/Y');
+    $resultat = "imputer";
+
+    // Vérifie que imputation_id est défini et numérique
+    $imputationId = null;
+    if (!empty($_GET['imputation_id']) && is_numeric($_GET['imputation_id'])) {
+        $imputationId = (int) $_GET['imputation_id'];
+    }
+
+    try {
+        $success = enregistrerImputation($connexion, $idPanne, $idChefDst, $instruction, $resultat, $dateImputation, $imputationId);
+
+        if ($success) {
+            header("Location: /COUD/panne/profils/dst/listPannes?success=2&type_panne=" . urlencode($type_panne));
+            exit();
+        } else {
+            throw new Exception("Échec de l'enregistrement de l'imputation.");
+        }
+    } catch (Exception $e) {
+        // Tu peux enregistrer l’erreur dans un log ici si besoin
+        header("Location: /COUD/panne/profils/dst/imputation?error=" . urlencode($e->getMessage()));
+        exit();
+    }
+} 
+
 $idPanne = isset($_GET['idPanne']) ? (int)$_GET['idPanne'] : null;
 $type_panne = isset($_GET['type']) ? $_GET['type'] : null;
 $userId = $_SESSION['id_user'];
-$imputation_id = isset($_GET['imputation_id']) ? (int)$_GET['imputation_id'] : null;
+$imputation_id = $_GET['imputation_id'] ??  null;
+/* $imputation_id = (isset($_GET['imputation_id']) && is_numeric($_GET['imputation_id']) && $_GET['imputation_id'] > 0)
+    ? (int)$_GET['imputation_id']
+    : null; */
 $instruction = '';
 
 if ($imputation_id) {
@@ -162,7 +197,7 @@ $clean_instruction = preg_replace('/\s+/', ' ', $clean_instruction);
                 <i class="fas fa-tasks me-2"></i>IMPUTATION DE PANNE
             </h2>
             
-            <form method="POST" action="../../traitement/traitement">
+            <form method="GET" action="imputation.php">
                 <div class="mb-4">
                     <label for="instruction" class="form-label">
                         <i class="fas fa-comment-dots me-2"></i>Instructions pour l'atelier

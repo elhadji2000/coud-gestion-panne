@@ -62,7 +62,7 @@ include('../../activite.php');
         margin-bottom: 10px;
         /* Espacement accru */
         color: #2c3e50;
-        font-size: 1.4rem;
+        font-size: 1.3rem;
         /* Libellés plus grands */
     }
 

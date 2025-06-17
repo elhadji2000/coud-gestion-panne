@@ -88,10 +88,11 @@ $allPannes = $result['pannes'];
         font-weight: 600;
         color: var(--secondary);
         border-bottom-width: 1px;
+        
     }
 
     .badge-urgence {
-        padding: 0.35rem 0.65rem;
+        padding: 0.30rem 0.30rem;
         font-weight: 500;
         border-radius: 4px;
     }
@@ -112,7 +113,7 @@ $allPannes = $result['pannes'];
     }
 
     .badge-etat {
-        padding: 0.35rem 0.65rem;
+        padding: 0.30rem 0.30rem;
         font-weight: 500;
         border-radius: 4px;
     }
@@ -231,7 +232,7 @@ $allPannes = $result['pannes'];
 
                                 <!-- Bouton Observation -->
                                 <?php if ($panne['resultat'] === 'en cours' || $panne['resultat'] === 'depanner'): ?>
-                                <span class="text-info action-observation" title="Ajouter observation"
+                                <span class="text-warning action-observation" title="Ajouter observation"
                                     style="cursor: pointer;"
                                     onclick="window.location.href='observation?idp=<?= $panne['id'] ?>&idInt=<?= $panne['idIntervention'] ?>&idObservation=<?= $panne['idObservation'] ?>'">
                                     <i class="fas fa-edit"></i> obs

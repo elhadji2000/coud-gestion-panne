@@ -182,7 +182,7 @@ $sorties = listeSorties($connexion);
                         <td><?= htmlspecialchars($sortie['article']) ?></td>
                         <td><?= htmlspecialchars($sortie['quantite']) ?></td>
                         <td>
-                            <a href="annuler_sortie.php?id=<?= $sortie['sortie_id'] ?>"
+                            <a href="annuler_sortie.php?id=<?= $sortie['id'] ?>"
                                 class="btn btn-sm btn-outline-danger action-btn" title="Annuler"
                                 onclick="return confirm('Confirmer l\'annulation ?')">
                                 supprimer

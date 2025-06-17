@@ -8,25 +8,36 @@ if (empty($_SESSION['username'])) {
 include('../../traitement/fonction.php');
 include('../../traitement/requete.php');
 include('../../activite.php');
-//########################### pour Enregistrer article #######################################
-if ($_SERVER['REQUEST_METHOD'] == 'GET' &&
-    isset($_GET['nom']) && isset($_GET['reference']) &&
-    isset($_GET['description']) && isset($_GET['categorie'])) {
 
+// Récupérer l'article à modifier
+$article = null;
+if (isset($_GET['id'])) {
+    $article_id = $_GET['id'];
+    $article = getArticleById($connexion, $article_id);
+    
+    if (!$article) {
+        header('Location: articles.php?error=article_not_found');
+        exit();
+    }
+}
+
+//########################### pour Modifier article #######################################
+if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['id']) && isset($_GET['nom'])) {
+    $id = $_GET['id'];
     $nom = $_GET['nom'];
     $reference = $_GET['reference'];
     $description = $_GET['description'];
     $categorie = $_GET['categorie'];
 
-    if (enregistrerArticles($connexion, $nom, $categorie, $description, $reference)) {
-        header('Location: /COUD/panne/profils/stock/nouvel_article?success=1');
+    if (modifierArticle($connexion, $id, $nom, $categorie, $description, $reference)) {
+        header('Location: articles.php?success=1');
         exit();
     } else {
-        header('Location: /COUD/panne/profils/stock/nouvel_article');
+        header('Location: modifier_article.php?id='.$id.'&error=1');
         exit();
     }
 }
-//########################### FIN Enregistrer article #######################################
+//########################### FIN Modifier article #######################################
 ?>
 
 <!DOCTYPE html>
@@ -35,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' &&
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nouvel Article | Stock</title>
+    <title><?= isset($article) ? 'Modifier' : 'Nouvel' ?> Article | Stock</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -114,39 +125,48 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' &&
 
     <div class="container py-4">
         <div class="form-container">
-            <h3 class="form-title"><i class="fas fa-plus-circle me-2"></i>Nouvel Article</h3>
+            <h3 class="form-title">
+                <i class="fas fa-<?= isset($article) ? 'edit' : 'plus-circle' ?> me-2"></i>
+                <?= isset($article) ? 'Modifier' : 'Nouvel' ?> Article
+            </h3>
 
             <form id="articleForm" method="GET" action="nouvel_article.php">
+                <?php if (isset($article)): ?>
+                <input type="hidden" name="id" value="<?= htmlspecialchars($article['id']) ?>">
+                <?php endif; ?>
+
                 <div class="mb-4">
                     <label for="nom" class="form-label required-field">Nom de l'article</label>
                     <input type="text" class="form-control" id="nom" name="nom" required
+                        value="<?= isset($article) ? htmlspecialchars($article['nom']) : '' ?>"
                         placeholder="Entrez le nom de l'article">
                 </div>
 
                 <div class="mb-4">
                     <label for="reference" class="form-label required-field">Référence</label>
                     <input type="text" class="form-control" id="reference" name="reference" required
+                        value="<?= isset($article) ? htmlspecialchars($article['references']) : '' ?>"
                         placeholder="Entrez la référence de l'article">
                 </div>
 
                 <div class="mb-4">
                     <label for="description" class="form-label">Description</label>
                     <textarea class="form-control" id="description" name="description" rows="3"
-                        placeholder="Décrivez l'article (facultatif)"></textarea>
+                        placeholder="Décrivez l'article (facultatif)"><?= isset($article) ? htmlspecialchars($article['description']) : '' ?></textarea>
                 </div>
 
                 <div class="mb-4">
                     <label for="categorie" class="form-label required-field">Catégorie</label>
                     <select class="form-select" id="categorie" name="categorie" required>
-                        <option value="" disabled selected>Sélectionnez une catégorie</option>
-                        <option value="Plomberie">Plomberie</option>
-                        <option value="Maçonnerie">Maçonnerie</option>
-                        <option value="Électricité">Électricité</option>
-                        <option value="Menuiserie bois">Menuiserie bois</option>
-                        <option value="Menuiserie aluminium">Menuiserie aluminium</option>
-                        <option value="Menuiserie métallique">Menuiserie métallique</option>
-                        <option value="Froid">Froid</option>
-                        <option value="Peinture">Peinture</option>
+                        <option value="" disabled <?= !isset($article) ? 'selected' : '' ?>>Sélectionnez une catégorie</option>
+                        <option value="Plomberie" <?= (isset($article) && $article['categorie'] == 'Plomberie') ? 'selected' : '' ?>>Plomberie</option>
+                        <option value="Maçonnerie" <?= (isset($article) && $article['categorie'] == 'Maçonnerie') ? 'selected' : '' ?>>Maçonnerie</option>
+                        <option value="Électricité" <?= (isset($article) && $article['categorie'] == 'Électricité') ? 'selected' : '' ?>>Électricité</option>
+                        <option value="Menuiserie bois" <?= (isset($article) && $article['categorie'] == 'Menuiserie bois') ? 'selected' : '' ?>>Menuiserie bois</option>
+                        <option value="Menuiserie aluminium" <?= (isset($article) && $article['categorie'] == 'Menuiserie aluminium') ? 'selected' : '' ?>>Menuiserie aluminium</option>
+                        <option value="Menuiserie métallique" <?= (isset($article) && $article['categorie'] == 'Menuiserie métallique') ? 'selected' : '' ?>>Menuiserie métallique</option>
+                        <option value="Froid" <?= (isset($article) && $article['categorie'] == 'Froid') ? 'selected' : '' ?>>Froid</option>
+                        <option value="Peinture" <?= (isset($article) && $article['categorie'] == 'Peinture') ? 'selected' : '' ?>>Peinture</option>
                     </select>
                 </div>
 
@@ -155,7 +175,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' &&
                         <i class="fas fa-times me-1"></i> Annuler
                     </a>
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-1"></i> Enregistrer
+                        <i class="fas fa-save me-1"></i> <?= isset($article) ? 'Mettre à jour' : 'Enregistrer' ?>
                     </button>
                 </div>
             </form>
@@ -176,9 +196,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' &&
     $(document).ready(function() {
         // Validation basique du formulaire
         $('#articleForm').submit(function(e) {
-            // Vérification des champs obligatoires
-            if ($('#nom').val() === '' || $('#reference').val() === '' || $('#categorie').val() ===
-                null) {
+            if ($('#nom').val() === '' || $('#reference').val() === '' || $('#categorie').val() === null) {
                 e.preventDefault();
                 alert('Veuillez remplir tous les champs obligatoires');
             }
@@ -186,30 +204,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' &&
     });
     </script>
 
-    <?php if (isset($_GET['success']) && $_GET['success'] == 1): ?>
-    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+    <?php if (isset($_GET['error'])): ?>
+    <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header bg-info">
-                    <h5 class="modal-title" id="successModalLabel">Succès</h5>
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="errorModalLabel">Erreur</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Article enregistrée avec succès !
+                    Une erreur est survenue lors de la modification de l'article. Veuillez réessayer.
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-info" data-bs-dismiss="modal">Fermer</button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Fermer</button>
                 </div>
             </div>
         </div>
     </div>
     <script>
-    var modal = new bootstrap.Modal(document.getElementById('successModal'));
+    var modal = new bootstrap.Modal(document.getElementById('errorModal'));
     modal.show();
     </script>
     <?php endif; ?>
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <?php include('../../footer.php'); ?>
 </body>

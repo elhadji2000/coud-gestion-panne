@@ -168,7 +168,7 @@ if ($idObservation) {
             <input type="hidden" name="idObservation" value="<?= htmlspecialchars($idObservation, ENT_QUOTES, 'UTF-8') ?>">
             
             <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                <a href="javascript:history.back()" class="btn btn-outline-secondary me-md-2">
+                <a href="listPannes.php" class="btn btn-outline-secondary me-md-2">
                     <i class="fas fa-arrow-left me-2"></i>Retour
                 </a>
                 <button type="submit" class="btn btn-primary">
