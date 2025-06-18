@@ -1,9 +1,5 @@
 <?php
 session_start();
-if (empty($_SESSION['username'])) {
-    header('Location: /COUD/panne/');
-    exit();
-}
 
 include('../../traitement/fonction.php');
 include('../../traitement/requete.php');
@@ -114,7 +110,7 @@ $allUsers = allUtilisateurs($connexion);
         vertical-align: middle;
     }
 
-    .status-badge {
+    .status-badge2 {
         width: 80px;
         display: inline-block;
         text-align: center;
@@ -122,6 +118,24 @@ $allUsers = allUtilisateurs($connexion);
         border-radius: 20px;
         font-weight: 500;
         font-size: 0.75rem;
+    }
+
+    .status-badge {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+        display: inline-block;
+    }
+
+    .status-updated {
+        background-color: #e6f7ee;
+        color: #28a745;
+    }
+
+    .status-default {
+        background-color: #f0f0f0;
+        color: #6c757d;
     }
 
     .status-active {
@@ -149,7 +163,7 @@ $allUsers = allUtilisateurs($connexion);
         border-radius: 4px;
         font-weight: 500;
         font-size: 0.75rem;
-        color:white;
+        color: white;
     }
     </style>
 </head>
@@ -191,6 +205,7 @@ $allUsers = allUtilisateurs($connexion);
                                         <th>Profil Principal</th>
                                         <th>Profil Secondaire</th>
                                         <th>Statut</th>
+                                        <th>Type</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -217,6 +232,12 @@ $allUsers = allUtilisateurs($connexion);
                                             <span
                                                 class="status-badge <?= $user['statut'] == 1 ? 'status-active' : 'status-inactive' ?>">
                                                 <?= $user['statut'] == 1 ? 'Actif' : 'Inactif' ?>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span
+                                                class="status-badge <?= $user['type_mdp'] == 'updated' ? 'status-updated' : 'status-default' ?>">
+                                                <?= $user['type_mdp'] == 'updated' ? 'Updated' : 'Default' ?>
                                             </span>
                                         </td>
                                         <td>
@@ -274,7 +295,7 @@ $allUsers = allUtilisateurs($connexion);
             </div>
         </div>
     </div>
-      <!-- Scripts -->
+    <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
@@ -363,7 +384,7 @@ $allUsers = allUtilisateurs($connexion);
     });
     </script>
 
-     
+
     <?php include('../../footer.php'); ?>
 </body>
 

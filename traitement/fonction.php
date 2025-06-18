@@ -638,7 +638,7 @@ function supprimerImputation($connexion, $idImputation) {
 function allUtilisateurs($connexion) {
     // Requête pour récupérer tous les utilisateurs
     $sql = "
-        SELECT id, username, statut, email, telephone, nom, prenom, profil1, profil2
+        SELECT id, username, statut, email, telephone, nom, prenom, profil1, type_mdp, profil2
         FROM Utilisateur ORDER BY id DESC;
     ";
 
@@ -1203,5 +1203,129 @@ function supprimerArticle($connexion, $id) {
     $query = "DELETE FROM articles WHERE id = ?";
     $stmt = $connexion->prepare($query);
     $stmt->bind_param("i", $id);
+    return $stmt->execute();
+}
+function supprimerSortie($connexion, $id) {
+    // Vérifier d'abord si l'article existe
+    $check = "SELECT id FROM sortie_stock WHERE id = ?";
+    $stmt = $connexion->prepare($check);
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $stmt->store_result();
+    
+    if ($stmt->num_rows === 0) {
+        return false; // Article non trouvé
+    }
+    
+    // Si l'article existe, procéder à la suppression
+    $query = "DELETE FROM sortie_stock WHERE id = ?";
+    $stmt = $connexion->prepare($query);
+    $stmt->bind_param("i", $id);
+    return $stmt->execute();
+}
+function supprimerEntree($connexion, $id) {
+    // Vérifier d'abord si l'article existe
+    $check = "SELECT id FROM entree_stock WHERE id = ?";
+    $stmt = $connexion->prepare($check);
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $stmt->store_result();
+    
+    if ($stmt->num_rows === 0) {
+        return false; // Article non trouvé
+    }
+    
+    // Si l'article existe, procéder à la suppression
+    $query = "DELETE FROM entree_stock WHERE id = ?";
+    $stmt = $connexion->prepare($query);
+    $stmt->bind_param("i", $id);
+    return $stmt->execute();
+}
+// Fonction pour récupérer une sortie par son ID
+function getSortieById($connexion, $id) {
+    $sql = "SELECT s.*, a.nom AS nom_article, a.references AS reference_article, a.description AS description_article,
+                   i.description_action AS description_intervention, i.resultat AS resultat_intervention
+            FROM sortie_stock s
+            JOIN articles a ON s.article_id = a.id
+            JOIN intervention i ON s.intervention_id = i.id
+            WHERE s.id = ?";
+
+    $stmt = mysqli_prepare($connexion, $sql);
+    if ($stmt) {
+        mysqli_stmt_bind_param($stmt, 'i', $id); // 'i' pour entier
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+        if ($result) {
+            return mysqli_fetch_assoc($result);
+        }
+    }
+    return null; // ou false si tu veux gérer une erreur
+}
+// Fonction pour modifier une sortie
+function modifierSortie($connexion, $id, $article_id, $intervention_id, $quantite, $date_sortie, $remarque) {
+    $sql = "UPDATE sortie_stock SET 
+                article_id = ?, 
+                intervention_id = ?, 
+                quantite = ?, 
+                date_sortie = ?, 
+                remarque = ?,
+                updated_at = NOW()
+            WHERE id = ?";
+
+    $stmt = mysqli_prepare($connexion, $sql);
+    if ($stmt) {
+        mysqli_stmt_bind_param($stmt, 'iiissi', $article_id, $intervention_id, $quantite, $date_sortie, $remarque, $id);
+        return mysqli_stmt_execute($stmt);
+    } else {
+        error_log("Erreur de préparation de la requête : " . mysqli_error($connexion));
+        return false;
+    }
+}
+function getEntreeById($connexion, $id) {
+    $query = "SELECT e.*, a.nom as nom_article, a.references as reference_article, a.description as description_article 
+              FROM entree_stock e 
+              JOIN articles a ON e.article_id = a.id 
+              WHERE e.id = ?";
+    $stmt = mysqli_prepare($connexion, $query);
+    mysqli_stmt_bind_param($stmt, "i", $id);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    return mysqli_fetch_assoc($result);
+}
+
+function modifierEntree($connexion, $id, $article_id, $quantite, $date_entree, $remarque) {
+    $query = "UPDATE entree_stock 
+              SET article_id = ?, quantite = ?, date_entree = ?, remarque = ?
+              WHERE id = ?";
+    $stmt = mysqli_prepare($connexion, $query);
+    mysqli_stmt_bind_param($stmt, "iissi", $article_id, $quantite, $date_entree, $remarque, $id);
+    return mysqli_stmt_execute($stmt);
+}
+
+function verifyCurrentPassword($username, $password, $connexion) {
+    $query = "SELECT password FROM utilisateur WHERE username = ?";
+    $stmt = $connexion->prepare($query);
+    $stmt->bind_param('s', $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result->num_rows === 1) {
+        $user = $result->fetch_assoc();
+        return sha1($password) === $user['password']; // Utilisé si hashé avec sha1()
+    }
+
+    return false;
+}
+function updatePassword($username, $new_password, $connexion) {
+    // Hashage avec SHA-1 (⚠️ non recommandé pour production)
+    $hashed_password = sha1($new_password);
+
+    // Mise à jour du mot de passe et du type_mdp
+    $query = "UPDATE utilisateur SET password = ?, type_mdp = ? WHERE username = ?";
+    $stmt = $connexion->prepare($query);
+    $type_mdp = 'updated';
+
+    $stmt->bind_param('sss', $hashed_password, $type_mdp, $username);
+
     return $stmt->execute();
 }

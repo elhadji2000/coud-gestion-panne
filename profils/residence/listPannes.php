@@ -1,10 +1,5 @@
 <?php
 session_start();
-if (empty($_SESSION['username']) && empty($_SESSION['mdp'])) {
-    header('Location: /COUD/panne/');
-    exit();
-}
-unset($_SESSION['classe']);
 
 include('../../traitement/fonction.php');
 include('../../traitement/requete.php');
@@ -21,14 +16,10 @@ $allPannes = $result['pannes'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des Pannes | Tableau de bord</title>
-
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
 
@@ -209,7 +200,7 @@ $allPannes = $result['pannes'];
                                 ?>
                                 <span class="badge-urgence <?= $urgenceClass ?>"><?= $panne['niveau_urgence'] ?></span>
                             </td>
-                            <td><?= date('d/m/Y', strtotime($panne['date_enregistrement'])) ?></td>
+                            <td><?= htmlspecialchars($panne['date_enregistrement']) ?></td>
                             <td>
                                 <?php 
                                 $etatClass = '';

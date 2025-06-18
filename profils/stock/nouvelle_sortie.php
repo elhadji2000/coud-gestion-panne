@@ -1,34 +1,55 @@
 <?php
 session_start();
-if (empty($_SESSION['username'])) {
-    header('Location: /COUD/codif/');
-    exit();
-}
 
 include('../../traitement/fonction.php');
 include('../../traitement/requete.php');
 include('../../activite.php');
 
-//########################### pour Enregistrer une Imputation #######################################
-if ($_SERVER['REQUEST_METHOD'] == 'POST' &&
-    isset($_POST['article_id']) && isset($_POST['intervention_id']) &&
-    isset($_POST['quantite']) && isset($_POST['date_sortie']) && isset($_POST['remarque'])) {
-
-    $article_id = $_POST['article_id'];
-    $intervention_id = $_POST['intervention_id'];
-    $quantite = $_POST['quantite'];
-    $date_sortie = $_POST['date_sortie'];
-    $remarque = $_POST['remarque'];
-
-    if (enregistrerSortie($connexion, $article_id, $intervention_id, $quantite, $date_sortie, $remarque)) {
-        header('Location: /COUD/panne/profils/stock/nouvelle_sortie?success=2');
-        exit();
-    } else {
-        header('Location: /COUD/panne/profils/stock/nouvelle_sortie');
+// Récupérer la sortie à modifier
+$sortie = null;
+if (isset($_GET['id'])) {
+    $sortie_id = $_GET['id'];
+    $sortie = getSortieById($connexion, $sortie_id);
+    
+    if (!$sortie) {
+        header('Location: sortie_stock.php?error=sortie_not_found');
         exit();
     }
 }
-//########################### FIN Enregistrer une Imputation #######################################
+
+//########################### pour Enregistrer ou Modifier une Sortie #######################################
+if ($_SERVER['REQUEST_METHOD'] == 'GET' &&
+    isset($_GET['article_id']) && isset($_GET['intervention_id']) &&
+    isset($_GET['quantite']) && isset($_GET['date_sortie']) && isset($_GET['remarque'])) {
+
+    $article_id = $_GET['article_id'];
+    $intervention_id = $_GET['intervention_id'];
+    $quantite = $_GET['quantite'];
+    $date_sortie = $_GET['date_sortie'];
+    $remarque = $_GET['remarque'];
+
+    if (isset($_GET['id_delete'])) {
+        // Modification d'une sortie existante
+        $id = $_GET['id_delete'];
+        if (modifierSortie($connexion, $id, $article_id, $intervention_id, $quantite, $date_sortie, $remarque)) {
+            header('Location: sortie_stock.php?success=1');
+            exit();
+        } else {
+            header('Location: nouvelle_sortie.php?id='.$id.'&error=1');
+            exit();
+        }
+    } else {
+        // Nouvelle sortie
+        if (enregistrerSortie($connexion, $article_id, $intervention_id, $quantite, $date_sortie, $remarque)) {
+            header('Location: sortie_stock.php?success=2');
+            exit();
+        } else {
+            header('Location: nouvelle_sortie.php?error=1');
+            exit();
+        }
+    }
+}
+//########################### FIN Enregistrer ou Modifier une Sortie #######################################
 
 // Récupérer la liste des articles et interventions
 $articles = listeArticles($connexion);
@@ -41,14 +62,10 @@ $interventions = getInterventions($connexion);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des Sorties | Stock</title>
-
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <!-- Select2 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
@@ -94,14 +111,16 @@ $interventions = getInterventions($connexion);
         margin-bottom: 0.5rem;
     }
 
-    .form-control, .select2-container--default .select2-selection--single {
+    .form-control,
+    .select2-container--default .select2-selection--single {
         height: 42px;
         border: 1px solid #e0e0e0;
         border-radius: var(--border-radius);
         padding: 0.5rem 1rem;
     }
 
-    .form-control:focus, .select2-container--default.select2-container--focus .select2-selection--single {
+    .form-control:focus,
+    .select2-container--default.select2-container--focus .select2-selection--single {
         border-color: var(--primary);
         box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.15);
     }
@@ -157,19 +176,26 @@ $interventions = getInterventions($connexion);
 
     <div class="container py-4">
         <div class="form-container">
-            <h3 class="form-title"><i class="fas fa-box-open me-2"></i>Sortie de Stock</h3>
+            <h3 class="form-title">
+                <i class="fas fa-<?= isset($sortie) ? 'edit' : 'box-open' ?> me-2"></i>
+                <?= isset($sortie) ? 'Modifier' : 'Nouvelle' ?> Sortie
+            </h3>
 
-            <form id="sortieForm" method="POST" action="nouvelle_sortie">
+            <form id="sortieForm" method="GET" action="nouvelle_sortie.php">
+                <?php if (isset($sortie)): ?>
+                <input type="hidden" name="id_delete" value="<?= htmlspecialchars($sortie['id']) ?>">
+                <?php endif; ?>
+
                 <!-- Section Article -->
                 <div class="mb-4">
                     <label for="article_id" class="form-label required-field">Article</label>
                     <select class="form-select select2-article" id="article_id" name="article_id" required>
                         <option value="">Sélectionner un article</option>
                         <?php foreach ($articles as $article): ?>
-                        <option value="<?= $article['id'] ?>"
-                            data-nom="<?= htmlspecialchars($article['nom']) ?>"
+                        <option value="<?= $article['id'] ?>" data-nom="<?= htmlspecialchars($article['nom']) ?>"
                             data-reference="<?= htmlspecialchars($article['references']) ?>"
-                            data-description="<?= htmlspecialchars($article['description']) ?>">
+                            data-description="<?= htmlspecialchars($article['description']) ?>"
+                            <?= (isset($sortie) && $sortie['article_id'] == $article['id']) ? 'selected' : '' ?>>
                             <?= htmlspecialchars($article['references']) ?> - <?= htmlspecialchars($article['nom']) ?>
                         </option>
                         <?php endforeach; ?>
@@ -179,17 +205,20 @@ $interventions = getInterventions($connexion);
                 <div class="row g-3 mb-4">
                     <div class="col-md-6">
                         <label for="nom_article" class="form-label">Nom de l'article</label>
-                        <input type="text" class="form-control readonly-field" id="nom_article" readonly>
+                        <input type="text" class="form-control readonly-field" id="nom_article" readonly
+                            value="<?= isset($sortie) ? htmlspecialchars($sortie['nom_article']) : '' ?>">
                     </div>
                     <div class="col-md-6">
                         <label for="reference_article" class="form-label">Référence</label>
-                        <input type="text" class="form-control readonly-field" id="reference_article" readonly>
+                        <input type="text" class="form-control readonly-field" id="reference_article" readonly
+                            value="<?= isset($sortie) ? htmlspecialchars($sortie['reference_article']) : '' ?>">
                     </div>
                 </div>
 
                 <div class="mb-4">
                     <label for="description_article" class="form-label">Description</label>
-                    <textarea class="form-control readonly-field" id="description_article" rows="2" readonly></textarea>
+                    <textarea class="form-control readonly-field" id="description_article" rows="2"
+                        readonly><?= isset($sortie) ? htmlspecialchars($sortie['description_article']) : '' ?></textarea>
                 </div>
 
                 <hr class="section-divider">
@@ -197,13 +226,16 @@ $interventions = getInterventions($connexion);
                 <!-- Section Intervention -->
                 <div class="mb-4">
                     <label for="intervention_id" class="form-label required-field">Intervention</label>
-                    <select class="form-select select2-intervention" id="intervention_id" name="intervention_id" required>
+                    <select class="form-select select2-intervention" id="intervention_id" name="intervention_id"
+                        required>
                         <option value="">Sélectionner une intervention</option>
                         <?php foreach ($interventions as $intervention): ?>
                         <option value="<?= $intervention['id'] ?>"
                             data-description="<?= htmlspecialchars($intervention['description_action']) ?>"
-                            data-resultat="<?= htmlspecialchars($intervention['resultat']) ?>">
-                            Intervention #<?= $intervention['id'] ?> - <?= htmlspecialchars(substr($intervention['description_action'], 0, 30)) ?>...
+                            data-resultat="<?= htmlspecialchars($intervention['resultat']) ?>"
+                            <?= (isset($sortie) && $sortie['intervention_id'] == $intervention['id']) ? 'selected' : '' ?>>
+                            Intervention #<?= $intervention['id'] ?> -
+                            <?= htmlspecialchars(substr($intervention['description_action'], 0, 30)) ?>...
                         </option>
                         <?php endforeach; ?>
                     </select>
@@ -212,11 +244,13 @@ $interventions = getInterventions($connexion);
                 <div class="row g-3 mb-4">
                     <div class="col-md-6">
                         <label for="description_intervention" class="form-label">Description</label>
-                        <textarea class="form-control readonly-field" id="description_intervention" rows="3" readonly></textarea>
+                        <textarea class="form-control readonly-field" id="description_intervention" rows="3"
+                            readonly><?= isset($sortie) ? htmlspecialchars($sortie['description_intervention']) : '' ?></textarea>
                     </div>
                     <div class="col-md-6">
                         <label for="resultat_intervention" class="form-label">Résultat attendu</label>
-                        <textarea class="form-control readonly-field" id="resultat_intervention" rows="3" readonly></textarea>
+                        <textarea class="form-control readonly-field" id="resultat_intervention" rows="3"
+                            readonly><?= isset($sortie) ? htmlspecialchars($sortie['resultat_intervention']) : '' ?></textarea>
                     </div>
                 </div>
 
@@ -226,24 +260,28 @@ $interventions = getInterventions($connexion);
                 <div class="row g-3">
                     <div class="col-md-4">
                         <label for="quantite" class="form-label required-field">Quantité</label>
-                        <input type="number" class="form-control" id="quantite" name="quantite" min="1" required>
+                        <input type="number" class="form-control" id="quantite" name="quantite" min="1" required
+                            value="<?= isset($sortie) ? htmlspecialchars($sortie['quantite']) : '' ?>">
                     </div>
                     <div class="col-md-4">
                         <label for="date_sortie" class="form-label required-field">Date de sortie</label>
-                        <input type="date" class="form-control" id="date_sortie" name="date_sortie" required>
+                        <input type="date" class="form-control" id="date_sortie" name="date_sortie" required
+                            value="<?= isset($sortie) ? date('Y-m-d', strtotime($sortie['date_sortie'])) : date('Y-m-d') ?>">
                     </div>
                     <div class="col-md-4">
                         <label for="remarque" class="form-label">Remarques</label>
-                        <input type="text" class="form-control" id="remarque" name="remarque" placeholder="Facultatif">
+                        <input type="text" class="form-control" id="remarque" name="remarque" placeholder="Facultatif"
+                            value="<?= isset($sortie) ? htmlspecialchars($sortie['remarque']) : '' ?>">
                     </div>
                 </div>
 
                 <div class="d-flex justify-content-end mt-4">
-                    <button type="reset" class="btn btn-outline-secondary me-2">
-                        <i class="fas fa-undo me-1"></i> Réinitialiser
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-1"></i> Enregistrer
+                    <a href="sortie_stock.php" class="btn btn-outline-secondary me-2">
+                        <i class="fas fa-times me-1"></i> Annuler
+                    </a>
+                    <button type="submit" class="btn btn-primary"
+                        onclick="return confirm('Êtes-vous sûr de vouloir continuer ?')">
+                        <i class="fas fa-save me-1"></i> <?= isset($sortie) ? 'Mettre à jour' : 'Enregistrer' ?>
                     </button>
                 </div>
             </form>
@@ -274,9 +312,6 @@ $interventions = getInterventions($connexion);
             allowClear: true
         });
 
-        // Définir la date du jour par défaut
-        $('#date_sortie').val(new Date().toISOString().substr(0, 10));
-
         // Gérer le changement d'article
         $('#article_id').change(function() {
             const selectedOption = $(this).find('option:selected');
@@ -291,28 +326,35 @@ $interventions = getInterventions($connexion);
             $('#description_intervention').val(selectedOption.data('description') || '');
             $('#resultat_intervention').val(selectedOption.data('resultat') || '');
         });
+
+        // Si on est en mode modification, déclencher les événements change pour remplir les champs
+        <?php if (isset($sortie)): ?>
+        $('#article_id').trigger('change');
+        $('#intervention_id').trigger('change');
+        <?php endif; ?>
     });
     </script>
 
-    <?php if (isset($_GET['success']) && $_GET['success'] == 2): ?>
-    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+    <?php if (isset($_GET['error'])): ?>
+    <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header bg-info">
-                    <h5 class="modal-title" id="successModalLabel">Succès</h5>
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="errorModalLabel">Erreur</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Sortie enregistrée avec succès !
+                    Une erreur est survenue lors de <?= isset($sortie) ? 'la modification' : "l'enregistrement" ?> de la
+                    sortie. Veuillez réessayer.
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-info" data-bs-dismiss="modal">Fermer</button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Fermer</button>
                 </div>
             </div>
         </div>
     </div>
     <script>
-    var modal = new bootstrap.Modal(document.getElementById('successModal'));
+    var modal = new bootstrap.Modal(document.getElementById('errorModal'));
     modal.show();
     </script>
     <?php endif; ?>

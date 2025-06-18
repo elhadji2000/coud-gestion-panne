@@ -1,9 +1,5 @@
 <?php
 session_start();
-if (empty($_SESSION['username'])) {
-    header('Location: /COUD/codif/');
-    exit();
-}
 
 include('../../traitement/fonction.php');
 include('../../traitement/requete.php');
@@ -316,6 +312,50 @@ $articles = listeArticles($connexion);
     </div>
     <script>
         var modal = new bootstrap.Modal(document.getElementById('successModal'));
+        modal.show();
+    </script>
+    <?php endif; ?>
+    <?php if (isset($success) && $success === 'modifier'): ?>
+    <div class="modal fade" id="successModal2" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">Succès</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    L'article a été modifiè avec succès.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        var modal = new bootstrap.Modal(document.getElementById('successModal2'));
+        modal.show();
+    </script>
+    <?php endif; ?>
+    <?php if (isset($success) && $success === 'enregistrer'): ?>
+    <div class="modal fade" id="successModal3" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">Succès</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    L'article a été enregistrer avec succès.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        var modal = new bootstrap.Modal(document.getElementById('successModal3'));
         modal.show();
     </script>
     <?php endif; ?>

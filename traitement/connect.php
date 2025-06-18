@@ -11,6 +11,7 @@ if (!empty($_GET['username_user']) && !empty($_GET['password_user'])) {
         $_SESSION['id_user'] = $row['id'];
         $_SESSION['username'] = $row['username'];
         $_SESSION['mdp'] = $row['password'];
+        $_SESSION['type_mdp'] = $row['type_mdp'];
         $_SESSION['profil'] = $row['profil1'];
         $_SESSION['profil2'] = $row['profil2'];
         $_SESSION['prenom'] = $row['prenom'];
@@ -38,7 +39,7 @@ if (!empty($_GET['username_user']) && !empty($_GET['password_user'])) {
             header('Location: /COUD/panne/profils/dasboard.php');
             exit();
         }  else {
-            header('Location: /COUD/panne');
+            header('Location: /COUD/ass');
             exit();
             }
         }

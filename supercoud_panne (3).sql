@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : lun. 16 juin 2025 à 16:05
+-- Généré le : mer. 18 juin 2025 à 18:51
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -41,9 +41,10 @@ CREATE TABLE `articles` (
 --
 
 INSERT INTO `articles` (`id`, `nom`, `description`, `date_creation`, `references`, `categorie`) VALUES
-(1, 'chaisse', 'les chaisse de bureau', '2025-06-12 15:17:46', 'chbr11', 'Menuiserie bois'),
-(2, 'seau', 'asdf', '2025-06-13 10:57:20', 'sett23-66', 'Peinture'),
-(3, 'ordinateur', 'ordinateur de bureau', '2025-06-16 10:25:36', 'hp-2309A', 'Électricité');
+(1, 'chaisse', 'les chaisse de bureau', '2025-06-12 15:17:46', 'CHBR-11', 'Menuiserie bois'),
+(2, 'seau', 'pour nettoyage', '2025-06-13 10:57:20', 'sett23-66', 'Peinture'),
+(3, 'ordinateur', 'ordinateur de bureau', '2025-06-16 10:25:36', 'hp-2309A', 'Électricité'),
+(4, 'marteau', 'neant22', '2025-06-17 10:04:24', '123Z5', 'Plomberie');
 
 -- --------------------------------------------------------
 
@@ -9788,7 +9789,8 @@ CREATE TABLE `entree_stock` (
 --
 
 INSERT INTO `entree_stock` (`id`, `article_id`, `quantite`, `date_entree`, `remarque`, `created_at`, `updated_at`) VALUES
-(1, 3, 12, '2025-06-16', 'aaaaaaaaaaa', '2025-06-16 11:18:17', '2025-06-16 11:18:17');
+(1, 3, 12, '2025-06-16', 'aaaaaaaaaaa', '2025-06-16 11:18:17', '2025-06-16 11:18:17'),
+(5, 1, 34, '2025-06-18', 'regler', '2025-06-18 13:46:03', '2025-06-18 13:46:03');
 
 -- --------------------------------------------------------
 
@@ -9811,7 +9813,10 @@ CREATE TABLE `imputation` (
 
 INSERT INTO `imputation` (`id`, `id_chef_dst`, `id_panne`, `instruction`, `date_imputation`, `resultat`) VALUES
 (21, 9, 28, 'veillez bien traiter la panne ....', '12/05/2025', 'imputer'),
-(22, 9, 29, 'intervention autoriser...', '12/05/2025', 'imputer');
+(22, 9, 29, 'intervention autoriser...', '12/05/2025', 'imputer'),
+(23, 9, 32, 'ertzuiop', '17/06/2025', 'imputer'),
+(24, 9, 30, 'a faire ...', '17/06/2025', 'imputer'),
+(25, 9, 31, 'ordonner', '17/06/2025', 'imputer');
 
 -- --------------------------------------------------------
 
@@ -9835,7 +9840,10 @@ CREATE TABLE `intervention` (
 --
 
 INSERT INTO `intervention` (`id`, `date_intervention`, `date_sys`, `description_action`, `resultat`, `personne_agent`, `id_chef_atelier`, `id_panne`) VALUES
-(13, '12/05/2025', '12/05/2025', 'reperation bien effectuer...', 'depanner', 'madiop faye', 2, 29);
+(13, '12/05/2025', '12/05/2025', 'reperation bien effectuer...', 'depanner', 'madiop faye', 2, 29),
+(14, '17/06/2025', '17/06/2025', 'bien fait 3', 'en cours', 'samba ka', 2, 28),
+(15, '17/06/2025', '17/06/2025', 'aaaaaa333', 'en cours', 'madiop diop', 2, 32),
+(16, '01/01/1970', '17/06/2025', 'aaaaa', 'depanner', 'madiop diop', 2, 30);
 
 -- --------------------------------------------------------
 
@@ -9858,7 +9866,8 @@ CREATE TABLE `observation` (
 --
 
 INSERT INTO `observation` (`id`, `evaluation_qualite`, `date_observation`, `commentaire_suggestion`, `id_chef_residence`, `id_panne`, `id_intervention`) VALUES
-(18, 'Fait', '12/05/2025', 'satisfait....', 18, 29, 13);
+(18, 'Fait', '12/05/2025', 'satisfait....', 18, 29, 13),
+(19, 'Fait', '17/06/2025', 'bien fait', 17, 30, 16);
 
 -- --------------------------------------------------------
 
@@ -9885,7 +9894,8 @@ INSERT INTO `panne` (`id`, `type_panne`, `date_enregistrement`, `description`, `
 (29, 'Plomberie', '12/05/2025', 'fuite d\'eau...', 'E.S.P | H(ESP) | Toilettes 1er étage', 'Élevée', 18),
 (30, 'Maçonnerie', '14/05/2025', 'scenage svp...', 'Grand_Campus | A0 | Chambre 101A0', 'Élevée', 17),
 (31, 'Électricité', '14/05/2025', 'ampoul endomager...', 'Grand_Campus | A0 | Toilettes RDC', 'Moyenne', 17),
-(32, 'Froid', '14/05/2025', 'climatisation a probleme...', 'Grand_Campus | A0 | Hall d\'entrée', 'Moyenne', 17);
+(32, 'Froid', '14/05/2025', 'climatisation a probleme...', 'Grand_Campus | A0 | Hall d\'entrée', 'Moyenne', 17),
+(33, 'Plomberie', '17/06/2025', 'fuite d\'eau...', 'A.S.J | B1 | Toilettes RDC', 'Moyenne', 16);
 
 -- --------------------------------------------------------
 
@@ -9899,16 +9909,16 @@ CREATE TABLE `sortie_stock` (
   `intervention_id` int(11) NOT NULL,
   `quantite` int(11) NOT NULL,
   `date_sortie` datetime DEFAULT current_timestamp(),
-  `remarque` text DEFAULT NULL
+  `remarque` text DEFAULT NULL,
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `sortie_stock`
 --
 
-INSERT INTO `sortie_stock` (`id`, `article_id`, `intervention_id`, `quantite`, `date_sortie`, `remarque`) VALUES
-(1, 1, 13, 4, '2025-06-12 15:49:52', 'travail fait'),
-(2, 1, 13, 3, '2025-06-13 00:00:00', 'aaaaaaaaaaa');
+INSERT INTO `sortie_stock` (`id`, `article_id`, `intervention_id`, `quantite`, `date_sortie`, `remarque`, `updated_at`) VALUES
+(3, 3, 14, 4, '2025-06-17 00:00:00', 'depanner', '2025-06-18 10:33:09');
 
 -- --------------------------------------------------------
 
@@ -9927,28 +9937,29 @@ CREATE TABLE `utilisateur` (
   `prenom` varchar(255) NOT NULL,
   `profil1` varchar(255) NOT NULL,
   `profil2` varchar(50) NOT NULL,
-  `date_sys` date NOT NULL DEFAULT current_timestamp()
+  `date_sys` date NOT NULL DEFAULT current_timestamp(),
+  `type_mdp` varchar(50) NOT NULL DEFAULT 'default'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `utilisateur`
 --
 
-INSERT INTO `utilisateur` (`id`, `username`, `password`, `statut`, `email`, `telephone`, `nom`, `prenom`, `profil1`, `profil2`, `date_sys`) VALUES
-(1, 'pavb', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'pavb@gmail.com', '767778899', 'DIOP', 'Madiop', 'residence', 'Grand_Campus | B', '2025-04-01'),
-(2, 'atelier', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'diopelhadjimadiop@gmail.com', '779099099', 'Faye', 'Waly', 'atelier', 'atelier', '2025-04-06'),
-(3, 'dst', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'dst@hotmail.com', '770010203', 'Fall', 'Ibrahima', 'dst', 'chef dst', '2025-04-21'),
-(4, 'pavd', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'pavd@yahoo.com', '770090908', 'Ndiaye', 'Ndiaye', 'residence', 'Grand_Campus | D', '2025-04-07'),
-(5, 'pavcEsp', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'pavcEsp@gmail.com', '77090989', 'DIOP', 'Moussa', 'residence', 'E.S.P | C(ESP)', '2025-04-06'),
-(7, 'section1', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'section1@gmail.com', '778834567', 'Sylla', 'Sylla', 'section', 'Menuserie_bois', '2025-04-06'),
-(8, 'chef_plomberie', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'plomberi@coud.sn', '756667788', 'Faye', 'Faye', 'section', 'Plomberie', '2025-05-11'),
-(9, 'sem', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'sem@coud.sn', '776000203', 'Faye', 'Faye', 'dst', 'S.E.M', '2025-05-11'),
-(10, 'chef_maçonnerie', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'maconnerie@coud.sn', '789000908', 'FAYE', 'Mor', 'section', 'maçonnerie', '2025-05-11'),
-(11, 'admin', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'admin@coud.sn', '765556677', 'sylla', 'babacar', 'admin', 'admin', '2025-05-11'),
-(14, 'madiop', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'ass@gmail.com', '784413400', 'diop', 'elhadji', 'section', 'Plomberie', '2025-05-11'),
-(16, '936076/M', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'eladji1.dg@coud.sn', '7844413400', 'diop', 'Elhadji', 'residence', 'A.S.J | B1', '2025-05-11'),
-(17, 'pava', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'pava@coud.sn', '778889900', 'sarr', 'Issa', 'residence', 'Grand_Campus | A0', '2025-05-11'),
-(18, '934837/B', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'admin789@coud.sn', '776668899', 'Diagne', 'Madiagne', 'residence', 'E.S.P | H(ESP)', '2025-05-12');
+INSERT INTO `utilisateur` (`id`, `username`, `password`, `statut`, `email`, `telephone`, `nom`, `prenom`, `profil1`, `profil2`, `date_sys`, `type_mdp`) VALUES
+(1, 'pavb', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'pavb@gmail.com', '767778899', 'DIOP', 'Madiop', 'residence', 'Grand_Campus | B', '2025-04-01', 'default'),
+(2, 'atelier', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'diopelhadjimadiop@gmail.com', '779099099', 'Faye', 'Waly', 'atelier', 'atelier', '2025-04-06', 'default'),
+(3, 'dst', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'dst@hotmail.com', '770010203', 'Fall', 'Ibrahima', 'dst', 'chef dst', '2025-04-21', 'updated'),
+(4, 'pavd', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'pavd@yahoo.com', '770090908', 'Ndiaye', 'Ndiaye', 'residence', 'Grand_Campus | D', '2025-04-07', 'default'),
+(5, 'pavcEsp', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'pavcEsp@gmail.com', '77090989', 'DIOP', 'Moussa', 'residence', 'E.S.P | C(ESP)', '2025-04-06', 'default'),
+(7, 'section1', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'section1@gmail.com', '778834567', 'Sylla', 'Sylla', 'section', 'Menuserie_bois', '2025-04-06', 'default'),
+(8, 'chef_plomberie', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'plomberi@coud.sn', '756667788', 'Faye', 'Faye', 'section', 'Plomberie', '2025-05-11', 'default'),
+(9, 'sem', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'sem@coud.sn', '776000203', 'Faye', 'Faye', 'dst', 'S.E.M', '2025-05-11', 'default'),
+(10, 'chef_maçonnerie', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'maconnerie@coud.sn', '789000908', 'FAYE', 'Mor', 'section', 'maçonnerie', '2025-05-11', 'default'),
+(11, 'admin', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'admin@coud.sn', '765556677', 'sylla', 'babacar', 'admin', 'admin', '2025-05-11', 'updated'),
+(14, 'madiop', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 0, 'ass@gmail.com', '784413400', 'diop', 'elhadji', 'section', 'Plomberie', '2025-05-11', 'default'),
+(16, '936076/M', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'eladji1.dg@coud.sn', '7844413400', 'diop', 'Elhadji', 'residence', 'A.S.J | B1', '2025-05-11', 'default'),
+(17, 'pava', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'pava@coud.sn', '778889900', 'sarr', 'Issa', 'residence', 'Grand_Campus | A0', '2025-05-11', 'updated'),
+(18, '934837/B', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'admin789@coud.sn', '776668899', 'Diagne', 'Madiagne', 'residence', 'E.S.P | H(ESP)', '2025-05-12', 'default');
 
 --
 -- Index pour les tables déchargées
@@ -10028,7 +10039,7 @@ ALTER TABLE `utilisateur`
 -- AUTO_INCREMENT pour la table `articles`
 --
 ALTER TABLE `articles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT pour la table `codif_lit_complet`
@@ -10040,37 +10051,37 @@ ALTER TABLE `codif_lit_complet`
 -- AUTO_INCREMENT pour la table `entree_stock`
 --
 ALTER TABLE `entree_stock`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT pour la table `imputation`
 --
 ALTER TABLE `imputation`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT pour la table `intervention`
 --
 ALTER TABLE `intervention`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT pour la table `observation`
 --
 ALTER TABLE `observation`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT pour la table `panne`
 --
 ALTER TABLE `panne`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT pour la table `sortie_stock`
 --
 ALTER TABLE `sortie_stock`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT pour la table `utilisateur`

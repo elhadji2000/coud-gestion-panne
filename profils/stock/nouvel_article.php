@@ -1,10 +1,5 @@
 <?php
 session_start();
-if (empty($_SESSION['username'])) {
-    header('Location: /COUD/codif/');
-    exit();
-}
-
 include('../../traitement/fonction.php');
 include('../../traitement/requete.php');
 include('../../activite.php');
@@ -22,21 +17,37 @@ if (isset($_GET['id'])) {
 }
 
 //########################### pour Modifier article #######################################
-if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['id']) && isset($_GET['nom'])) {
-    $id = $_GET['id'];
+if ($_SERVER['REQUEST_METHOD'] === 'GET' &&
+    isset($_GET['nom']) &&
+    isset($_GET['reference']) &&
+    isset($_GET['description']) &&
+    isset($_GET['categorie'])) {
+
     $nom = $_GET['nom'];
     $reference = $_GET['reference'];
     $description = $_GET['description'];
     $categorie = $_GET['categorie'];
 
-    if (modifierArticle($connexion, $id, $nom, $categorie, $description, $reference)) {
-        header('Location: articles.php?success=1');
-        exit();
+    // Vérifie si c'est une modification ou un enregistrement
+    if (isset($_GET['id']) && !empty($_GET['id'])) {
+        // Cas : Modification
+        $id = $_GET['id'];
+        if (modifierArticle($connexion, $id, $nom, $categorie, $description, $reference)) {
+            header('Location: articles.php?success=modifier');
+        } else {
+            header("Location: nouvel_article.php?id=$id&error=1");
+        }
     } else {
-        header('Location: modifier_article.php?id='.$id.'&error=1');
-        exit();
+        // Cas : Enregistrement
+        if (enregistrerArticles($connexion, $nom, $categorie, $description, $reference)) {
+            header('Location: articles.php?success=enregistrer');
+        } else {
+            header('Location: nouvel_article.php?error=1');
+        }
     }
+    exit();
 }
+
 //########################### FIN Modifier article #######################################
 ?>
 
@@ -158,15 +169,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['id']) && isset($_GET['no
                 <div class="mb-4">
                     <label for="categorie" class="form-label required-field">Catégorie</label>
                     <select class="form-select" id="categorie" name="categorie" required>
-                        <option value="" disabled <?= !isset($article) ? 'selected' : '' ?>>Sélectionnez une catégorie</option>
-                        <option value="Plomberie" <?= (isset($article) && $article['categorie'] == 'Plomberie') ? 'selected' : '' ?>>Plomberie</option>
-                        <option value="Maçonnerie" <?= (isset($article) && $article['categorie'] == 'Maçonnerie') ? 'selected' : '' ?>>Maçonnerie</option>
-                        <option value="Électricité" <?= (isset($article) && $article['categorie'] == 'Électricité') ? 'selected' : '' ?>>Électricité</option>
-                        <option value="Menuiserie bois" <?= (isset($article) && $article['categorie'] == 'Menuiserie bois') ? 'selected' : '' ?>>Menuiserie bois</option>
-                        <option value="Menuiserie aluminium" <?= (isset($article) && $article['categorie'] == 'Menuiserie aluminium') ? 'selected' : '' ?>>Menuiserie aluminium</option>
-                        <option value="Menuiserie métallique" <?= (isset($article) && $article['categorie'] == 'Menuiserie métallique') ? 'selected' : '' ?>>Menuiserie métallique</option>
-                        <option value="Froid" <?= (isset($article) && $article['categorie'] == 'Froid') ? 'selected' : '' ?>>Froid</option>
-                        <option value="Peinture" <?= (isset($article) && $article['categorie'] == 'Peinture') ? 'selected' : '' ?>>Peinture</option>
+                        <option value="" disabled <?= !isset($article) ? 'selected' : '' ?>>Sélectionnez une catégorie
+                        </option>
+                        <option value="Plomberie"
+                            <?= (isset($article) && $article['categorie'] == 'Plomberie') ? 'selected' : '' ?>>Plomberie
+                        </option>
+                        <option value="Maçonnerie"
+                            <?= (isset($article) && $article['categorie'] == 'Maçonnerie') ? 'selected' : '' ?>>
+                            Maçonnerie</option>
+                        <option value="Électricité"
+                            <?= (isset($article) && $article['categorie'] == 'Électricité') ? 'selected' : '' ?>>
+                            Électricité</option>
+                        <option value="Menuiserie bois"
+                            <?= (isset($article) && $article['categorie'] == 'Menuiserie bois') ? 'selected' : '' ?>>
+                            Menuiserie bois</option>
+                        <option value="Menuiserie aluminium"
+                            <?= (isset($article) && $article['categorie'] == 'Menuiserie aluminium') ? 'selected' : '' ?>>
+                            Menuiserie aluminium</option>
+                        <option value="Menuiserie métallique"
+                            <?= (isset($article) && $article['categorie'] == 'Menuiserie métallique') ? 'selected' : '' ?>>
+                            Menuiserie métallique</option>
+                        <option value="Froid"
+                            <?= (isset($article) && $article['categorie'] == 'Froid') ? 'selected' : '' ?>>Froid
+                        </option>
+                        <option value="Peinture"
+                            <?= (isset($article) && $article['categorie'] == 'Peinture') ? 'selected' : '' ?>>Peinture
+                        </option>
                     </select>
                 </div>
 
@@ -174,9 +202,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['id']) && isset($_GET['no
                     <a href="articles.php" class="btn btn-outline-secondary me-2">
                         <i class="fas fa-times me-1"></i> Annuler
                     </a>
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-primary"
+                        onclick="return confirm('Êtes-vous sûr de vouloir continuer ?')">
                         <i class="fas fa-save me-1"></i> <?= isset($article) ? 'Mettre à jour' : 'Enregistrer' ?>
                     </button>
+
                 </div>
             </form>
         </div>
@@ -196,7 +226,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['id']) && isset($_GET['no
     $(document).ready(function() {
         // Validation basique du formulaire
         $('#articleForm').submit(function(e) {
-            if ($('#nom').val() === '' || $('#reference').val() === '' || $('#categorie').val() === null) {
+            if ($('#nom').val() === '' || $('#reference').val() === '' || $('#categorie').val() ===
+                null) {
                 e.preventDefault();
                 alert('Veuillez remplir tous les champs obligatoires');
             }

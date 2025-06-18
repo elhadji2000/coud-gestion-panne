@@ -1,11 +1,5 @@
 <?php
 session_start();
-if (empty($_SESSION['username']) && empty($_SESSION['mdp'])) {
-    header('Location: /COUD/codif/');
-    exit();
-}
-unset($_SESSION['classe']);
-
 include('../../traitement/fonction.php');
 include('../../traitement/requete.php');
 include('../../activite.php');
@@ -17,14 +11,10 @@ include('../../activite.php');
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Déclaration de Panne</title>
-
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <!-- Select2 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
@@ -265,7 +255,8 @@ include('../../activite.php');
                 </div>
 
                 <!-- Bouton de soumission -->
-                <button type="submit" class="btn btn-submit">
+                <button type="submit" class="btn btn-submit"
+                    onclick="return confirm('Êtes-vous sûr de vouloir continuer ?')">
                     <i class="fas fa-save me-2"></i>ENREGISTRER
                 </button>
 

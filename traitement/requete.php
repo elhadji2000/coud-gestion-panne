@@ -1,24 +1,21 @@
 <?php
-// Verifier la session si elle est actif, sinon on redirige vers la racine
-if (empty($_SESSION['username']) && empty($_SESSION['mdp'])) {
+ if (session_status() === PHP_SESSION_NONE) {
+    session_start(); // Toujours démarrer la session si elle n'est pas active
+}
+// 
+
+// Vérifie si l'utilisateur est connecté
+ if (empty($_SESSION['username'])) {
+    session_unset();
+    session_destroy();
     header('Location: /COUD/panne/');
     exit();
 }
-// Verifier si la session stock toujours la valeur du niveau de la classe, sinon on l'initialise
-if (isset($_SESSION['classe'])) {
-    $classe = $_SESSION['classe'];
-} else {
-    $classe = "";
-}
-// appelle la page fonction.php
-require_once(__DIR__ . '/fonction.php');
 
-// Declaration des variables et tableaux
-$tableauDataFaculte = [];
-$tableauDataNiveauFormation = [];
-$erreurClasse = "";
-$messageErreurFaculte = "";
-$messageErreurDepartement = "";
+// Vérifie si le mot de passe est encore celui par défaut
+if (isset($_SESSION['type_mdp']) && $_SESSION['type_mdp'] === 'default') {
+    header('Location: /COUD/panne/profils/admin/update_mdp.php');
+    exit();
+} 
 
-
-
+?>

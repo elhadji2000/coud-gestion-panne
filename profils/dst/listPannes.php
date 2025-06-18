@@ -1,10 +1,5 @@
 <?php
 session_start();
-if (empty($_SESSION['username']) && empty($_SESSION['mdp'])) {
-    header('Location: /COUD/panne/');
-    exit();
-}
-unset($_SESSION['classe']);
 
 include('../../traitement/fonction.php');
 include('../../traitement/requete.php');

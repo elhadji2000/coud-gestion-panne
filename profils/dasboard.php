@@ -1,19 +1,19 @@
 <?php
-session_start();
-if (empty($_SESSION['username']) && empty($_SESSION['mdp'])) {
-    header('Location: /COUD/codif/');
-    exit();
-}
-unset($_SESSION['classe']);
+ session_start();
 
 include('../traitement/fonction.php');
 include('../traitement/requete.php');
-//include('../activite.php');
 
 $userId = $_SESSION['id_user'];
 $userRole = $_SESSION['profil'];
 
-// Récupération des données pour les graphiques
+// Récupération des données pour les statistiques
+$totalPannes = countTotalPannes($connexion);
+$pannesResolues = countPannesResolues($connexion);
+$pannesEnCours = countPannesEnCours($connexion);
+$pannesNonResolues = $totalPannes - $pannesResolues;
+
+// Récupération des pannes par type
 $typesPannes = [];
 $countsPannes = [];
 $queryTypes = "SELECT type_panne, COUNT(*) as count FROM panne GROUP BY type_panne";
@@ -21,25 +21,6 @@ $resultTypes = mysqli_query($connexion, $queryTypes);
 while ($row = mysqli_fetch_assoc($resultTypes)) {
     $typesPannes[] = $row['type_panne'];
     $countsPannes[] = $row['count'];
-}
-
-// Données pour le graphique temporel
-$months = [];
-$monthData = [];
-for ($i = 5; $i >= 0; $i--) {
-    $month = date('Y-m', strtotime("-$i months"));
-    $months[] = date('M Y', strtotime($month));
-    
-    $queryMonth = "SELECT type_panne, COUNT(*) as count 
-                  FROM panne 
-                  WHERE STR_TO_DATE(date_enregistrement, '%d/%m/%Y') LIKE '$month%'
-                  GROUP BY type_panne";
-    $resultMonth = mysqli_query($connexion, $queryMonth);
-    
-    $monthData[$month] = [];
-    while ($row = mysqli_fetch_assoc($resultMonth)) {
-        $monthData[$month][$row['type_panne']] = $row['count'];
-    }
 }
 ?>
 
@@ -49,7 +30,7 @@ for ($i = 5; $i >= 0; $i--) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GESCOUD</title>
+    <title>GESCOUD - Tableau de Bord</title>
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -57,107 +38,123 @@ for ($i = 5; $i >= 0; $i--) {
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --card-spacing: 1.5rem;
-            --card-padding: 2rem;
+            --primary: #4e73df;
+            --success: #1cc88a;
+            --warning: #f6c23e;
+            --danger: #e74a3b;
+            --info: #36b9cc;
+            --dark: #5a5c69;
+            --light: #f8f9fc;
         }
         
         body {
-            background-color: #f8f9fc;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f7fb;
+            color: #4a4a4a;
         }
         
         .dashboard-container {
             padding: 2rem;
-            max-width: 1400px;
+            max-width: 1800px;
             margin: 0 auto;
         }
         
         .dashboard-header {
-            margin-bottom: 3rem;
+            margin-bottom: 2.5rem;
             padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
         }
         
         .dashboard-title {
-            font-size: 1.8rem;
+            font-size: 2rem;
             font-weight: 600;
             color: #2e3a4d;
+            margin-bottom: 0.5rem;
         }
         
         .dashboard-subtitle {
             color: #6c757d;
             font-size: 1rem;
+            font-weight: 400;
         }
         
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: var(--card-spacing);
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
             margin-bottom: 3rem;
         }
         
         .stat-card {
             background: white;
             border-radius: 12px;
-            padding: var(--card-padding);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            transition: all 0.3s ease;
             border: none;
             position: relative;
             overflow: hidden;
+            border-left: 4px solid var(--primary);
         }
         
         .stat-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
         }
         
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
+        .stat-card.total {
+            border-left-color: var(--primary);
         }
         
-        .stat-card.users::before {
-            background-color: #4e73df;
+        .stat-card.resolved {
+            border-left-color: var(--success);
         }
         
-        .stat-card.pannes::before {
-            background-color: #e74a3b;
+        .stat-card.pending {
+            border-left-color: var(--warning);
         }
         
-        .stat-card.en-cours::before {
-            background-color: #f6c23e;
+        .stat-card.unresolved {
+            border-left-color: var(--danger);
         }
         
-        .stat-card.resolues::before {
-            background-color: #1cc88a;
+        .stat-card.type {
+            border-left-color: var(--info);
         }
         
         .stat-icon {
-            font-size: 2.2rem;
-            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
             opacity: 0.8;
+            position: absolute;
+            right: 1.5rem;
+            top: 1.5rem;
+            color: rgba(0,0,0,0.1);
         }
         
-        .stat-card.users .stat-icon {
-            color: #4e73df;
+        .stat-card.total .stat-icon {
+            color: rgba(78, 115, 223, 0.2);
         }
         
-        .stat-card.pannes .stat-icon {
-            color: #e74a3b;
+        .stat-card.resolved .stat-icon {
+            color: rgba(28, 200, 138, 0.2);
         }
         
-        .stat-card.en-cours .stat-icon {
-            color: #f6c23e;
+        .stat-card.pending .stat-icon {
+            color: rgba(246, 194, 62, 0.2);
         }
         
-        .stat-card.resolues .stat-icon {
-            
-            color: #1cc88a;
+        .stat-card.unresolved .stat-icon {
+            color: rgba(231, 74, 59, 0.2);
+        }
+        
+        .stat-card.type .stat-icon {
+            color: rgba(54, 185, 204, 0.2);
         }
         
         .stat-title {
@@ -181,28 +178,69 @@ for ($i = 5; $i >= 0; $i--) {
             color: #6c757d;
         }
         
+        .progress {
+            height: 6px;
+            border-radius: 3px;
+            margin-top: 10px;
+            background-color: #e9ecef;
+        }
+        
+        .progress-bar {
+            border-radius: 3px;
+        }
+        
         .chart-container {
             background: white;
             border-radius: 12px;
-            padding: var(--card-padding);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            margin-bottom: 3rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            margin-bottom: 2rem;
         }
         
         .chart-header {
             margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
         .chart-title {
             font-size: 1.2rem;
             font-weight: 600;
             color: #2e3a4d;
+            margin-bottom: 0;
         }
         
         .chart-wrapper {
             position: relative;
-            height: 400px;
+            height: 350px;
             width: 100%;
+        }
+        
+        .type-badge {
+            padding: 0.35rem 0.65rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .type-badge i {
+            margin-right: 0.3rem;
+            font-size: 0.7rem;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -212,50 +250,102 @@ for ($i = 5; $i >= 0; $i--) {
 
     <div class="dashboard-container">
         <div class="dashboard-header">
-            <h1 class="dashboard-title">Tableau de Bord</h1>
-            <p class="dashboard-subtitle">Statistiques globales du système de gestion des pannes</p>
+            <h1 class="dashboard-title">Tableau de Bord des Pannes</h1>
+            <p class="dashboard-subtitle">Statistiques et analyses des pannes enregistrées</p>
         </div>
 
+        <!-- Section des statistiques principales -->
         <div class="stats-grid">
-            <!-- Carte Utilisateurs -->
-            <div class="stat-card users">
-                <div class="stat-icon">
-                    <i class="fas fa-users"></i>
-                </div>
-                <div class="stat-title">Utilisateurs Totaux</div>
-                <div class="stat-value"><?php echo countUsers($connexion); ?></div>
-                <div class="stat-diff">Tous les utilisateurs actifs</div>
-            </div>
-
             <!-- Carte Pannes Totales -->
-            <div class="stat-card pannes">
+            <div class="stat-card total">
                 <div class="stat-icon">
-                    <i class="fas fa-exclamation-triangle"></i>
+                    <i class="fas fa-clipboard-list"></i>
                 </div>
-                <div class="stat-title">Pannes Totales</div>
-                <div class="stat-value"><?php echo countTotalPannes($connexion); ?></div>
-                <div class="stat-diff">Depuis le début</div>
-            </div>
-
-            <!-- Carte Pannes en Cours -->
-            <div class="stat-card en-cours">
-                <div class="stat-icon">
-                    <i class="fas fa-spinner"></i>
+                <div class="stat-title">Total des Pannes</div>
+                <div class="stat-value"><?php echo $totalPannes; ?></div>
+                <div class="stat-diff">Toutes pannes enregistrées</div>
+                <div class="progress">
+                    <div class="progress-bar bg-primary" style="width: 100%"></div>
                 </div>
-                <div class="stat-title">Pannes en Cours</div>
-                <div class="stat-value"><?php echo countPannesEnCours($connexion); ?></div>
-                <div class="stat-diff">À traiter rapidement</div>
             </div>
 
             <!-- Carte Pannes Résolues -->
-            <div class="stat-card resolues">
+            <div class="stat-card resolved">
                 <div class="stat-icon">
                     <i class="fas fa-check-circle"></i>
                 </div>
                 <div class="stat-title">Pannes Résolues</div>
-                <div class="stat-value"><?php echo countPannesResolues($connexion); ?></div>
-                <div class="stat-diff">Problèmes corrigés</div>
+                <div class="stat-value"><?php echo $pannesResolues; ?></div>
+                <div class="stat-diff"><?php echo round(($pannesResolues/$totalPannes)*100, 2); ?>% du total</div>
+                <div class="progress">
+                    <div class="progress-bar bg-success" style="width: <?php echo ($totalPannes > 0) ? ($pannesResolues/$totalPannes)*100 : 0; ?>%"></div>
+                </div>
             </div>
+
+            <!-- Carte Pannes en Cours -->
+            <div class="stat-card pending">
+                <div class="stat-icon">
+                    <i class="fas fa-spinner"></i>
+                </div>
+                <div class="stat-title">Pannes en Cours</div>
+                <div class="stat-value"><?php echo $pannesEnCours; ?></div>
+                <div class="stat-diff"><?php echo round(($pannesEnCours/$totalPannes)*100, 2); ?>% du total</div>
+                <div class="progress">
+                    <div class="progress-bar bg-warning" style="width: <?php echo ($totalPannes > 0) ? ($pannesEnCours/$totalPannes)*100 : 0; ?>%"></div>
+                </div>
+            </div>
+
+            <!-- Carte Pannes Non Résolues -->
+            <div class="stat-card unresolved">
+                <div class="stat-icon">
+                    <i class="fas fa-times-circle"></i>
+                </div>
+                <div class="stat-title">Pannes Non Résolues</div>
+                <div class="stat-value"><?php echo $pannesNonResolues; ?></div>
+                <div class="stat-diff"><?php echo round(($pannesNonResolues/$totalPannes)*100, 2); ?>% du total</div>
+                <div class="progress">
+                    <div class="progress-bar bg-danger" style="width: <?php echo ($totalPannes > 0) ? ($pannesNonResolues/$totalPannes)*100 : 0; ?>%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Deuxième ligne de cartes pour les types de pannes -->
+        <div class="stats-grid">
+            <?php 
+            // Afficher une carte pour chaque type de panne
+            foreach ($typesPannes as $index => $type) {
+                $count = $countsPannes[$index];
+                $percentage = round(($count/$totalPannes)*100, 2);
+                $color = [
+                    'rgba(78, 115, 223, 0.9)',
+                    'rgba(28, 200, 138, 0.9)',
+                    'rgba(246, 194, 62, 0.9)',
+                    'rgba(231, 74, 59, 0.9)',
+                    'rgba(54, 185, 204, 0.9)',
+                    'rgba(155, 89, 182, 0.9)'
+                ][$index % 6];
+                
+                $icon = [
+                    'fas fa-laptop',
+                    'fas fa-network-wired',
+                    'fas fa-print',
+                    'fas fa-server',
+                    'fas fa-database',
+                    'fas fa-mobile-alt'
+                ][$index % 6];
+            ?>
+            <div class="stat-card type">
+                <div class="stat-icon">
+                    <i class="<?php echo $icon; ?>"></i>
+                </div>
+                <div class="stat-title">Pannes <?php echo htmlspecialchars($type); ?></div>
+                <div class="stat-value"><?php echo $count; ?></div>
+                <div class="stat-diff"><?php echo $percentage; ?>% du total</div>
+                <div class="progress">
+                    <div class="progress-bar" style="width: <?php echo $percentage; ?>%; background-color: <?php echo $color; ?>"></div>
+                </div>
+            </div>
+            <?php } ?>
         </div>
 
         <!-- Graphique des pannes par type -->
@@ -265,16 +355,6 @@ for ($i = 5; $i >= 0; $i--) {
             </div>
             <div class="chart-wrapper">
                 <canvas id="typePanneChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Graphique temporel des pannes déclarées -->
-        <div class="chart-container">
-            <div class="chart-header">
-                <h2 class="chart-title">Évolution des pannes déclarées</h2>
-            </div>
-            <div class="chart-wrapper">
-                <canvas id="timelineChart"></canvas>
             </div>
         </div>
     </div>
@@ -287,56 +367,34 @@ for ($i = 5; $i >= 0; $i--) {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <script>
-        // Fonction pour générer des couleurs aléatoires
-        function getRandomColor() {
-            const r = Math.floor(Math.random() * 255);
-            const g = Math.floor(Math.random() * 255);
-            const b = Math.floor(Math.random() * 255);
-            return `rgba(${r}, ${g}, ${b}, 0.7)`;
+        // Fonction pour générer des couleurs
+        function getColor(index) {
+            const colors = [
+                'rgba(78, 115, 223, 0.9)',
+                'rgba(28, 200, 138, 0.9)',
+                'rgba(246, 194, 62, 0.9)',
+                'rgba(231, 74, 59, 0.9)',
+                'rgba(54, 185, 204, 0.9)',
+                'rgba(155, 89, 182, 0.9)'
+            ];
+            return colors[index % colors.length];
         }
 
         // Données pour les graphiques
         const typePanneLabels = <?php echo json_encode($typesPannes); ?>;
         const typePanneData = <?php echo json_encode($countsPannes); ?>;
         
-        // Préparation des données pour le graphique temporel
-        const timelineLabels = <?php echo json_encode($months); ?>;
-        const timelineDatasets = [];
-        
-        <?php 
-        // Générer un dataset pour chaque type de panne
-        foreach ($typesPannes as $index => $type) {
-            $data = [];
-            foreach ($months as $month) {
-                $monthKey = date('Y-m', strtotime($month));
-                $count = isset($monthData[$monthKey][$type]) ? $monthData[$monthKey][$type] : 0;
-                $data[] = $count;
-            }
-            
-            $color = "rgba(".rand(0,255).",".rand(0,255).",".rand(0,255).",0.7)";
-            echo "timelineDatasets.push({
-                label: '".addslashes($type)."',
-                data: ".json_encode($data).",
-                backgroundColor: '$color',
-                borderColor: '$color',
-                borderWidth: 2,
-                tension: 0.1,
-                fill: false
-            });";
-        }
-        ?>
-
         // Initialisation des graphiques après le chargement de la page
         document.addEventListener('DOMContentLoaded', function() {
             // Graphique des types de pannes (camembert)
             const typePanneCtx = document.getElementById('typePanneChart').getContext('2d');
             const typePanneChart = new Chart(typePanneCtx, {
-                type: 'pie',
+                type: 'doughnut',
                 data: {
                     labels: typePanneLabels,
                     datasets: [{
                         data: typePanneData,
-                        backgroundColor: typePanneLabels.map(() => getRandomColor()),
+                        backgroundColor: typePanneLabels.map((_, index) => getColor(index)),
                         borderWidth: 1
                     }]
                 },
@@ -346,6 +404,12 @@ for ($i = 5; $i >= 0; $i--) {
                     plugins: {
                         legend: {
                             position: 'right',
+                            labels: {
+                                boxWidth: 12,
+                                padding: 20,
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
                         },
                         tooltip: {
                             callbacks: {
@@ -358,44 +422,11 @@ for ($i = 5; $i >= 0; $i--) {
                                 }
                             }
                         }
-                    }
-                }
-            });
-
-            // Graphique temporel (courbe)
-            const timelineCtx = document.getElementById('timelineChart').getContext('2d');
-            const timelineChart = new Chart(timelineCtx, {
-                type: 'line',
-                data: {
-                    labels: timelineLabels,
-                    datasets: timelineDatasets
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Nombre de pannes'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Mois'
-                            }
-                        }
                     },
-                    plugins: {
-                        tooltip: {
-                            mode: 'index',
-                            intersect: false
-                        },
-                        legend: {
-                            position: 'top',
-                        }
+                    cutout: '70%',
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true
                     }
                 }
             });
@@ -403,3 +434,4 @@ for ($i = 5; $i >= 0; $i--) {
     </script>
 </body>
 </html>
+<?php ob_end_flush(); ?>

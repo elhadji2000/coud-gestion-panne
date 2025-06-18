@@ -1,14 +1,6 @@
 <?php
 // Démarre une nouvelle session ou reprend une session existante
 session_start();
-if (empty($_SESSION['username']) && empty($_SESSION['mdp'])) {
-    header('Location: /COUD/codif/');
-    exit();
-}
-
-// Supprimer une variable de session spécifique
-unset($_SESSION['classe']);
-
 // Inclusion des fichiers nécessaires
 require_once('../../traitement/fonction.php');
 require_once('../../traitement/requete.php');
