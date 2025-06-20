@@ -828,7 +828,7 @@ function countUsers($connexion) {
 
 // 1. Compter le nombre total de pannes (avec filtre si pas admin ou dst)
 function countTotalPannes($connexion, $id_user, $profil) {
-    if ($profil === 'admin' || $profil === 'dst') {
+    if ($profil === 'admin' || $profil === 'dst' || $profil === 'atelier') {
         $query = "SELECT COUNT(*) as total FROM panne";
         $stmt = $connexion->prepare($query);
     }
@@ -851,7 +851,7 @@ function countTotalPannes($connexion, $id_user, $profil) {
 
 // 2. Compter les pannes en cours via jointure intervention → panne → utilisateur
 function countPannesEnCours($connexion, $id_user, $profil) {
-    if ($profil === 'admin' || $profil === 'dst') {
+    if ($profil === 'admin' || $profil === 'dst' || $profil === 'atelier') {
         $query = "SELECT COUNT(*) as total FROM intervention WHERE resultat = 'en cours'";
         $stmt = $connexion->prepare($query);
     }
@@ -884,7 +884,7 @@ function countPannesEnCours($connexion, $id_user, $profil) {
 
 // 3. Compter les pannes résolues avec même logique
 function countPannesResolues($connexion, $id_user, $profil) {
-    if ($profil === 'admin' || $profil === 'dst') {
+    if ($profil === 'admin' || $profil === 'dst' || $profil === 'atelier') {
         $query = "SELECT COUNT(*) as total FROM intervention WHERE resultat = 'depanner'";
         $stmt = $connexion->prepare($query);
     }
@@ -915,7 +915,7 @@ function countPannesResolues($connexion, $id_user, $profil) {
     return $row['total'];
 }
 function getTypesPannesAvecCounts($connexion, $id_user, $profil) {
-    if ($profil === 'admin' || $profil === 'dst') {
+    if ($profil === 'admin' || $profil === 'dst' || $profil === 'atelier') {
         $query = "SELECT type_panne, COUNT(*) as count FROM panne GROUP BY type_panne";
         $stmt = $connexion->prepare($query);
     }

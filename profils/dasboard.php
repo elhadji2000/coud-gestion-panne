@@ -11,7 +11,7 @@ $userRole = $_SESSION['profil'];
 $totalPannes = countTotalPannes($connexion, $userId, $userRole);
 $pannesResolues = countPannesResolues($connexion, $userId, $userRole);
 $pannesEnCours = countPannesEnCours($connexion, $userId, $userRole);
-$pannesNonResolues = $totalPannes - $pannesResolues;
+$pannesNonResolues = $totalPannes - ($pannesResolues + $pannesEnCours);
 
 // Récupération des pannes par type
 $typesPannes = [];
@@ -273,7 +273,7 @@ $countsPannes = $dataPannes['counts'];
                 </div>
                 <div class="stat-title">Pannes Résolues</div>
                 <div class="stat-value"><?php echo $pannesResolues; ?></div>
-                <div class="stat-diff"><?php echo round(($pannesResolues/$totalPannes)*100, 2); ?>% du total</div>
+                <div class="stat-diff"><?php echo ($totalPannes > 0) ? round(($pannesResolues / $totalPannes) * 100, 2) : 0; ?>% du total</div>
                 <div class="progress">
                     <div class="progress-bar bg-success" style="width: <?php echo ($totalPannes > 0) ? ($pannesResolues/$totalPannes)*100 : 0; ?>%"></div>
                 </div>
@@ -286,7 +286,7 @@ $countsPannes = $dataPannes['counts'];
                 </div>
                 <div class="stat-title">Pannes en Cours</div>
                 <div class="stat-value"><?php echo $pannesEnCours; ?></div>
-                <div class="stat-diff"><?php echo round(($pannesEnCours/$totalPannes)*100, 2); ?>% du total</div>
+                <div class="stat-diff"><?php echo ($totalPannes > 0) ? round(($pannesEnCours / $totalPannes) * 100, 2) : 0; ?>% du total</div>
                 <div class="progress">
                     <div class="progress-bar bg-warning" style="width: <?php echo ($totalPannes > 0) ? ($pannesEnCours/$totalPannes)*100 : 0; ?>%"></div>
                 </div>
@@ -299,7 +299,7 @@ $countsPannes = $dataPannes['counts'];
                 </div>
                 <div class="stat-title">Pannes Non Résolues</div>
                 <div class="stat-value"><?php echo $pannesNonResolues; ?></div>
-                <div class="stat-diff"><?php echo round(($pannesNonResolues/$totalPannes)*100, 2); ?>% du total</div>
+                <div class="stat-diff"><?php echo ($totalPannes > 0) ? round(($pannesNonResolues / $totalPannes) * 100, 2) : 0; ?>% du total</div>
                 <div class="progress">
                     <div class="progress-bar bg-danger" style="width: <?php echo ($totalPannes > 0) ? ($pannesNonResolues/$totalPannes)*100 : 0; ?>%"></div>
                 </div>

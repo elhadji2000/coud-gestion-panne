@@ -17,117 +17,133 @@ require_once(__DIR__ . '/traitement/fonction.php');
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="icon" href="log.gif" type="image/x-icon">
     <style>
-        /* Styles de base */
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
+    /* Styles de base */
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        padding-top: 120px;
+        /* Ajoutez ceci pour éviter que le contenu ne soit caché sous l'en-tête fixe */
+    }
+
+    header {
+        position: fixed;
+        /* Rend l'en-tête fixe */
+        top: 0;
+        /* Le colle en haut */
+        left: 0;
+        /* S'étend sur toute la largeur */
+        right: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #ddd;
+        flex-wrap: wrap;
+        z-index: 1000;
+        /* Assure que l'en-tête reste au-dessus du contenu */
+    }
+
+    .logo-container {
+        display: flex;
+        align-items: center;
+    }
+
+    .logo-container img {
+        height: 40px;
+    }
+
+    .logo-container span {
+        margin-left: 10px;
+        font-weight: bold;
+        font-size: 18px;
+    }
+
+    /* Navigation desktop */
+    .desktop-nav ul {
+        display: flex;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .desktop-nav li {
+        margin: 0 10px;
+    }
+
+    .desktop-nav a {
+        text-decoration: none;
+        color: #333;
+        display: flex;
+        align-items: center;
+    }
+
+    .desktop-nav i {
+        margin-right: 5px;
+    }
+
+    /* Menu hamburger */
+    .hamburger {
+        display: none;
+        cursor: pointer;
+        font-size: 24px;
+    }
+
+    /* Navigation mobile */
+    .mobile-nav {
+        display: none;
+        width: 100%;
+    }
+
+    .mobile-nav ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .mobile-nav li {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .mobile-nav a {
+        text-decoration: none;
+        color: #333;
+        display: flex;
+        align-items: center;
+    }
+
+    .mobile-nav i {
+        margin-right: 10px;
+    }
+
+    /* Banner */
+    .banner {
+        position: absolute; /* Rend la bannière fixe aussi */
+        top: 60px; /* Positionne sous l'en-tête (ajuster selon la hauteur de votre header) */
+        left: 0;
+        right: 0;
+        text-align: center;
+        padding: 10px;
+        background: #3777B0;
+        color: white;
+        z-index: 999; /* Place sous l'en-tête mais au-dessus du contenu */
+    }
+
+    /* Media queries pour la responsivité */
+    @media (max-width: 768px) {
+        .desktop-nav {
+            display: none;
         }
-        
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 20px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #ddd;
-            flex-wrap: wrap;
-        }
-        
-        .logo-container {
-            display: flex;
-            align-items: center;
-        }
-        
-        .logo-container img {
-            height: 40px;
-        }
-        
-        .logo-container span {
-            margin-left: 10px;
-            font-weight: bold;
-            font-size: 18px;
-        }
-        
-        /* Navigation desktop */
-        .desktop-nav ul {
-            display: flex;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-        
-        .desktop-nav li {
-            margin: 0 10px;
-        }
-        
-        .desktop-nav a {
-            text-decoration: none;
-            color: #333;
-            display: flex;
-            align-items: center;
-        }
-        
-        .desktop-nav i {
-            margin-right: 5px;
-        }
-        
-        /* Menu hamburger */
+
         .hamburger {
-            display: none;
-            cursor: pointer;
-            font-size: 24px;
+            display: block;
         }
-        
-        /* Navigation mobile */
-        .mobile-nav {
-            display: none;
-            width: 100%;
+
+        .mobile-nav.active {
+            display: block;
         }
-        
-        .mobile-nav ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        .mobile-nav li {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .mobile-nav a {
-            text-decoration: none;
-            color: #333;
-            display: flex;
-            align-items: center;
-        }
-        
-        .mobile-nav i {
-            margin-right: 10px;
-        }
-        
-        /* Banner */
-        .banner {
-            text-align: center;
-            padding: 10px;
-            background: #3777B0;
-            color: white;
-        }
-        
-        /* Media queries pour la responsivité */
-        @media (max-width: 768px) {
-            .desktop-nav {
-                display: none;
-            }
-            
-            .hamburger {
-                display: block;
-            }
-            
-            .mobile-nav.active {
-                display: block;
-            }
-        }
+    }
     </style>
 </head>
 
@@ -157,7 +173,7 @@ require_once(__DIR__ . '/traitement/fonction.php');
                 <?php } elseif (($_SESSION['profil'] == 'residence') || ($_SESSION['profil'] == 'service')) { ?>
                 <li><a href="http://localhost/COUD/panne/profils/dasboard.php">
                         <i class="fa fa-home" aria-hidden="true"></i>Accueil</a></li>
-                <li><a href="http://localhost/COUD/panne/profils/residence/listPannes.php"> 
+                <li><a href="http://localhost/COUD/panne/profils/residence/listPannes.php">
                         <i class="fa fa-wrench" aria-hidden="true"></i>Déclarations</a></li>
 
                 <?php } elseif (($_SESSION['profil'] == 'dst') || ($_SESSION['profil'] == 'atelier')) { ?>
@@ -166,7 +182,7 @@ require_once(__DIR__ . '/traitement/fonction.php');
                         <i class="fa fa-home" aria-hidden="true"></i>Accueil
                     </a>
                 </li>
-                <li><a href="http://localhost/COUD/panne/profils/dst/listPannes.php"> 
+                <li><a href="http://localhost/COUD/panne/profils/dst/listPannes.php">
                         <i class="fa fa-wrench" aria-hidden="true"></i>Déclarations</a></li>
                 <li><a href="http://localhost/COUD/panne/profils/stock/gestion.php">
                         <i class="fas fa-warehouse" aria-hidden="true"></i>Stock</a>
@@ -214,7 +230,7 @@ require_once(__DIR__ . '/traitement/fonction.php');
                 <?php } elseif (($_SESSION['profil'] == 'residence') || ($_SESSION['profil'] == 'service')) { ?>
                 <li><a href="http://localhost/COUD/panne/profils/dasboard.php">
                         <i class="fa fa-home" aria-hidden="true"></i>Accueil</a></li>
-                <li><a href="http://localhost/COUD/panne/profils/residence/listPannes.php"> 
+                <li><a href="http://localhost/COUD/panne/profils/residence/listPannes.php">
                         <i class="fa fa-wrench" aria-hidden="true"></i>Déclarations</a></li>
 
                 <?php } elseif (($_SESSION['profil'] == 'dst') || ($_SESSION['profil'] == 'atelier')) { ?>
@@ -223,7 +239,7 @@ require_once(__DIR__ . '/traitement/fonction.php');
                         <i class="fa fa-home" aria-hidden="true"></i>Accueil
                     </a>
                 </li>
-                <li><a href="http://localhost/COUD/panne/profils/dst/listPannes.php"> 
+                <li><a href="http://localhost/COUD/panne/profils/dst/listPannes.php">
                         <i class="fa fa-wrench" aria-hidden="true"></i>Déclarations</a></li>
                 <li><a href="http://localhost/COUD/panne/profils/stock/gestion.php">
                         <i class="fas fa-warehouse" aria-hidden="true"></i>Stock</a>
@@ -267,12 +283,14 @@ require_once(__DIR__ . '/traitement/fonction.php');
         </p>
         <?php } ?>
     </div>
+    <br>
 
     <script>
-        function toggleMenu() {
-            const mobileNav = document.getElementById('mobileNav');
-            mobileNav.classList.toggle('active');
-        }
+    function toggleMenu() {
+        const mobileNav = document.getElementById('mobileNav');
+        mobileNav.classList.toggle('active');
+    }
     </script>
 </body>
+
 </html>

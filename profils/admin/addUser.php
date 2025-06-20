@@ -156,6 +156,14 @@ if ($user_id) {
             <?php if (isset($user['id'])): ?>
             <input type="hidden" name="id" value="<?= htmlspecialchars($user['id']) ?>">
             <?php endif; ?>
+            <?php if (isset($_GET['erreur'])): ?>
+            <?php if ($_GET['erreur'] === 'exist'): ?>
+            <div class="alert alert-danger">Nom d'utilisateur ou email déjà utilisé.</div>
+            <?php elseif ($_GET['erreur'] === 'save'): ?>
+            <div class="alert alert-danger">Une erreur est survenue lors de l'enregistrement.</div>
+            <?php endif; ?>
+            <?php endif; ?>
+
 
             <div class="row g-3">
                 <!-- Username -->
@@ -214,7 +222,8 @@ if ($user_id) {
                 <div class="col-md-6 form-section">
                     <label for="password" class="form-label">Mot de passe</label>
                     <div class="input-group">
-                        <input type="password" class="form-control" value="coud2025" id="password" name="password" required>
+                        <input type="password" class="form-control" value="coud2025" id="password" name="password"
+                            required>
                         <button class="btn btn-outline-secondary" type="button" id="togglePassword">
                             <i class="fas fa-eye"></i>
                         </button>
@@ -262,7 +271,8 @@ if ($user_id) {
                 <a href="users.php" class="back-link">
                     <i class="fas fa-arrow-left me-2"></i>Retour
                 </a>
-                <button type="submit" class="btn btn-primary-custom" onclick="return confirm('Êtes-vous sûr de vouloir continuer ?')">
+                <button type="submit" class="btn btn-primary-custom"
+                    onclick="return confirm('Êtes-vous sûr de vouloir continuer ?')">
                     <i class="fas fa-save me-2"></i>ENREGISTRER
                 </button>
             </div>

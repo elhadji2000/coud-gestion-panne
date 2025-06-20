@@ -201,7 +201,8 @@ if ($intervention_id) {
                     <a href="javascript:history.back()" class="back-link">
                         <i class="fas fa-arrow-left me-2"></i>Retour
                     </a>
-                    <button type="submit" class="btn btn-submit text-white">
+                    <button type="submit" class="btn btn-submit text-white"
+                        onclick="return confirm('Êtes-vous sûr de vouloir continuer ?')">
                         <i class="fas fa-save me-2"></i>Enregistrer l'intervention
                     </button>
                 </div>

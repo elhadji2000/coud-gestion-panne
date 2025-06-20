@@ -197,6 +197,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <a href="javascript:history.back()" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left me-2"></i>Retour
                     </a>
+
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save me-2"></i>Enregistrer
                     </button>
@@ -208,6 +209,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <?php if ($success): ?>
+    <!-- Modal Bootstrap -->
+    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-success">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="successModalLabel">
+                        <i class="fas fa-check-circle me-2"></i>Succès
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <?= htmlspecialchars($success) ?>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script JS -->
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const modalElement = document.getElementById('successModal');
+        const modalInstance = new bootstrap.Modal(modalElement);
+
+        // Afficher le modal
+        modalInstance.show();
+
+        // Lorsqu'il est fermé, rediriger vers index.php
+        modalElement.addEventListener('hidden.bs.modal', function() {
+            window.location.href = 'http://localhost/COUD/panne/index.php'; // modifie si besoin
+        });
+    });
+    </script>
+    <?php endif; ?>
+
+
 
     <script>
     // Basculer la visibilité du mot de passe

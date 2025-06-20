@@ -67,15 +67,15 @@ if (
     $description_action = trim($_POST['details']);
     $id_chef_atelier = $_SESSION['id_user'] ?? null;
     $id_panne = (int) $_POST['idPanne'];
-    $date_intervention = trim($_POST['date_intervention']);
+    $date_intervention = $_POST['date_intervention'];
 
     $intervention_id = isset($_POST['intervention_id']) && is_numeric($_POST['intervention_id']) && $_POST['intervention_id'] > 0
         ? (int) $_POST['intervention_id']
         : null;
 
     // Convertir la date de dd/mm/yyyy vers yyyy-mm-dd
-    $date_intervention = date('Y-m-d', strtotime(str_replace('/', '-', $date_intervention)));
-    $date_sys = date('Y-m-d');
+    $date_intervention = date('d/m/Y', strtotime(str_replace('-', '/', $date_intervention)));
+    $date_sys = date('d/m/Y');;
 
     $resultat = "en cours";
 
@@ -189,7 +189,7 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['imputation_id']) ) {
 elseif ($_SERVER['REQUEST_METHOD'] == 'POST' &&
     isset($_POST['username']) && isset($_POST['nom']) &&
     isset($_POST['prenom']) && isset($_POST['telephone']) &&
-    isset($_POST['email']) &&  isset($_POST['profil1']) && 
+    isset($_POST['email']) && isset($_POST['profil1']) && 
     isset($_POST['profil2'])) {
 
     // Récupérer les données du formulaire
@@ -203,39 +203,62 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'POST' &&
 
     // Vérifier si c'est une mise à jour ou un nouvel utilisateur
     if (isset($_POST['id']) && !empty($_POST['id'])) {
-        // Cas de mise à jour d'un utilisateur existant
+        // --- MISE À JOUR ---
         $id = $_POST['id'];
-
-        // Optionnel : Vérifier si un nouveau mot de passe est saisi
         $motDePasse = isset($_POST['password']) && !empty($_POST['password']) ? $_POST['password'] : null;
 
-        // Appeler la fonction de mise à jour
+        // Vérifier si username ou email est utilisé par un autre utilisateur
+        $stmt = $connexion->prepare("SELECT id FROM utilisateur WHERE (username = ? OR email = ?) AND id != ?");
+        $stmt->bind_param("ssi", $username, $email, $id);
+        $stmt->execute();
+        $stmt->store_result();
+
+        if ($stmt->num_rows > 0) {
+            // Un autre utilisateur utilise déjà ce username ou cet email
+            header('Location: /COUD/panne/profils/admin/addUser?user_id=' . $id . '&erreur=exist');
+            exit();
+        }
+
+        $stmt->close();
+
+        // Mise à jour si OK
         if (updateUtilisateur($connexion, $id, $username, $nom, $prenom, $email, $telephone, $motDePasse, $profil1, $profil2)) {
-            // Redirection en cas de succès
             header('Location: /COUD/panne/profils/admin/users');
             exit();
         } else {
-            // Redirection en cas d'échec
-            header('Location: /COUD/panne/profils/admin/editUser?id=' . $id);
+            header('Location: /COUD/panne/profils/admin/addUser?user_id=' . $id . '&erreur=save');
             exit();
         }
 
     } else {
-        // Cas de création d'un nouvel utilisateur
+        // --- CRÉATION ---
         $motDePasse = $_POST['password'];
 
-        // Appeler la fonction d'enregistrement
+        // Vérifier si username ou email existe déjà
+        $stmt = $connexion->prepare("SELECT id FROM utilisateur WHERE username = ? OR email = ?");
+        $stmt->bind_param("ss", $username, $email);
+        $stmt->execute();
+        $stmt->store_result();
+
+        if ($stmt->num_rows > 0) {
+            // Username ou email déjà pris
+            header('Location: /COUD/panne/profils/admin/addUser?erreur=exist');
+            exit();
+        }
+
+        $stmt->close();
+
+        // Enregistrement si OK
         if (enregistrerUtilisateur($connexion, $username, $nom, $prenom, $email, $telephone, $motDePasse, $profil1, $profil2)) {
-            // Redirection en cas de succès
             header('Location: /COUD/panne/profils/admin/users');
             exit();
         } else {
-            // Redirection en cas d'échec
-            header('Location: /COUD/panne/profils/admin/addUser');
+            header('Location: /COUD/panne/profils/admin/addUser?erreur=save');
             exit();
         }
     }
 }
+
 
 
 //############### pour supprimer Utilisateur ##################################

@@ -237,7 +237,7 @@ $pannes = obtenirPanneParId($connexion, $idPanne);
                     </div>
                 </div>
                 
-                <?php if ($_SESSION['profil'] == 'dst'): ?>
+                <?php if ($_SESSION['profil2'] == 'S.E.M'): ?>
                 <div class="row mt-4">
                     <div class="col-12 text-end">
                         <button class="btn btn-primary action-btn" 
