@@ -18,7 +18,6 @@ $pannes = obtenirPanneParId($connexion, $idPanne);
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -220,7 +219,7 @@ $pannes = obtenirPanneParId($connexion, $idPanne);
         </div>
         
         <!-- Section Instructions Chef S.E.M -->
-        <?php if ($_SESSION['profil'] != 'residence' && !empty($panne['date_imputation'])): ?>
+        <?php if ($_SESSION['profil'] != 'residence' && $_SESSION['profil'] != 'service' && !empty($panne['date_imputation'])): ?>
         <div class="card mb-4">
             <div class="card-header">
                 <h4 class="mb-0">Instructions du Chef S.E.M</h4>

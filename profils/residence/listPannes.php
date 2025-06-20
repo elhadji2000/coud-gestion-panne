@@ -78,8 +78,14 @@ $allPannes = $result['pannes'];
         background-color: #f8fafc;
         font-weight: 600;
         color: var(--secondary);
-        border-bottom-width: 1px;
-        
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .table td {
+        vertical-align: middle;
     }
 
     .badge-urgence {
@@ -174,7 +180,7 @@ $allPannes = $result['pannes'];
                 <table id="pannesTable" class="table table-hover" style="width:100%">
                     <thead>
                         <tr>
-                            <th>N°</th>
+                            <th>N°ID</th>
                             <th>Type</th>
                             <th>Localisation</th>
                             <th>Urgence</th>

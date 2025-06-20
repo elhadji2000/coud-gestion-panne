@@ -44,6 +44,19 @@ $statsGlobales = getStatsGlobales($connexion);
         background-color: #f8fafc;
         color: var(--secondary);
     }
+    .table th {
+        background-color: #f8fafc;
+        font-weight: 600;
+        color: var(--secondary);
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .table td {
+        vertical-align: middle;
+    }
 
     .card-stat {
         border-radius: 10px;

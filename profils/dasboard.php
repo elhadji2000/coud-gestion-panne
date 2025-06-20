@@ -8,20 +8,17 @@ $userId = $_SESSION['id_user'];
 $userRole = $_SESSION['profil'];
 
 // Récupération des données pour les statistiques
-$totalPannes = countTotalPannes($connexion);
-$pannesResolues = countPannesResolues($connexion);
-$pannesEnCours = countPannesEnCours($connexion);
+$totalPannes = countTotalPannes($connexion, $userId, $userRole);
+$pannesResolues = countPannesResolues($connexion, $userId, $userRole);
+$pannesEnCours = countPannesEnCours($connexion, $userId, $userRole);
 $pannesNonResolues = $totalPannes - $pannesResolues;
 
 // Récupération des pannes par type
 $typesPannes = [];
 $countsPannes = [];
-$queryTypes = "SELECT type_panne, COUNT(*) as count FROM panne GROUP BY type_panne";
-$resultTypes = mysqli_query($connexion, $queryTypes);
-while ($row = mysqli_fetch_assoc($resultTypes)) {
-    $typesPannes[] = $row['type_panne'];
-    $countsPannes[] = $row['count'];
-}
+$dataPannes = getTypesPannesAvecCounts($connexion, $userId, $userRole);
+$typesPannes = $dataPannes['types'];
+$countsPannes = $dataPannes['counts'];
 ?>
 
 <!DOCTYPE html>

@@ -35,9 +35,9 @@ include('traitement/connect.php');
     }
     
     .login-header {
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      background: #3777B0;
       color: white;
-      padding: 2rem 0;
+      padding: 1.5rem 0;
       text-align: center;
     }
     
@@ -52,7 +52,7 @@ include('traitement/connect.php');
     
     .login-logo {
       text-align: center;
-      margin-bottom: 1.5rem;
+      margin-bottom: 0rem;
     }
     
     .login-logo img {
@@ -87,7 +87,7 @@ include('traitement/connect.php');
     .btn-login {
       width: 100%;
       padding: 0.75rem;
-      background: var(--primary);
+      background: #3777B0;
       color: white;
       border: none;
       border-radius: 8px;
@@ -142,7 +142,6 @@ include('traitement/connect.php');
     </div>
     <h2>Centre des Œuvres Universitaires de Dakar</h2>
   </div>
-
   <div class="login-container">
     <h3 class="login-title">Connexion à GESCOUD</h3>
     
@@ -168,7 +167,6 @@ include('traitement/connect.php');
       
       <div class="login-links">
         <a href="mpo1">Mot de passe oublié ?</a>
-        <a href="rc">Faire une réclamation</a>
         <a href="index">Retour à l'accueil</a>
       </div>
     </form>

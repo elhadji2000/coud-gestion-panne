@@ -20,9 +20,9 @@ function verifTime() {
 	var timeNow=currentTime.getTime();
 	if (timeNow-theTime>300000) {
 	
-			//   alert('Votre session a expir�. Veuillez vous reconnecter!');
-            //     top.location.href="index"			   
-			//  top.location.href="https://campuscoud.ucad.sn"			 
+			   alert('Votre session a expir�. Veuillez vous reconnecter!');
+                 top.location.href="index"			   
+			  top.location.href="http://localhost/COUD/panne/"			 
 		   
 	}
 }

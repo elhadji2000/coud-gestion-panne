@@ -157,41 +157,34 @@ include('../../activite.php');
                     <select class="form-select select2-localisation" name="localisation" required>
                         <option value="" disabled selected>Choisir une localisation...</option>
 
-                        <!-- Chambres -->
-                        <optgroup label="Chambres">
-                            <?php 
-    $profil2 = $_SESSION['profil2'] ?? '';
-    
-    // Vérifier le format exact "campus|pavillon"
-    if (preg_match('/^[^|]+\|[^|]+$/', $profil2)) {
-        try {
-            $chambres = getChambresByCampusPavillon($connexion, $profil2);
-            
-            if (!empty($chambres)) {
-                foreach ($chambres as $chambre) {
-                    $chambre_clean = htmlspecialchars($chambre, ENT_QUOTES);
-                    echo "<option value=\"Chambre $chambre_clean\">Chambre $chambre_clean</option>";
-                }
-            } else {
-                echo '<option value="" disabled>Aucune chambre trouvée pour ce pavillon</option>';
-            }
-        } catch (Exception $e) {
-            error_log("Erreur récupération chambres: " . $e->getMessage());
-            // Fallback
-            for($i = 1; $i <= 20; $i++) {
-                echo "<option value=\"Chambre $i\">Chambre $i</option>";
-            }
-        }
-    } else {
-        // Fallback si format incorrect
-        for($i = 1; $i <= 20; $i++) {
-            echo "<option value=\"Chambre $i\">Chambre $i</option>";
-        }
-    }
-    ?>
-                        </optgroup>
+                        <?php
+        $profil2 = $_SESSION['profil2'] ?? '';
+        $profil1 = $_SESSION['profil1'] ?? '';
 
-                        <!-- Couloirs -->
+        // Pour les chefs de résidence : format "Campus|Pavillon"
+        if ($profil1 === 'residence' && preg_match('/^[^|]+\|[^|]+$/', $profil2)) {
+            echo '<optgroup label="Chambres">';
+            try {
+                $chambres = getChambresByCampusPavillon($connexion, $profil2);
+                if (!empty($chambres)) {
+                    foreach ($chambres as $chambre) {
+                        $chambre_clean = htmlspecialchars($chambre, ENT_QUOTES);
+                        echo "<option value=\"Chambre $chambre_clean\">Chambre $chambre_clean</option>";
+                    }
+                } else {
+                    echo '<option value="" disabled>Aucune chambre trouvée pour ce pavillon</option>';
+                }
+            } catch (Exception $e) {
+                error_log("Erreur récupération chambres: " . $e->getMessage());
+                for ($i = 1; $i <= 20; $i++) {
+                    echo "<option value=\"Chambre $i\">Chambre $i</option>";
+                }
+            }
+            echo '</optgroup>';
+        }
+
+        // Ajout générique pour tous : Couloirs, Toilettes, Autres
+        ?>
                         <optgroup label="Couloirs">
                             <option value="Couloir Nord">Couloir Nord</option>
                             <option value="Couloir Sud">Couloir Sud</option>
@@ -200,7 +193,6 @@ include('../../activite.php');
                             <option value="Couloir Central">Couloir Central</option>
                         </optgroup>
 
-                        <!-- Toilettes -->
                         <optgroup label="Toilettes">
                             <option value="Toilettes RDC">Toilettes RDC</option>
                             <option value="Toilettes 1er étage">Toilettes 1er étage</option>
@@ -209,12 +201,13 @@ include('../../activite.php');
                             <option value="Toilettes Sud">Toilettes Sud</option>
                         </optgroup>
 
-                        <!-- Autres -->
-                        <optgroup label="Autres">
+                        <optgroup label="Bureaux et Autres Espaces">
                             <option value="Cuisine">Cuisine</option>
                             <option value="Salle à manger">Salle à manger</option>
                             <option value="Salle de réunion">Salle de réunion</option>
                             <option value="Bureau">Bureau</option>
+                            <option value="Secrétariat">Secrétariat</option>
+                            <option value="Accueil">Accueil</option>
                             <option value="Hall d'entrée">Hall d'entrée</option>
                         </optgroup>
                     </select>

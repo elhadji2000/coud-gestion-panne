@@ -638,7 +638,7 @@ function supprimerImputation($connexion, $idImputation) {
 function allUtilisateurs($connexion) {
     // Requête pour récupérer tous les utilisateurs
     $sql = "
-        SELECT id, username, statut, email, telephone, nom, prenom, profil1, type_mdp, profil2
+        SELECT *
         FROM Utilisateur ORDER BY id DESC;
     ";
 
@@ -675,6 +675,19 @@ function allPavillons($connexion) {
     $stmt->close();
     
     return $pavillons;
+}
+function allServices($connexion) {
+    $sql = "SELECT DISTINCT nom, libelle FROM departement ORDER BY nom ASC;";
+    $stmt = $connexion->prepare($sql);
+    if ($stmt === false) {
+        throw new Exception('Échec de la préparation de la requête : ' . $connexion->error);
+    }
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $services = $result->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+    
+    return $services;
 }
 
 function enregistrerUtilisateur($connexion, $username, $nom, $prenom, $email, $telephone, $motDePasse, $profil1, $profil2) {
@@ -813,29 +826,127 @@ function countUsers($connexion) {
     return $row['total'];
 }
 
-// Compter le nombre total de pannes
-function countTotalPannes($connexion) {
-    $query = "SELECT COUNT(*) as total FROM panne";
-    $result = mysqli_query($connexion, $query);
-    $row = mysqli_fetch_assoc($result);
+// 1. Compter le nombre total de pannes (avec filtre si pas admin ou dst)
+function countTotalPannes($connexion, $id_user, $profil) {
+    if ($profil === 'admin' || $profil === 'dst') {
+        $query = "SELECT COUNT(*) as total FROM panne";
+        $stmt = $connexion->prepare($query);
+    }
+    elseif($profil === 'section') {
+        $query = "SELECT COUNT(*) as total FROM panne WHERE type_panne = ?";
+        $stmt = $connexion->prepare($query);
+        $stmt->bind_param("s", $_SESSION['profil2']);
+    }
+    else {
+        $query = "SELECT COUNT(*) as total FROM panne WHERE id_chef_residence = ?";
+        $stmt = $connexion->prepare($query);
+        $stmt->bind_param("i", $id_user);
+    }
+
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
     return $row['total'];
 }
 
-// Compter les pannes en cours
-function countPannesEnCours($connexion) {
-    $query = "SELECT COUNT(*) as total FROM intervention WHERE resultat = 'En cours'";
-    $result = mysqli_query($connexion, $query);
-    $row = mysqli_fetch_assoc($result);
+// 2. Compter les pannes en cours via jointure intervention → panne → utilisateur
+function countPannesEnCours($connexion, $id_user, $profil) {
+    if ($profil === 'admin' || $profil === 'dst') {
+        $query = "SELECT COUNT(*) as total FROM intervention WHERE resultat = 'en cours'";
+        $stmt = $connexion->prepare($query);
+    }
+    elseif($profil === 'section') {
+        $query = "
+            SELECT COUNT(*) as total 
+            FROM intervention i
+            JOIN panne p ON i.id_panne = p.id
+            WHERE i.resultat = 'en cours' AND p.type_panne = ?
+        ";
+        $stmt = $connexion->prepare($query);
+        $stmt->bind_param("s", $_SESSION['profil2']);
+    }
+    else {
+        $query = "
+            SELECT COUNT(*) as total 
+            FROM intervention i
+            JOIN panne p ON i.id_panne = p.id
+            WHERE i.resultat = 'en cours' AND p.id_chef_residence = ?
+        ";
+        $stmt = $connexion->prepare($query);
+        $stmt->bind_param("i", $id_user);
+    }
+
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
     return $row['total'];
 }
 
-// Compter les pannes résolues
-function countPannesResolues($connexion) {
-    $query = "SELECT COUNT(*) as total FROM intervention WHERE resultat = 'depanner'";
-    $result = mysqli_query($connexion, $query);
-    $row = mysqli_fetch_assoc($result);
+// 3. Compter les pannes résolues avec même logique
+function countPannesResolues($connexion, $id_user, $profil) {
+    if ($profil === 'admin' || $profil === 'dst') {
+        $query = "SELECT COUNT(*) as total FROM intervention WHERE resultat = 'depanner'";
+        $stmt = $connexion->prepare($query);
+    }
+    elseif($profil === 'section') {
+        $query = "
+            SELECT COUNT(*) as total 
+            FROM intervention i
+            JOIN panne p ON i.id_panne = p.id
+            WHERE i.resultat = 'depanner' AND p.type_panne = ?
+        ";
+        $stmt = $connexion->prepare($query);
+        $stmt->bind_param("s", $_SESSION['profil2']);
+    }
+    else {
+        $query = "
+            SELECT COUNT(*) as total 
+            FROM intervention i
+            JOIN panne p ON i.id_panne = p.id
+            WHERE i.resultat = 'depanner' AND p.id_chef_residence = ?
+        ";
+        $stmt = $connexion->prepare($query);
+        $stmt->bind_param("i", $id_user);
+    }
+
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
     return $row['total'];
 }
+function getTypesPannesAvecCounts($connexion, $id_user, $profil) {
+    if ($profil === 'admin' || $profil === 'dst') {
+        $query = "SELECT type_panne, COUNT(*) as count FROM panne GROUP BY type_panne";
+        $stmt = $connexion->prepare($query);
+    }
+    elseif($profil === 'section') {
+        $query = "SELECT type_panne, COUNT(*) as count FROM panne WHERE type_panne = ? GROUP BY type_panne";
+        $stmt = $connexion->prepare($query);
+        $stmt->bind_param("s", $_SESSION['profil2']);
+    }
+    else {
+        $query = "SELECT type_panne, COUNT(*) as count FROM panne WHERE id_chef_residence = ? GROUP BY type_panne";
+        $stmt = $connexion->prepare($query);
+        $stmt->bind_param("i", $id_user);
+    }
+
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $typesPannes = [];
+    $countsPannes = [];
+
+    while ($row = $result->fetch_assoc()) {
+        $typesPannes[] = $row['type_panne'];
+        $countsPannes[] = $row['count'];
+    }
+
+    return [
+        'types' => $typesPannes,
+        'counts' => $countsPannes
+    ];
+}
+
 
 // Fonction pour générer une couleur aléatoire
 function getRandomColor() {
@@ -1328,4 +1439,39 @@ function updatePassword($username, $new_password, $connexion) {
     $stmt->bind_param('sss', $hashed_password, $type_mdp, $username);
 
     return $stmt->execute();
+}
+
+function notifierUrgence($connexion, $type_panne, $description, $localisation) {
+    // Récupérer les utilisateurs à notifier (ex. responsables techniques, sécurité, etc.)
+    $query = "SELECT nom, prenom, email, telephone, canal_notif FROM utilisateur WHERE recevoir_alerte = 1";
+    $stmt = $connexion->prepare($query);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $message = "🚨 ALERTE URGENCE COUD 🚨\n"
+        . "Type : $type_panne\n"
+        . "Localisation : $localisation\n"
+        . "Description : $description";
+
+    while ($user = $result->fetch_assoc()) {
+        $canal = strtolower($user['canal_notif']); // 'email', 'sms', 'whatsapp'
+        $contact = $user['telephone'];
+        $email = $user['email'];
+
+        switch ($canal) {
+            case 'email':
+                envoyerEmail($email, 'Alerte Urgence COUD', $message);
+                break;
+            case 'sms':
+                envoyerSMS($contact, $message); // nécessite une API
+                break;
+            case 'whatsapp':
+                envoyerWhatsapp($contact, $message); // nécessite une API ou WhatsApp Business
+                break;
+        }
+    }
+}
+
+function envoyerEmail($to, $subject, $message) {
+    mail($to, $subject, $message); // ou mieux, PHPMailer
 }

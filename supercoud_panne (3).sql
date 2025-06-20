@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : mer. 18 juin 2025 à 18:51
+-- Généré le : ven. 20 juin 2025 à 11:52
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -9771,6 +9771,43 @@ INSERT INTO `codif_lit_complet` (`id_lit`, `pavillon`, `chambre`, `lit`, `campus
 -- --------------------------------------------------------
 
 --
+-- Structure de la table `departement`
+--
+
+CREATE TABLE `departement` (
+  `id` int(11) NOT NULL,
+  `nom` varchar(50) NOT NULL,
+  `libelle` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `departement`
+--
+
+INSERT INTO `departement` (`id`, `nom`, `libelle`) VALUES
+(1, 'DCH', 'Département du Capital humain'),
+(2, 'DMG', 'Département des Moyens généraux'),
+(3, 'DSAS', 'Département de la santé et de l\'Action social'),
+(4, 'DRU', 'Département de la Restauration universitaire'),
+(5, 'DCU', 'Département des Cités universitaires'),
+(6, 'DACS', 'Département des Activités culturelles et sportives'),
+(7, 'DE', 'Département de L\'Environnement'),
+(8, 'DI', 'Département de L\'Informatique'),
+(9, 'DST', 'Département des Services techniques'),
+(10, 'DB', 'Département du Budget'),
+(11, 'AC', 'Agence Comptable'),
+(12, 'CSA/BAP', 'Bureau de l\'Accueil et du Protocole'),
+(13, 'CSA/CC', 'Cellule de la Coopération'),
+(14, 'CSA/CPM', 'Cellule de Passation des Marchés'),
+(15, 'D/CS', 'Cellule de Suivi'),
+(16, 'D/BC', 'Bureau du Courrier'),
+(17, 'D/BAD', 'Bureau des Archives et de la Documentation'),
+(18, 'D/CACG', 'Cellule Audit et Contrôle de gestion'),
+(19, 'D/CC', 'Cellule de Communication');
+
+-- --------------------------------------------------------
+
+--
 -- Structure de la table `entree_stock`
 --
 
@@ -9895,7 +9932,9 @@ INSERT INTO `panne` (`id`, `type_panne`, `date_enregistrement`, `description`, `
 (30, 'Maçonnerie', '14/05/2025', 'scenage svp...', 'Grand_Campus | A0 | Chambre 101A0', 'Élevée', 17),
 (31, 'Électricité', '14/05/2025', 'ampoul endomager...', 'Grand_Campus | A0 | Toilettes RDC', 'Moyenne', 17),
 (32, 'Froid', '14/05/2025', 'climatisation a probleme...', 'Grand_Campus | A0 | Hall d\'entrée', 'Moyenne', 17),
-(33, 'Plomberie', '17/06/2025', 'fuite d\'eau...', 'A.S.J | B1 | Toilettes RDC', 'Moyenne', 16);
+(33, 'Plomberie', '17/06/2025', 'fuite d\'eau...', 'A.S.J | B1 | Toilettes RDC', 'Moyenne', 16),
+(34, 'Maçonnerie', '19/06/2025', 'il y\'a une fissure au mur...', 'DAF | Secrétariat', 'Élevée', 19),
+(35, 'Menuiserie bois', '19/06/2025', 'table de mon bureau casser..', 'DAF | Bureau', 'Élevée', 19);
 
 -- --------------------------------------------------------
 
@@ -9938,28 +9977,31 @@ CREATE TABLE `utilisateur` (
   `profil1` varchar(255) NOT NULL,
   `profil2` varchar(50) NOT NULL,
   `date_sys` date NOT NULL DEFAULT current_timestamp(),
-  `type_mdp` varchar(50) NOT NULL DEFAULT 'default'
+  `type_mdp` varchar(50) NOT NULL DEFAULT 'default',
+  `canal_notif` enum('email','sms','whatsapp') DEFAULT 'email',
+  `recevoir_alerte` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `utilisateur`
 --
 
-INSERT INTO `utilisateur` (`id`, `username`, `password`, `statut`, `email`, `telephone`, `nom`, `prenom`, `profil1`, `profil2`, `date_sys`, `type_mdp`) VALUES
-(1, 'pavb', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'pavb@gmail.com', '767778899', 'DIOP', 'Madiop', 'residence', 'Grand_Campus | B', '2025-04-01', 'default'),
-(2, 'atelier', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'diopelhadjimadiop@gmail.com', '779099099', 'Faye', 'Waly', 'atelier', 'atelier', '2025-04-06', 'default'),
-(3, 'dst', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'dst@hotmail.com', '770010203', 'Fall', 'Ibrahima', 'dst', 'chef dst', '2025-04-21', 'updated'),
-(4, 'pavd', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'pavd@yahoo.com', '770090908', 'Ndiaye', 'Ndiaye', 'residence', 'Grand_Campus | D', '2025-04-07', 'default'),
-(5, 'pavcEsp', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'pavcEsp@gmail.com', '77090989', 'DIOP', 'Moussa', 'residence', 'E.S.P | C(ESP)', '2025-04-06', 'default'),
-(7, 'section1', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'section1@gmail.com', '778834567', 'Sylla', 'Sylla', 'section', 'Menuserie_bois', '2025-04-06', 'default'),
-(8, 'chef_plomberie', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'plomberi@coud.sn', '756667788', 'Faye', 'Faye', 'section', 'Plomberie', '2025-05-11', 'default'),
-(9, 'sem', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'sem@coud.sn', '776000203', 'Faye', 'Faye', 'dst', 'S.E.M', '2025-05-11', 'default'),
-(10, 'chef_maçonnerie', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'maconnerie@coud.sn', '789000908', 'FAYE', 'Mor', 'section', 'maçonnerie', '2025-05-11', 'default'),
-(11, 'admin', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'admin@coud.sn', '765556677', 'sylla', 'babacar', 'admin', 'admin', '2025-05-11', 'updated'),
-(14, 'madiop', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 0, 'ass@gmail.com', '784413400', 'diop', 'elhadji', 'section', 'Plomberie', '2025-05-11', 'default'),
-(16, '936076/M', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'eladji1.dg@coud.sn', '7844413400', 'diop', 'Elhadji', 'residence', 'A.S.J | B1', '2025-05-11', 'default'),
-(17, 'pava', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'pava@coud.sn', '778889900', 'sarr', 'Issa', 'residence', 'Grand_Campus | A0', '2025-05-11', 'updated'),
-(18, '934837/B', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'admin789@coud.sn', '776668899', 'Diagne', 'Madiagne', 'residence', 'E.S.P | H(ESP)', '2025-05-12', 'default');
+INSERT INTO `utilisateur` (`id`, `username`, `password`, `statut`, `email`, `telephone`, `nom`, `prenom`, `profil1`, `profil2`, `date_sys`, `type_mdp`, `canal_notif`, `recevoir_alerte`) VALUES
+(1, 'pavb', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'pavb@gmail.com', '767778899', 'DIOP', 'Madiop', 'residence', 'Grand_Campus | B', '2025-04-01', 'default', 'email', 0),
+(2, 'atelier', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'diopelhadjimadiop@gmail.com', '779099099', 'Faye', 'Waly', 'atelier', 'atelier', '2025-04-06', 'default', 'email', 1),
+(3, 'dst', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'dst@hotmail.com', '770010203', 'Fall', 'Ibrahima', 'dst', 'chef dst', '2025-04-21', 'updated', 'email', 0),
+(4, 'pavd', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'pavd@yahoo.com', '770090908', 'Ndiaye', 'Ndiaye', 'residence', 'Grand_Campus | D', '2025-04-07', 'default', 'email', 0),
+(5, 'pavcEsp', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'pavcEsp@gmail.com', '77090989', 'DIOP', 'Moussa', 'residence', 'E.S.P | C(ESP)', '2025-04-06', 'default', 'email', 0),
+(7, 'section1', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'section1@gmail.com', '778834567', 'Sylla', 'Sylla', 'section', 'Menuserie_bois', '2025-04-06', 'default', 'email', 0),
+(8, 'chef_plomberie', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'plomberi@coud.sn', '756667788', 'Faye', 'Faye', 'section', 'Plomberie', '2025-05-11', 'updated', 'email', 0),
+(9, 'sem', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'sem@coud.sn', '776000203', 'Faye', 'Faye', 'dst', 'S.E.M', '2025-05-11', 'default', 'email', 0),
+(10, 'chef_maçonnerie', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'maconnerie@coud.sn', '789000908', 'FAYE', 'Mor', 'section', 'maçonnerie', '2025-05-11', 'default', 'email', 0),
+(11, 'admin', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'admin@coud.sn', '765556677', 'sylla', 'babacar', 'admin', 'admin', '2025-05-11', 'updated', 'email', 0),
+(14, 'madiop', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 0, 'ass@gmail.com', '784413400', 'diop', 'elhadji', 'section', 'Plomberie', '2025-05-11', 'default', 'email', 0),
+(16, '936076/M', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'eladji1.dg@coud.sn', '7844413400', 'diop', 'Elhadji', 'residence', 'A.S.J | B1', '2025-05-11', 'updated', 'email', 0),
+(17, 'pava', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'pava@coud.sn', '778889900', 'sarr', 'Issa', 'residence', 'Grand_Campus | A0', '2025-05-11', 'updated', 'email', 0),
+(18, '934837/B', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'admin789@coud.sn', '776668899', 'Diagne', 'Madiagne', 'residence', 'E.S.P | H(ESP)', '2025-05-12', 'default', 'email', 0),
+(19, 'daf', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'daf@coud.edu.sn', '789859809', 'seck', 'Moussa', 'service', 'DACS', '2025-06-19', 'updated', 'email', 0);
 
 --
 -- Index pour les tables déchargées
@@ -9977,6 +10019,12 @@ ALTER TABLE `articles`
 ALTER TABLE `codif_lit_complet`
   ADD PRIMARY KEY (`id_lit`),
   ADD UNIQUE KEY `lit` (`lit`);
+
+--
+-- Index pour la table `departement`
+--
+ALTER TABLE `departement`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Index pour la table `entree_stock`
@@ -10048,6 +10096,12 @@ ALTER TABLE `codif_lit_complet`
   MODIFY `id_lit` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9695;
 
 --
+-- AUTO_INCREMENT pour la table `departement`
+--
+ALTER TABLE `departement`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+
+--
 -- AUTO_INCREMENT pour la table `entree_stock`
 --
 ALTER TABLE `entree_stock`
@@ -10075,7 +10129,7 @@ ALTER TABLE `observation`
 -- AUTO_INCREMENT pour la table `panne`
 --
 ALTER TABLE `panne`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT pour la table `sortie_stock`
@@ -10087,7 +10141,7 @@ ALTER TABLE `sortie_stock`
 -- AUTO_INCREMENT pour la table `utilisateur`
 --
 ALTER TABLE `utilisateur`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- Contraintes pour les tables déchargées

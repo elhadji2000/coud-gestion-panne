@@ -20,7 +20,7 @@ if (!empty($_GET['username_user']) && !empty($_GET['password_user'])) {
             header('Location: /COUD/panne/profils/dst/listPannes.php');
             exit();
         } 
-        else if ($row['profil1'] == 'residence') {
+        else if ($row['profil1'] == 'residence' || $row['profil1'] == 'service') {
             header('Location: /COUD/panne/profils/dasboard.php');
             exit();
         }else if ($row['profil1'] == 'dst') {
@@ -39,7 +39,7 @@ if (!empty($_GET['username_user']) && !empty($_GET['password_user'])) {
             header('Location: /COUD/panne/profils/dasboard.php');
             exit();
         }  else {
-            header('Location: /COUD/ass');
+            header('Location: /COUD/panne');
             exit();
             }
         }

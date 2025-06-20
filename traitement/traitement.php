@@ -22,6 +22,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' &&
     $localisation = $profil1 . " | " . $localisation;
 
     if (insertPanne($connexion, $type_panne, $date_enregistrement, $description, $localisation, $niveau_urgence, $id_chef_residence)) {
+        if (strtolower($niveau_urgence) === 'Élevée') {
+            notifierUrgence($connexion, $type_panne, $description, $localisation);
+        }
         header('Location: /COUD/panne/profils/residence/ajoutPanne?success=1');
         exit();
     } else {
@@ -56,48 +59,39 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'POST' &&
 //#################################### FIN Enregister une Observation #####################################################
 
 //#################################### DEBUT Enregister une Intervention #####################################################
-elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Vérification de la présence des champs nécessaires
-    if (
-        isset($_POST['agent'], $_POST['details'], $_POST['idPanne'], $_POST['date_intervention'])
-    ) {
-        // Sécurisation des données
-        $personne_agent = trim($_POST['agent']);
-        $description_action = trim($_POST['details']);
-        $id_chef_atelier = $_SESSION['id_user'] ?? null;
-        $id_panne = (int) $_POST['idPanne'];
-        $intervention_id = isset($_POST['intervention_id']) && is_numeric($_POST['intervention_id']) && $_POST['intervention_id'] > 0
-            ? (int) $_POST['intervention_id']
-            : null;
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST' &&
+    isset($_POST['agent'], $_POST['details'], $_POST['idPanne'], $_POST['date_intervention'])
+) {
+    $personne_agent = trim($_POST['agent']);
+    $description_action = trim($_POST['details']);
+    $id_chef_atelier = $_SESSION['id_user'] ?? null;
+    $id_panne = (int) $_POST['idPanne'];
+    $date_intervention = trim($_POST['date_intervention']);
 
-        // Gestion des dates (convertir la date reçue en format MySQL : YYYY-MM-DD)
-        $date_intervention = date('d/m/Y', strtotime($date_intervention));
-        $date_sys = date('d/m/Y');
+    $intervention_id = isset($_POST['intervention_id']) && is_numeric($_POST['intervention_id']) && $_POST['intervention_id'] > 0
+        ? (int) $_POST['intervention_id']
+        : null;
 
-        $resultat = "en cours";
+    // Convertir la date de dd/mm/yyyy vers yyyy-mm-dd
+    $date_intervention = date('Y-m-d', strtotime(str_replace('/', '-', $date_intervention)));
+    $date_sys = date('Y-m-d');
 
-        // Création ou mise à jour ?
-        $isCreation = is_null($intervention_id);
+    $resultat = "en cours";
 
-        // Exécution de la requête selon le cas
-        $success = $isCreation
-            ? enregistrerIntervention($connexion, $date_intervention, $description_action, $personne_agent, $date_sys, $resultat, $id_chef_atelier, $id_panne)
-            : updateIntervention($connexion, $date_intervention, $description_action, $personne_agent, $date_sys, $resultat, $id_chef_atelier, $id_panne, $intervention_id);
+    $isCreation = is_null($intervention_id);
 
-        // Redirection
-        if ($success) {
-            header('Location: /COUD/panne/profils/dst/listPannes');
-        } else {
-            header('Location: /COUD/panne/profils/dst/intervention');
-        }
-        exit();
-    } else {
-        // Champs manquants
-        echo "Erreur : Tous les champs requis ne sont pas remplis.";
-    }
+    $success = $isCreation
+        ? enregistrerIntervention($connexion, $date_intervention, $description_action, $personne_agent, $date_sys, $resultat, $id_chef_atelier, $id_panne)
+        : updateIntervention($connexion, $date_intervention, $description_action, $personne_agent, $date_sys, $resultat, $id_chef_atelier, $id_panne, $intervention_id);
+
+    header('Location: ' . ($success
+        ? '/COUD/panne/profils/dst/listPannes'
+        : '/COUD/panne/profils/dst/intervention'));
+    exit();
 }
-
 //#################################### FIN Enregister une Intervention #####################################################
+
 
 //########################## pour supprimer Intervention ######################################################
 
@@ -195,7 +189,7 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['imputation_id']) ) {
 elseif ($_SERVER['REQUEST_METHOD'] == 'POST' &&
     isset($_POST['username']) && isset($_POST['nom']) &&
     isset($_POST['prenom']) && isset($_POST['telephone']) &&
-    isset($_POST['email']) && isset($_POST['profil1']) &&
+    isset($_POST['email']) &&  isset($_POST['profil1']) && 
     isset($_POST['profil2'])) {
 
     // Récupérer les données du formulaire

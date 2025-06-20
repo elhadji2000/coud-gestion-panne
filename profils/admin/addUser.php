@@ -160,7 +160,7 @@ if ($user_id) {
             <div class="row g-3">
                 <!-- Username -->
                 <div class="col-md-6 form-section">
-                    <label for="username" class="form-label">Nom d'utilisateur</label>
+                    <label for="username" class="form-label">Matricule</label>
                     <input type="text" class="form-control" id="username" name="username"
                         value="<?= htmlspecialchars($user['username']) ?>" placeholder="Entrez le nom d'utilisateur"
                         required>
@@ -214,7 +214,7 @@ if ($user_id) {
                 <div class="col-md-6 form-section">
                     <label for="password" class="form-label">Mot de passe</label>
                     <div class="input-group">
-                        <input type="password" class="form-control" id="password" name="password" required>
+                        <input type="password" class="form-control" value="coud2025" id="password" name="password" required>
                         <button class="btn btn-outline-secondary" type="button" id="togglePassword">
                             <i class="fas fa-eye"></i>
                         </button>
@@ -235,6 +235,7 @@ if ($user_id) {
                         <option value="section" <?= $user['profil1'] === 'section' ? 'selected' : '' ?>>Section</option>
                         <option value="atelier" <?= $user['profil1'] === 'atelier' ? 'selected' : '' ?>>Atelier</option>
                         <option value="dst" <?= $user['profil1'] === 'dst' ? 'selected' : '' ?>>DST</option>
+                        <option value="service" <?= $user['profil1'] === 'service' ? 'selected' : '' ?>>Service</option>
                         <option value="admin" <?= $user['profil1'] === 'admin' ? 'selected' : '' ?>>Admin</option>
                     </select>
                     <div class="invalid-feedback">
@@ -261,7 +262,7 @@ if ($user_id) {
                 <a href="users.php" class="back-link">
                     <i class="fas fa-arrow-left me-2"></i>Retour
                 </a>
-                <button type="submit" class="btn btn-primary-custom">
+                <button type="submit" class="btn btn-primary-custom" onclick="return confirm('Êtes-vous sûr de vouloir continuer ?')">
                     <i class="fas fa-save me-2"></i>ENREGISTRER
                 </button>
             </div>
@@ -273,6 +274,7 @@ if ($user_id) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <?php
 $pavillons = allPavillons($connexion);
+$services = allServices($connexion);
 ?>
     <script>
     // Fonction pour mettre à jour le Profil 2 en fonction du Profil 1 sélectionné
@@ -291,6 +293,13 @@ $pavillons = allPavillons($connexion);
                 <?php 
         foreach ($pavillons as $pav) {
             echo "'" . htmlspecialchars($pav['campus'] . " | " . $pav['pavillon'], ENT_QUOTES) . "',";
+        }
+        ?>
+            ],
+            'service': [
+                <?php 
+        foreach ($services as $ser) {
+            echo "'" . htmlspecialchars($ser['nom'], ENT_QUOTES) . "',";
         }
         ?>
             ],

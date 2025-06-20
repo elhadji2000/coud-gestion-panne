@@ -84,8 +84,14 @@ $entrees = listeEntrees($connexion);
         background-color: #f8fafc;
         font-weight: 600;
         color: var(--secondary);
-        border-bottom-width: 1px;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #e9ecef;
+    }
 
+    .table td {
+        vertical-align: middle;
     }
 
     .badge-urgence {

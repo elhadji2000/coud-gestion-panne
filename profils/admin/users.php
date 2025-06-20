@@ -25,6 +25,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         exit();
     }
 }
+// Vérifier les paramètres
+if (isset($_GET['user_id']) && isset($_GET['new_state'])) {
+    $userId = (int)$_GET['user_id'];
+    $newState = (int)$_GET['new_state'];
+    
+    // Requête simple
+    $query = "UPDATE utilisateur SET recevoir_alerte = $newState WHERE id = $userId";
+    mysqli_query($connexion, $query);
+    
+    // Redirection vers la page précédente
+    header("Location: ".$_SERVER['HTTP_REFERER']);
+    exit;
+}
 
 $userId = $_SESSION['id_user'];
 $allUsers = allUtilisateurs($connexion);
@@ -165,6 +178,22 @@ $allUsers = allUtilisateurs($connexion);
         font-size: 0.75rem;
         color: white;
     }
+
+    .toggle-pill {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        background: #dc3545;
+        color: white;
+        font-size: 0.6rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .toggle-pill.active {
+        background: #28a745;
+    }
     </style>
 </head>
 
@@ -205,6 +234,7 @@ $allUsers = allUtilisateurs($connexion);
                                         <th>Profil Principal</th>
                                         <th>Profil Secondaire</th>
                                         <th>Statut</th>
+                                        <th>Alerte</th>
                                         <th>Type</th>
                                         <th>Actions</th>
                                     </tr>
@@ -234,6 +264,13 @@ $allUsers = allUtilisateurs($connexion);
                                                 <?= $user['statut'] == 1 ? 'Actif' : 'Inactif' ?>
                                             </span>
                                         </td>
+                                        <td>
+                                            <span class="toggle-pill <?= $user['recevoir_alerte'] ? 'active' : '' ?>"
+                                                onclick="toggleAlertStatus(<?= $user['id'] ?>, <?= $user['recevoir_alerte'] ? 1 : 0 ?>, this)">
+                                                <?= $user['recevoir_alerte'] ? 'ON' : 'OFF' ?>
+                                            </span>
+                                        </td>
+
                                         <td>
                                             <span
                                                 class="status-badge <?= $user['type_mdp'] == 'updated' ? 'status-updated' : 'status-default' ?>">
@@ -382,6 +419,15 @@ $allUsers = allUtilisateurs($connexion);
             });
         });
     });
+
+    function toggleAlertStatus(userId, currentState, element) {
+        const newState = currentState ? 0 : 1;
+
+        if (confirm(`Voulez-vous ${newState ? 'activer' : 'désactiver'} les alertes ?`)) {
+            // Envoyer la requête simple (sans AJAX)
+            window.location.href = `users.php?user_id=${userId}&new_state=${newState}`;
+        }
+    }
     </script>
 
 
