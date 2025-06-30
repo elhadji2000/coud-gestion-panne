@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : ven. 20 juin 2025 à 11:52
+-- Généré le : lun. 30 juin 2025 à 10:28
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -20,6 +20,35 @@ SET time_zone = "+00:00";
 --
 -- Base de données : `supercoud_panne`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `agent`
+--
+
+CREATE TABLE `agent` (
+  `id` int(11) NOT NULL,
+  `nom` varchar(100) NOT NULL,
+  `prenom` varchar(100) NOT NULL,
+  `section` varchar(100) DEFAULT NULL,
+  `date_naissance` date DEFAULT NULL,
+  `matricule` varchar(50) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `agent`
+--
+
+INSERT INTO `agent` (`id`, `nom`, `prenom`, `section`, `date_naissance`, `matricule`) VALUES
+(1, 'Fall', 'Aminata', 'Plomberie', '1992-08-12', '123456/A'),
+(2, 'Ba', 'Ibrahima', 'Maçonnerie', '1990-11-05', '234567/B'),
+(3, 'Diop', 'Fatou', 'Électricité', '1989-06-23', '345678/C'),
+(4, 'Sarr', 'Moussa', 'Menuiserie bois', '1991-01-14', '456789/D'),
+(5, 'Ndoye', 'Khadija', 'Menuiserie aluminium', '1993-03-30', '567890/E'),
+(6, 'Diallo', 'Aliou', 'Menuiserie métallique', '1988-09-09', '678901/F'),
+(7, 'Sy', 'Astou', 'Froid', '1994-04-18', '789012/G'),
+(8, 'Gueye', 'Cheikh', 'Peinture', '1990-12-26', '890123/H');
 
 -- --------------------------------------------------------
 
@@ -9827,7 +9856,10 @@ CREATE TABLE `entree_stock` (
 
 INSERT INTO `entree_stock` (`id`, `article_id`, `quantite`, `date_entree`, `remarque`, `created_at`, `updated_at`) VALUES
 (1, 3, 12, '2025-06-16', 'aaaaaaaaaaa', '2025-06-16 11:18:17', '2025-06-16 11:18:17'),
-(5, 1, 34, '2025-06-18', 'regler', '2025-06-18 13:46:03', '2025-06-18 13:46:03');
+(5, 1, 34, '2025-06-18', 'regler', '2025-06-18 13:46:03', '2025-06-18 13:46:03'),
+(6, 3, 78, '2025-06-23', 'ssaaaaa', '2025-06-23 11:11:36', '2025-06-23 11:11:36'),
+(7, 4, 40, '2025-06-23', 'aaa', '2025-06-23 11:56:07', '2025-06-23 11:56:07'),
+(8, 4, 15, '2025-06-23', 'rrrr', '2025-06-23 11:56:44', '2025-06-23 11:56:44');
 
 -- --------------------------------------------------------
 
@@ -9853,7 +9885,10 @@ INSERT INTO `imputation` (`id`, `id_chef_dst`, `id_panne`, `instruction`, `date_
 (22, 9, 29, 'intervention autoriser...', '12/05/2025', 'imputer'),
 (23, 9, 32, 'ertzuiop', '17/06/2025', 'imputer'),
 (24, 9, 30, 'a faire ...', '17/06/2025', 'imputer'),
-(25, 9, 31, 'ordonner', '17/06/2025', 'imputer');
+(25, 9, 31, 'ordonner', '17/06/2025', 'imputer'),
+(26, 9, 36, 'a faire...', '20/06/2025', 'imputer'),
+(27, 9, 37, 'a faire...', '23/06/2025', 'imputer'),
+(28, 9, 38, 'a faire..!', '23/06/2025', 'imputer');
 
 -- --------------------------------------------------------
 
@@ -9867,6 +9902,7 @@ CREATE TABLE `intervention` (
   `date_sys` varchar(255) NOT NULL,
   `description_action` text NOT NULL,
   `resultat` text NOT NULL,
+  `type_intervention` varchar(50) NOT NULL DEFAULT 'NaN',
   `personne_agent` varchar(255) NOT NULL,
   `id_chef_atelier` int(11) DEFAULT NULL,
   `id_panne` int(11) DEFAULT NULL
@@ -9876,11 +9912,34 @@ CREATE TABLE `intervention` (
 -- Déchargement des données de la table `intervention`
 --
 
-INSERT INTO `intervention` (`id`, `date_intervention`, `date_sys`, `description_action`, `resultat`, `personne_agent`, `id_chef_atelier`, `id_panne`) VALUES
-(13, '12/05/2025', '12/05/2025', 'reperation bien effectuer...', 'depanner', 'madiop faye', 2, 29),
-(14, '17/06/2025', '17/06/2025', 'bien fait 3', 'en cours', 'samba ka', 2, 28),
-(15, '17/06/2025', '17/06/2025', 'aaaaaa333', 'en cours', 'madiop diop', 2, 32),
-(16, '01/01/1970', '17/06/2025', 'aaaaa', 'depanner', 'madiop diop', 2, 30);
+INSERT INTO `intervention` (`id`, `date_intervention`, `date_sys`, `description_action`, `resultat`, `type_intervention`, `personne_agent`, `id_chef_atelier`, `id_panne`) VALUES
+(13, '12/05/2025', '12/05/2025', 'reperation bien effectuer...', 'depanner', 'NaN', 'madiop faye', 2, 29),
+(14, '17/06/2025', '17/06/2025', 'bien fait 3', 'en cours', 'NaN', 'samba ka', 2, 28),
+(15, '17/06/2025', '17/06/2025', 'aaaaaa333', 'en cours', 'NaN', 'madiop diop', 2, 32),
+(16, '01/01/1970', '17/06/2025', 'aaaaa', 'depanner', 'NaN', 'madiop diop', 2, 30),
+(17, '20/06/2025', '17/06/2025', 'travail termine', 'en cours', 'NaN', 'Moussa faye', 2, 36),
+(18, '23/06/2025', '23/06/2025', 'neant...', 'depanner', 'NaN', 'samba ka', 2, 37),
+(19, '23/06/2025', '23/06/2025', 'travail effectuer', 'en cours', 'NaN', 'Moussa faye', 2, 38),
+(20, '25/06/2025', '25/06/2025', 'ass diop', 'depanner', 'NaN', 'samba ka', 2, 38),
+(21, '2025-06-29', '', '123qwertzuio', 'en cours', 'Réparation', '', NULL, 31);
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `intervention_agent`
+--
+
+CREATE TABLE `intervention_agent` (
+  `intervention_id` int(11) NOT NULL,
+  `agent_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `intervention_agent`
+--
+
+INSERT INTO `intervention_agent` (`intervention_id`, `agent_id`) VALUES
+(21, 7);
 
 -- --------------------------------------------------------
 
@@ -9904,7 +9963,12 @@ CREATE TABLE `observation` (
 
 INSERT INTO `observation` (`id`, `evaluation_qualite`, `date_observation`, `commentaire_suggestion`, `id_chef_residence`, `id_panne`, `id_intervention`) VALUES
 (18, 'Fait', '12/05/2025', 'satisfait....', 18, 29, 13),
-(19, 'Fait', '17/06/2025', 'bien fait', 17, 30, 16);
+(19, 'Fait', '17/06/2025', 'bien fait', 17, 30, 16),
+(20, 'Fait', '29/06/2025', 'bien fait...22', 16, 37, 18),
+(21, 'Inachevee', '23/06/2025', 'aaaaaaa', 16, 38, 19),
+(22, 'Fait', '26/06/2025', 'rrrr', 16, 38, 20),
+(23, 'Inachevee', '26/06/2025', 'aaaaa', 16, 38, 20),
+(24, 'Fait', '26/06/2025', 'aasssss', 16, 38, 20);
 
 -- --------------------------------------------------------
 
@@ -9934,7 +9998,10 @@ INSERT INTO `panne` (`id`, `type_panne`, `date_enregistrement`, `description`, `
 (32, 'Froid', '14/05/2025', 'climatisation a probleme...', 'Grand_Campus | A0 | Hall d\'entrée', 'Moyenne', 17),
 (33, 'Plomberie', '17/06/2025', 'fuite d\'eau...', 'A.S.J | B1 | Toilettes RDC', 'Moyenne', 16),
 (34, 'Maçonnerie', '19/06/2025', 'il y\'a une fissure au mur...', 'DAF | Secrétariat', 'Élevée', 19),
-(35, 'Menuiserie bois', '19/06/2025', 'table de mon bureau casser..', 'DAF | Bureau', 'Élevée', 19);
+(35, 'Menuiserie bois', '19/06/2025', 'table de mon bureau casser..', 'DAF | Bureau', 'Élevée', 19),
+(36, 'Électricité', '20/06/2025', 'prise défectueuse...', 'DI | Bureau', 'Élevée', 20),
+(37, 'Maçonnerie', '23/06/2025', 'neant....', 'A.S.J | B1 | Chambre 101B1', 'Élevée', 16),
+(38, 'Plomberie', '23/06/2025', 'tuyau défectueux', 'A.S.J | B1 | Toilettes RDC', 'Moyenne', 16);
 
 -- --------------------------------------------------------
 
@@ -9957,7 +10024,8 @@ CREATE TABLE `sortie_stock` (
 --
 
 INSERT INTO `sortie_stock` (`id`, `article_id`, `intervention_id`, `quantite`, `date_sortie`, `remarque`, `updated_at`) VALUES
-(3, 3, 14, 4, '2025-06-17 00:00:00', 'depanner', '2025-06-18 10:33:09');
+(3, 3, 14, 4, '2025-06-17 00:00:00', 'depanner', '2025-06-18 10:33:09'),
+(4, 4, 21, 12, '2025-06-29 00:00:00', NULL, '2025-06-29 13:43:25');
 
 -- --------------------------------------------------------
 
@@ -9988,24 +10056,33 @@ CREATE TABLE `utilisateur` (
 
 INSERT INTO `utilisateur` (`id`, `username`, `password`, `statut`, `email`, `telephone`, `nom`, `prenom`, `profil1`, `profil2`, `date_sys`, `type_mdp`, `canal_notif`, `recevoir_alerte`) VALUES
 (1, 'pavb', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'pavb@gmail.com', '767778899', 'DIOP', 'Madiop', 'residence', 'Grand_Campus | B', '2025-04-01', 'default', 'email', 0),
-(2, 'atelier', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'diopelhadjimadiop@gmail.com', '779099099', 'Faye', 'Waly', 'atelier', 'atelier', '2025-04-06', 'default', 'email', 1),
+(2, 'atelier', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'diopelhadjimadiop@gmail.com', '779099099', 'Faye', 'Waly', 'atelier', 'atelier', '2025-04-06', 'updated', 'email', 1),
 (3, 'dst', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'dst@hotmail.com', '770010203', 'Fall', 'Ibrahima', 'dst', 'chef dst', '2025-04-21', 'updated', 'email', 0),
-(4, 'pavd', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'pavd@yahoo.com', '770090908', 'Ndiaye', 'Ndiaye', 'residence', 'Grand_Campus | D', '2025-04-07', 'default', 'email', 0),
+(4, 'pavd', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'pavd@yahoo.com', '770090908', 'Ndiaye', 'Ndiaye', 'residence', 'Grand_Campus | D', '2025-04-07', 'updated', 'email', 0),
 (5, 'pavcEsp', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'pavcEsp@gmail.com', '77090989', 'DIOP', 'Moussa', 'residence', 'E.S.P | C(ESP)', '2025-04-06', 'default', 'email', 0),
 (7, 'section1', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'section1@gmail.com', '778834567', 'Sylla', 'Sylla', 'section', 'Menuserie_bois', '2025-04-06', 'default', 'email', 0),
 (8, 'chef_plomberie', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'plomberi@coud.sn', '756667788', 'Faye', 'Faye', 'section', 'Plomberie', '2025-05-11', 'updated', 'email', 0),
-(9, 'sem', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'sem@coud.sn', '776000203', 'Faye', 'Faye', 'dst', 'S.E.M', '2025-05-11', 'default', 'email', 0),
+(9, 'sem', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'hameth512@gmail.com', '776000203', 'Faye', 'Faye', 'dst', 'S.E.M', '2025-05-11', 'updated', 'email', 1),
 (10, 'chef_maçonnerie', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'maconnerie@coud.sn', '789000908', 'FAYE', 'Mor', 'section', 'maçonnerie', '2025-05-11', 'default', 'email', 0),
-(11, 'admin', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'admin@coud.sn', '765556677', 'sylla', 'babacar', 'admin', 'admin', '2025-05-11', 'updated', 'email', 0),
-(14, 'madiop', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 0, 'ass@gmail.com', '784413400', 'diop', 'elhadji', 'section', 'Plomberie', '2025-05-11', 'default', 'email', 0),
+(11, 'admin', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'admin@coud.sn', '765556677', 'sylla', 'babacar', 'admin', 'admin', '2025-05-11', 'updated', 'email', 0),
+(14, 'madiop', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 0, 'ass@gmail.com', '784413400', 'diop', 'elhadji', 'section', 'Électricité', '2025-05-11', 'default', 'email', 0),
 (16, '936076/M', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'eladji1.dg@coud.sn', '7844413400', 'diop', 'Elhadji', 'residence', 'A.S.J | B1', '2025-05-11', 'updated', 'email', 0),
 (17, 'pava', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'pava@coud.sn', '778889900', 'sarr', 'Issa', 'residence', 'Grand_Campus | A0', '2025-05-11', 'updated', 'email', 0),
-(18, '934837/B', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'admin789@coud.sn', '776668899', 'Diagne', 'Madiagne', 'residence', 'E.S.P | H(ESP)', '2025-05-12', 'default', 'email', 0),
-(19, 'daf', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'daf@coud.edu.sn', '789859809', 'seck', 'Moussa', 'service', 'DACS', '2025-06-19', 'updated', 'email', 0);
+(18, '934837/C', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'admin789@coud.sn', '776668899', 'Diagne', 'Madiagne', 'residence', 'E.S.P | H(ESP)', '2025-05-12', 'default', 'email', 0),
+(19, 'daf', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'daf@coud.edu.sn', '789859809', 'seck', 'Moussa', 'service', 'DACS', '2025-06-19', 'updated', 'email', 0),
+(20, '934837/B', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'madiagne35@gmail.com', '776267155', 'diagne', 'Madiagne', 'service', 'DI', '2025-06-20', 'updated', 'email', 1),
+(21, '883007/A', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'fayeass@coud.sn', '756678999', 'faye', 'elhadji', 'atelier', 'chef d\'atelier', '2025-06-29', 'default', 'email', 0);
 
 --
 -- Index pour les tables déchargées
 --
+
+--
+-- Index pour la table `agent`
+--
+ALTER TABLE `agent`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `matricule` (`matricule`);
 
 --
 -- Index pour la table `articles`
@@ -10050,6 +10127,13 @@ ALTER TABLE `intervention`
   ADD KEY `intervention_ibfk_2` (`id_panne`);
 
 --
+-- Index pour la table `intervention_agent`
+--
+ALTER TABLE `intervention_agent`
+  ADD PRIMARY KEY (`intervention_id`,`agent_id`),
+  ADD KEY `agent_id` (`agent_id`);
+
+--
 -- Index pour la table `observation`
 --
 ALTER TABLE `observation`
@@ -10084,6 +10168,12 @@ ALTER TABLE `utilisateur`
 --
 
 --
+-- AUTO_INCREMENT pour la table `agent`
+--
+ALTER TABLE `agent`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
 -- AUTO_INCREMENT pour la table `articles`
 --
 ALTER TABLE `articles`
@@ -10105,43 +10195,43 @@ ALTER TABLE `departement`
 -- AUTO_INCREMENT pour la table `entree_stock`
 --
 ALTER TABLE `entree_stock`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT pour la table `imputation`
 --
 ALTER TABLE `imputation`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT pour la table `intervention`
 --
 ALTER TABLE `intervention`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT pour la table `observation`
 --
 ALTER TABLE `observation`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT pour la table `panne`
 --
 ALTER TABLE `panne`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT pour la table `sortie_stock`
 --
 ALTER TABLE `sortie_stock`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT pour la table `utilisateur`
 --
 ALTER TABLE `utilisateur`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- Contraintes pour les tables déchargées
@@ -10166,6 +10256,13 @@ ALTER TABLE `imputation`
 ALTER TABLE `intervention`
   ADD CONSTRAINT `intervention_ibfk_1` FOREIGN KEY (`id_chef_atelier`) REFERENCES `utilisateur` (`id`),
   ADD CONSTRAINT `intervention_ibfk_2` FOREIGN KEY (`id_panne`) REFERENCES `panne` (`id`) ON DELETE CASCADE;
+
+--
+-- Contraintes pour la table `intervention_agent`
+--
+ALTER TABLE `intervention_agent`
+  ADD CONSTRAINT `intervention_agent_ibfk_1` FOREIGN KEY (`intervention_id`) REFERENCES `intervention` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `intervention_agent_ibfk_2` FOREIGN KEY (`agent_id`) REFERENCES `agent` (`id`) ON DELETE CASCADE;
 
 --
 -- Contraintes pour la table `observation`

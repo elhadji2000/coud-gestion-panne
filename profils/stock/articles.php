@@ -19,8 +19,6 @@ $articles = listeArticles($connexion);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des Articles | Stock</title>
-
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -30,7 +28,7 @@ $articles = listeArticles($connexion);
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
 
-     <style>
+    <style>
     :root {
         --primary: #3498db;
         --secondary: #2c3e50;
@@ -199,11 +197,14 @@ $articles = listeArticles($connexion);
                     </h1>
                     <p class="text-muted mb-0">Liste complète des articles en stock</p>
                 </div>
+                <?php if (isset($_SESSION['profil2']) && $_SESSION['profil2'] === 'atelier'): ?>
                 <div>
                     <a href="nouvel_article.php" class="btn btn-add">
                         <i class="fas fa-plus me-2"></i>Nouvel Article
                     </a>
                 </div>
+                <?php endif; ?>
+
             </div>
         </div>
     </div>
@@ -220,7 +221,9 @@ $articles = listeArticles($connexion);
                             <th>Désignation</th>
                             <th>Nom</th>
                             <th>Catégorie</th>
+                            <?php if (isset($_SESSION['profil2']) && $_SESSION['profil2'] === 'atelier'): ?>
                             <th>Actions</th>
+                            <?php endif; ?>
                         </tr>
                     </thead>
                     <tbody>
@@ -231,19 +234,18 @@ $articles = listeArticles($connexion);
                             <td><?= htmlspecialchars($article['description']) ?></td>
                             <td><?= htmlspecialchars($article['nom']) ?></td>
                             <td><?= htmlspecialchars($article['categorie']) ?></td>
+                            <?php if (isset($_SESSION['profil2']) && $_SESSION['profil2'] === 'atelier'): ?>
                             <td>
-                                <a href="nouvel_article.php?id=<?= $article['id'] ?>" 
-                                   class="action-link link-edit me-2"
-                                   title="Modifier">
+                                <a href="nouvel_article.php?id=<?= $article['id'] ?>" class="action-link link-edit me-2"
+                                    title="Modifier">
                                     <i class="fas fa-edit me-1"></i>Modifier
                                 </a>
-                                <a href="#" 
-                                   class="action-link link-delete delete-btn" 
-                                   title="Supprimer"
-                                   data-id="<?= $article['id'] ?>">
+                                <a href="#" class="action-link link-delete delete-btn" title="Supprimer"
+                                    data-id="<?= $article['id'] ?>">
                                     <i class="fas fa-trash me-1"></i>Supprimer
                                 </a>
                             </td>
+                            <?php endif; ?>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -258,7 +260,8 @@ $articles = listeArticles($connexion);
             <div class="modal-content">
                 <div class="modal-header bg-danger text-white">
                     <h5 class="modal-title" id="deleteModalLabel">Confirmer la suppression</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <p>Êtes-vous sûr de vouloir supprimer cet article ? Cette action est irréversible.</p>
@@ -286,7 +289,10 @@ $articles = listeArticles($connexion);
             },
             responsive: true,
             pageLength: 10,
-            lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]]
+            lengthMenu: [
+                [10, 25, 50, 100],
+                [10, 25, 50, 100]
+            ]
         });
 
         // Gestion de la suppression
@@ -317,8 +323,8 @@ $articles = listeArticles($connexion);
         </div>
     </div>
     <script>
-        var modal = new bootstrap.Modal(document.getElementById('successModal'));
-        modal.show();
+    var modal = new bootstrap.Modal(document.getElementById('successModal'));
+    modal.show();
     </script>
     <?php endif; ?>
     <?php if (isset($success) && $success === 'modifier'): ?>
@@ -339,8 +345,8 @@ $articles = listeArticles($connexion);
         </div>
     </div>
     <script>
-        var modal = new bootstrap.Modal(document.getElementById('successModal2'));
-        modal.show();
+    var modal = new bootstrap.Modal(document.getElementById('successModal2'));
+    modal.show();
     </script>
     <?php endif; ?>
     <?php if (isset($success) && $success === 'enregistrer'): ?>
@@ -361,8 +367,8 @@ $articles = listeArticles($connexion);
         </div>
     </div>
     <script>
-        var modal = new bootstrap.Modal(document.getElementById('successModal3'));
-        modal.show();
+    var modal = new bootstrap.Modal(document.getElementById('successModal3'));
+    modal.show();
     </script>
     <?php endif; ?>
 
@@ -384,11 +390,12 @@ $articles = listeArticles($connexion);
         </div>
     </div>
     <script>
-        var modal = new bootstrap.Modal(document.getElementById('errorModal'));
-        modal.show();
+    var modal = new bootstrap.Modal(document.getElementById('errorModal'));
+    modal.show();
     </script>
     <?php endif; ?>
 
     <?php include('../../footer.php'); ?>
 </body>
+
 </html>

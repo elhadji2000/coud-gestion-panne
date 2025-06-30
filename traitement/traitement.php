@@ -222,8 +222,8 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'POST' &&
         $stmt->close();
 
         // Mise à jour si OK
-        if (updateUtilisateur($connexion, $id, $username, $nom, $prenom, $email, $telephone, $motDePasse, $profil1, $profil2)) {
-            header('Location: /COUD/panne/profils/admin/users');
+        if (updateUtilisateur($connexion, $id, $username, $nom, $prenom, $email, $telephone, $profil1, $profil2, $motDePasse)) {
+            header('Location: /COUD/panne/profils/admin/users?profil2='.$profil1);
             exit();
         } else {
             header('Location: /COUD/panne/profils/admin/addUser?user_id=' . $id . '&erreur=save');

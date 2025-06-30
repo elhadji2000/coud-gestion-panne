@@ -1,5 +1,10 @@
 <?php
 session_start();
+if (empty($_SESSION['username'])) {
+    header('Location: /COUD/codif/');
+    exit();
+}
+
 include('../../traitement/fonction.php');
 include('../../traitement/requete.php');
 include('../../activite.php');
@@ -7,8 +12,7 @@ include('../../activite.php');
 // Afficher les messages de succès/erreur
 $success = $_GET['success'] ?? null;
 $error = $_GET['error'] ?? null;
-
-// Récupérer la liste des sorties
+// Récupérer la liste des entrées
 $sorties = listeSorties($connexion);
 ?>
 
@@ -18,14 +22,10 @@ $sorties = listeSorties($connexion);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GESCOUD</title>
-
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
 
@@ -80,7 +80,7 @@ $sorties = listeSorties($connexion);
         margin-bottom: 2rem;
     }
 
-   .table th {
+    .table th {
         background-color: #f8fafc;
         font-weight: 600;
         color: var(--secondary);
@@ -194,55 +194,56 @@ $sorties = listeSorties($connexion);
             <div class="d-flex justify-content-between align-items-center flex-wrap">
                 <div class="mb-2 mb-md-0">
                     <h1 class="page-title">
-                        <i class="fas fa-arrow-up me-2"></i>Gestion des Sorties
+                        <i class="fas fa-box me-2"></i>Gestion des Sorties
                     </h1>
-                    <p class="text-muted mb-0">Historique des sorties de stock</p>
+                    <p class="text-muted mb-0">Historique des Sorties de stock</p>
                 </div>
+                <?php if (isset($_SESSION['profil2']) && $_SESSION['profil2'] === 'atelier'): ?>
                 <div>
                     <a href="nouvelle_sortie.php" class="btn btn-add">
                         <i class="fas fa-plus me-2"></i>Nouvelle Sortie
                     </a>
                 </div>
+                <?php endif; ?>
+
             </div>
         </div>
     </div>
 
     <!-- Contenu principal -->
-    <div class="container-fluid mb-5">
+    <div class="container mb-5">
         <div class="table-container">
             <div class="table-responsive">
-                <table id="articlesTable" class="table table-hover" style="width:100%">
+                <table id="articlesTable" class="table table-hover table-bordered" style="width:100%">
                     <thead>
                         <tr>
-                            <th>N° Sortie</th>
-                            <th>Date</th>
+                            <th>#</th>
+                            <th>Date dernière sortie</th>
                             <th>Référence</th>
                             <th>Article</th>
-                            <th>Quantité</th>
+                            <th>Quantité totale</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach($sorties as $sortie): ?>
+                        <?php $i = 1; foreach($sorties as $sortie): ?>
                         <tr>
-                            <td><?= htmlspecialchars($sortie['id']) ?></td>
-                            <td><?= date('d/m/Y', strtotime($sortie['date_sortie'])) ?></td>
+                            <td><?= $i++ ?></td>
+                            <td><?= date('d/m/Y', strtotime($sortie['derniere_sortie'])) ?></td>
                             <td><?= htmlspecialchars($sortie['references']) ?></td>
                             <td><?= htmlspecialchars($sortie['article']) ?></td>
-                            <td><?= htmlspecialchars($sortie['quantite']) ?></td>
+                            <td><?= htmlspecialchars($sortie['total_quantite']) ?></td>
                             <td>
-                                <a href="nouvelle_sortie.php?id=<?= $sortie['id'] ?>" class="action-link link-edit me-2"
-                                    title="Modifier">
-                                    <i class="fas fa-edit me-1"></i>Modifier
-                                </a>
-                                <a href="#" class="action-link link-delete delete-btn" title="Supprimer"
-                                    data-id="<?= $sortie['id'] ?>">
-                                    <i class="fas fa-trash me-1"></i>Supprimer
+                                <a href="details_sortie.php?ref=<?= urlencode($sortie['references']) ?>"
+                                    class="btn btn-sm btn-info">
+                                    <i class="fas fa-list"></i> Détails
                                 </a>
                             </td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
+
+
                 </table>
             </div>
         </div>
@@ -258,7 +259,7 @@ $sorties = listeSorties($connexion);
                         aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Êtes-vous sûr de vouloir supprimer cette sortie ? Cette action est irréversible.</p>
+                    <p>Êtes-vous sûr de vouloir supprimer cette entrèe ? Cette action est irréversible.</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
@@ -293,7 +294,7 @@ $sorties = listeSorties($connexion);
         $('.delete-btn').click(function(e) {
             e.preventDefault();
             var id = $(this).data('id');
-            $('#confirmDelete').attr('href', 'suppr_sortie.php?id=' + id);
+            $('#confirmDelete').attr('href', 'suppr_entree.php?id=' + id);
             $('#deleteModal').modal('show');
         });
     });
@@ -308,7 +309,7 @@ $sorties = listeSorties($connexion);
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    L'enregistrement a été supprimé avec succès.
+                    L'entrée a été supprimé avec succès.
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-success" data-bs-dismiss="modal">OK</button>
@@ -318,50 +319,6 @@ $sorties = listeSorties($connexion);
     </div>
     <script>
     var modal = new bootstrap.Modal(document.getElementById('successModal'));
-    modal.show();
-    </script>
-    <?php endif; ?>
-     <?php if (isset($success) && $success == 2): ?>
-    <div class="modal fade" id="successModal2" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title">Succès</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    sortie a été enregistrer avec succès.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">OK</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <script>
-    var modal = new bootstrap.Modal(document.getElementById('successModal2'));
-    modal.show();
-    </script>
-    <?php endif; ?>
-    <?php if (isset($success) && $success == 1): ?>
-    <div class="modal fade" id="successModal1" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title">Succès</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    sortie a été modifier avec succès.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">OK</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <script>
-    var modal = new bootstrap.Modal(document.getElementById('successModal1'));
     modal.show();
     </script>
     <?php endif; ?>

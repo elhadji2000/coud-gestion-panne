@@ -159,10 +159,10 @@ include('../../activite.php');
 
                         <?php
         $profil2 = $_SESSION['profil2'] ?? '';
-        $profil1 = $_SESSION['profil1'] ?? '';
+        $profil1 = $_SESSION['profil'] ?? '';
 
         // Pour les chefs de résidence : format "Campus|Pavillon"
-        if ($profil1 === 'residence' && preg_match('/^[^|]+\|[^|]+$/', $profil2)) {
+        if ($profil1 === 'residence') {
             echo '<optgroup label="Chambres">';
             try {
                 $chambres = getChambresByCampusPavillon($connexion, $profil2);

@@ -3,7 +3,7 @@ session_start();
 if (!empty($_SESSION['username']) && !empty($_SESSION['mdp'])) {
   session_destroy();
 }
-include('activite.php');
+//include('activite.php');
 include('traitement/connect.php');
 ?>
 <!DOCTYPE html>
@@ -11,7 +11,7 @@ include('traitement/connect.php');
 
 <head>
   <meta charset="utf-8">
-  <title>Connexion | GESCOUD</title>
+  <title>COUD'MAINT</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -143,7 +143,7 @@ include('traitement/connect.php');
     <h2>Centre des Œuvres Universitaires de Dakar</h2>
   </div>
   <div class="login-container">
-    <h3 class="login-title">Connexion à GESCOUD</h3>
+    <h3 class="login-title">Connexion à COUD'MAINT</h3>
     
     <?php if (isset($_GET['error'])): ?>
       <div class="error-message"><?= htmlspecialchars($_GET['error']) ?></div>

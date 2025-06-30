@@ -17,8 +17,6 @@ $statsGlobales = getStatsGlobales($connexion);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rapports de Stock | Gestion de Stock</title>
-
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -44,6 +42,7 @@ $statsGlobales = getStatsGlobales($connexion);
         background-color: #f8fafc;
         color: var(--secondary);
     }
+
     .table th {
         background-color: #f8fafc;
         font-weight: 600;
@@ -255,26 +254,24 @@ $statsGlobales = getStatsGlobales($connexion);
             <div class="tab-pane fade" id="entrees" role="tabpanel">
                 <div class="table-container mt-3">
                     <h5 class="section-title"><i class="fas fa-boxes me-2"></i>Détail des entrées</h5>
-                    <table id="entreesTable" class="table table-hover" style="width:100%">
+                    <table id="entreesTable" class="table table-hover table-bordered" style="width:100%">
                         <thead>
                             <tr>
-                                <th>N° Entrée</th>
-                                <th>Date</th>
-                                <th>Article</th>
+                                <th>#</th>
+                                <th>Date dernière entrée</th>
                                 <th>Référence</th>
-                                <th>Quantité</th>
-                                <th>Remarque</th>
+                                <th>Article</th>
+                                <th>Quantité totale</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach($entrees as $entree): ?>
+                            <?php $i = 1; foreach($entrees as $entree): ?>
                             <tr>
-                                <td><?= $entree['id'] ?></td>
-                                <td><?= date('d/m/Y', strtotime($entree['date_entree'])) ?></td>
-                                <td><?= htmlspecialchars($entree['article']) ?></td>
+                                <td><?= $i++ ?></td>
+                                <td><?= date('d/m/Y', strtotime($entree['derniere_entree'])) ?></td>
                                 <td><?= htmlspecialchars($entree['references']) ?></td>
-                                <td><?= $entree['quantite'] ?></td>
-                                <td><?= htmlspecialchars($entree['remarque']) ?></td>
+                                <td><?= htmlspecialchars($entree['article']) ?></td>
+                                <td><?= htmlspecialchars($entree['total_quantite']) ?></td>
                             </tr>
                             <?php endforeach; ?>
                         </tbody>
@@ -286,28 +283,24 @@ $statsGlobales = getStatsGlobales($connexion);
             <div class="tab-pane fade" id="sorties" role="tabpanel">
                 <div class="table-container mt-3">
                     <h5 class="section-title"><i class="fas fa-truck-loading me-2"></i>Détail des sorties</h5>
-                    <table id="sortiesTable" class="table table-hover" style="width:100%">
+                    <table id="sortiesTable" class="table table-hover table-bordered" style="width:100%">
                         <thead>
                             <tr>
-                                <th>N° Sortie</th>
-                                <th>Date</th>
-                                <th>Article</th>
+                                <th>#</th>
+                                <th>Date dernière sortie</th>
                                 <th>Référence</th>
-                                <th>Quantité</th>
-                                <th>Intervention</th>
-                                <th>Remarque</th>
+                                <th>Article</th>
+                                <th>Quantité totale</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach($sorties as $sortie): ?>
+                            <?php $i = 1; foreach($sorties as $sortie): ?>
                             <tr>
-                                <td><?= $sortie['id'] ?></td>
-                                <td><?= date('d/m/Y', strtotime($sortie['date_sortie'])) ?></td>
-                                <td><?= htmlspecialchars($sortie['article']) ?></td>
+                                <td><?= $i++ ?></td>
+                                <td><?= date('d/m/Y', strtotime($sortie['derniere_sortie'])) ?></td>
                                 <td><?= htmlspecialchars($sortie['references']) ?></td>
-                                <td><?= $sortie['quantite'] ?></td>
-                                <td><?= htmlspecialchars($sortie['intervention']) ?></td>
-                                <td><?= htmlspecialchars($sortie['remarque']) ?></td>
+                                <td><?= htmlspecialchars($sortie['article']) ?></td>
+                                <td><?= htmlspecialchars($sortie['total_quantite']) ?></td>
                             </tr>
                             <?php endforeach; ?>
                         </tbody>
@@ -336,31 +329,31 @@ $statsGlobales = getStatsGlobales($connexion);
                                 <th>Article</th>
                                 <th>Référence</th>
                                 <th>Quantité</th>
-                                <th>Détails</th>
+                                <th style="display: none;">ArticleID</th> <!-- colonne cachée -->
                             </tr>
                         </thead>
                         <tbody>
                             <?php 
                             // Combiner entrées et sorties pour l'affichage
                             foreach($entrees as $entree): ?>
-                            <tr data-article="<?= $entree['article_id'] ?>" >
-                                <td><?= date('d/m/Y', strtotime($entree['date_entree'])) ?></td>
+                            <tr data-article="<?= $entree['article_id'] ?>">
+                                <td><?= date('d/m/Y', strtotime($entree['derniere_entree'])) ?></td>
                                 <td><span class="badge badge-entree">Entrée</span></td>
                                 <td><?= htmlspecialchars($entree['article']) ?></td>
                                 <td><?= htmlspecialchars($entree['references']) ?></td>
-                                <td>+<?= $entree['quantite'] ?></td>
-                                <td><?= htmlspecialchars($entree['remarque']) ?></td>
+                                <td>+<?= $entree['total_quantite'] ?></td>
+                                <td style="display:none;"><?= $entree['article_id'] ?></td>
                             </tr>
                             <?php endforeach; 
                             
                             foreach($sorties as $sortie): ?>
                             <tr data-article="<?= $sortie['article_id'] ?>">
-                                <td><?= date('d/m/Y', strtotime($sortie['date_sortie'])) ?></td>
+                                <td><?= date('d/m/Y', strtotime($sortie['derniere_sortie'])) ?></td>
                                 <td><span class="badge badge-sortie">Sortie</span></td>
                                 <td><?= htmlspecialchars($sortie['article']) ?></td>
                                 <td><?= htmlspecialchars($sortie['references']) ?></td>
-                                <td>-<?= $sortie['quantite'] ?></td>
-                                <td>Intervention: <?= htmlspecialchars($sortie['intervention']) ?></td>
+                                <td>-<?= $sortie['total_quantite'] ?></td>
+                                <td style="display:none;"><?= $sortie['article_id'] ?></td>
                             </tr>
                             <?php endforeach; ?>
                         </tbody>
@@ -417,22 +410,24 @@ $statsGlobales = getStatsGlobales($connexion);
             language: {
                 url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/fr-FR.json'
             },
-            order: [
-                [0, 'desc']
-            ],
             dom: 'Bfrtip',
-            buttons: ['excel', 'pdf']
+            buttons: ['excel', 'pdf'],
+            columnDefs: [{
+                targets: 5, // 7e colonne (index 6)
+                visible: false,
+                searchable: true
+            }]
         });
 
-        // Filtrer par article
-        $('#selectArticle').change(function() {
+
+
+        $('#selectArticle').on('change', function() {
             var articleId = $(this).val();
-            if (articleId) {
-                articlesTable.column(2).search(articleId).draw();
-            } else {
-                articlesTable.search('').columns().search('').draw();
-            }
+            articlesTable.column(6).search(articleId).draw();
         });
+
+
+
     });
     </script>
 

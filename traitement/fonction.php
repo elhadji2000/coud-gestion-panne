@@ -20,40 +20,94 @@ $connexion = connexionBD();
 function allPannesByUser($connexion, $user_id, $page = 1, $limit = 10) {
     $offset = ($page - 1) * $limit;
 
-    // Requête pour récupérer les pannes paginées
     $sql = "
-        SELECT p.id, p.type_panne, p.date_enregistrement, p.description, p.localisation, p.niveau_urgence,
-               i.resultat,i.id AS idIntervention, i.date_intervention, i.description_action, i.personne_agent,
-               u.nom, u.profil1,u.profil2,u.prenom, 
-               o.evaluation_qualite,o.id AS idObservation,o.date_observation, o.commentaire_suggestion,m.instruction
+        SELECT 
+            p.id, 
+            p.type_panne, 
+            p.date_enregistrement, 
+            p.description, 
+            p.localisation, 
+            p.niveau_urgence,
+            u.nom, 
+            u.prenom,
+            u.profil1, 
+            u.profil2,
+
+            -- Dernière intervention
+            (
+                SELECT resultat 
+                FROM Intervention 
+                WHERE id_panne = p.id 
+                ORDER BY date_intervention DESC 
+                LIMIT 1
+            ) AS dernier_resultat,
+            (
+                SELECT id 
+                FROM Intervention 
+                WHERE id_panne = p.id 
+                ORDER BY date_intervention DESC 
+                LIMIT 1
+            ) AS idIntervention,
+
+            -- Dernière observation
+            (
+                SELECT id 
+                FROM Observation 
+                WHERE id_panne = p.id 
+                ORDER BY date_observation DESC 
+                LIMIT 1
+            ) AS idObservation,
+
+            -- Dernière imputation
+            (
+                SELECT instruction 
+                FROM Imputation 
+                WHERE id_panne = p.id 
+                ORDER BY date_imputation DESC 
+                LIMIT 1
+            ) AS instruction
+
         FROM Panne p
-        LEFT JOIN Intervention i ON p.id = i.id_panne
         LEFT JOIN Utilisateur u ON p.id_chef_residence = u.id
-        LEFT JOIN Observation o ON p.id = o.id_panne
-        LEFT JOIN Imputation m ON p.id = m.id_panne
         WHERE p.id_chef_residence = ?
+
         ORDER BY 
-            (CASE 
-                WHEN i.resultat IS NULL THEN 1 
-                WHEN i.resultat = 'en cours' THEN 2 
-                ELSE 3 
-            END) ASC, 
-            (CASE 
-                WHEN p.niveau_urgence = 'Èlevèe' THEN 1 
-                WHEN p.niveau_urgence = 'Moyenne' THEN 2 
-                WHEN p.niveau_urgence = 'Faible' THEN 3 
-                ELSE 4 
-            END) ASC, 
+            -- Priorité d'affichage
+            CASE 
+                WHEN (
+                    SELECT COUNT(*) FROM Intervention WHERE id_panne = p.id
+                ) = 0 THEN 1
+                WHEN (
+                    SELECT resultat 
+                    FROM Intervention 
+                    WHERE id_panne = p.id 
+                    ORDER BY date_intervention DESC 
+                    LIMIT 1
+                ) = 'en cours' THEN 2
+                ELSE 3
+            END ASC,
+
+            -- Urgence
+            CASE 
+                WHEN p.niveau_urgence = 'Élevée' THEN 1
+                WHEN p.niveau_urgence = 'Moyenne' THEN 2
+                WHEN p.niveau_urgence = 'Faible' THEN 3
+                ELSE 4
+            END ASC,
+
+            -- Date récente
             p.date_enregistrement DESC
+
         LIMIT ? OFFSET ?
     ";
+
     $stmt = $connexion->prepare($sql);
     $stmt->bind_param('iii', $user_id, $limit, $offset);
     $stmt->execute();
     $result = $stmt->get_result();
     $pannes = $result->fetch_all(MYSQLI_ASSOC);
 
-    // Requête pour compter le nombre total de pannes
+    // Compte total
     $sqlCount = "
         SELECT COUNT(*) as total_count
         FROM Panne
@@ -65,8 +119,13 @@ function allPannesByUser($connexion, $user_id, $page = 1, $limit = 10) {
     $resultCount = $stmtCount->get_result();
     $totalCount = $resultCount->fetch_assoc()['total_count'];
 
-    return ['pannes' => $pannes, 'total_count' => $totalCount];
+    return [
+        'pannes' => $pannes,
+        'total_count' => $totalCount
+    ];
 }
+
+
 // ###############       FIN DE LA FONCTION      ####################
 
 //############## Fonction de connexion dans l'espace utilisateur ############################
@@ -185,33 +244,44 @@ function rechercherPannesParMotCle($connexion, $userId, $searchTerm, $page = 1, 
 function obtenirPanneParId($connexion, $panneId) {
     $sql = "
         SELECT 
+            -- Informations panne
             p.id AS panne_id, 
             p.type_panne, 
             p.date_enregistrement, 
             p.description AS panne_description, 
             p.localisation, 
             p.niveau_urgence,
-            u.nom AS chef_nom, 
+            
+            -- Chef de résidence
+            u.nom AS declarant, 
             u.profil1 AS chef_role,
+            
+            -- Intervention
             i.id AS intervention_id, 
             i.date_intervention, 
             i.description_action, 
             i.resultat, 
             i.personne_agent,
+            
+            -- Observation (liée à l’intervention)
             o.id AS observation_id, 
             o.evaluation_qualite,
             o.date_observation, 
             o.commentaire_suggestion,
+            
+            -- Imputation (toujours liée à la panne)
             m.id AS imputation_id,
             m.id_chef_dst,
             m.instruction,
             m.date_imputation
+            
         FROM Panne p
         LEFT JOIN Utilisateur u ON p.id_chef_residence = u.id
         LEFT JOIN Intervention i ON p.id = i.id_panne
-        LEFT JOIN Observation o ON p.id = o.id_panne
+        LEFT JOIN Observation o ON i.id = o.id_intervention
         LEFT JOIN Imputation m ON p.id = m.id_panne
         WHERE p.id = ?
+        ORDER BY i.date_intervention ASC, o.date_observation ASC
     ";
     $stmt = $connexion->prepare($sql);
     $stmt->bind_param('i', $panneId);
@@ -219,6 +289,7 @@ function obtenirPanneParId($connexion, $panneId) {
     $result = $stmt->get_result();
     return $result->fetch_all(MYSQLI_ASSOC);
 }
+
 //  ################# FIN DE LA  FONCTION  ##########################
 
 
@@ -386,114 +457,148 @@ function allPannes1($connexion, $page = 1, $limit = 10, $profil2 = null) {
 
 
 // ###############  DEBUT DE LA FONCTION  RECHERCHERPANNES()  #####################################
-function rechercherPannes($connexion, $profil2 = null, $search = '', $isChefDst = false) {
-    // Initialiser la clause WHERE
+function allPannes($connexion, $page = 1, $limit = 10, $profil2 = null, $isChefDst = false) {
+    $offset = ($page - 1) * $limit;
+
+    // Clause WHERE
     $whereClauses = [];
     $params = [];
     $types = '';
 
-    // Ajouter la condition pour filtrer par profil2 si fourni
     if ($profil2 !== null) {
         $whereClauses[] = "p.type_panne = ?";
         $params[] = $profil2;
-        $types .= 's'; // 's' pour string
+        $types .= 's';
     }
 
-    // Ajouter la condition pour la recherche par mots-clés seulement si un terme de recherche est spécifié
-    if (!empty($search)) {
-        $searchConditions = " (p.id LIKE ? OR p.type_panne LIKE ? OR p.date_enregistrement LIKE ? OR 
-                               p.description LIKE ? OR p.localisation LIKE ? OR 
-                               p.niveau_urgence LIKE ? OR 
-                               i.id LIKE ? OR i.resultat LIKE ? OR i.date_intervention LIKE ? OR 
-                               i.description_action LIKE ? OR i.personne_agent LIKE ? OR 
-                               u.id LIKE ? OR u.nom LIKE ? OR u.prenom LIKE ? OR u.profil1 LIKE ? OR 
-                               u.profil2 LIKE ? OR 
-                               o.id LIKE ? OR o.evaluation_qualite LIKE ? OR o.commentaire_suggestion LIKE ? OR
-                               m.id_chef_dst LIKE ? OR m.date_imputation LIKE ?)";
-        $whereClauses[] = $searchConditions;
+    // JOIN conditionnel sur imputation
+    $joinImputation = $isChefDst
+        ? "LEFT JOIN Imputation m ON p.id = m.id_panne"
+        : "INNER JOIN Imputation m ON p.id = m.id_panne";
 
-        // Créez le tableau des paramètres pour correspondre au nombre de ? dans la requête
-        $params = array_merge($params, array_fill(0, 21, "%$search%"));
-        $types .= str_repeat('s', 21); // 's' pour string répété pour chaque paramètre de recherche
-    }
-
-    // Ajouter la jointure obligatoire avec la table Imputation pour les utilisateurs autres que chef DST
-    $joinImputation = "";
-    if (!$isChefDst) {
-        $joinImputation = "INNER JOIN Imputation m ON p.id = m.id_panne";
-    } else {
-        $joinImputation = "LEFT JOIN Imputation m ON p.id = m.id_panne";
-    }
-
-    // Construire la clause WHERE finale
     $whereClause = '';
     if (!empty($whereClauses)) {
         $whereClause = 'WHERE ' . implode(' AND ', $whereClauses);
     }
 
-    // Requête pour récupérer les pannes filtrées par recherche avec les clauses ORDER BY
+    // Requête principale (une ligne par panne)
     $sql = "
-        SELECT p.id, p.type_panne, p.date_enregistrement, p.description, p.localisation, p.niveau_urgence,
-               i.resultat, i.id AS idIntervention, i.date_intervention, i.description_action, i.personne_agent,
-               u.nom, u.prenom, u.profil1, u.profil2,
-               o.evaluation_qualite, o.id AS idObservation, o.date_observation, o.commentaire_suggestion,
-               m.id_chef_dst,m.resultat AS resultat_imp, m.instruction, m.date_imputation
+        SELECT 
+            p.id,
+            p.type_panne,
+            p.date_enregistrement,
+            p.description,
+            p.localisation,
+            p.niveau_urgence,
+            u.nom,
+            u.prenom,
+            u.profil1,
+            u.profil2,
+
+            -- Dernière intervention
+            (
+                SELECT resultat 
+                FROM Intervention 
+                WHERE id_panne = p.id 
+                ORDER BY date_intervention DESC 
+                LIMIT 1
+            ) AS resultat,
+            (
+                SELECT id 
+                FROM Intervention 
+                WHERE id_panne = p.id 
+                ORDER BY date_intervention DESC 
+                LIMIT 1
+            ) AS idIntervention,
+
+            -- Dernière observation
+            (
+                SELECT id 
+                FROM Observation 
+                WHERE id_panne = p.id 
+                ORDER BY date_observation DESC 
+                LIMIT 1
+            ) AS idObservation,
+
+            -- Imputation (si existe)
+            m.instruction,
+            m.id_chef_dst,
+            m.resultat AS resultat_imp,
+            m.date_imputation
+
         FROM Panne p
-        LEFT JOIN Intervention i ON p.id = i.id_panne
         LEFT JOIN Utilisateur u ON p.id_chef_residence = u.id
-        LEFT JOIN Observation o ON p.id = o.id_panne
         $joinImputation
         $whereClause
         ORDER BY 
-            (CASE 
-                WHEN m.id_chef_dst IS NULL THEN 1 
-                ELSE 2 
-            END) ASC,
-            (CASE 
-                WHEN i.resultat IS NULL THEN 1 
-                WHEN i.resultat = 'en cours' THEN 2 
-                ELSE 3 
-            END) ASC, 
-            (CASE 
-                WHEN p.niveau_urgence = 'Èlevèe' THEN 1 
-                WHEN p.niveau_urgence = 'Moyenne' THEN 2 
-                WHEN p.niveau_urgence = 'Faible' THEN 3 
-                ELSE 4 
-            END) ASC, 
+            -- Intervention status (null = non traité en premier)
+            CASE 
+                WHEN (
+                    SELECT resultat 
+                    FROM Intervention 
+                    WHERE id_panne = p.id 
+                    ORDER BY date_intervention DESC 
+                    LIMIT 1
+                ) IS NULL THEN 1
+                WHEN (
+                    SELECT resultat 
+                    FROM Intervention 
+                    WHERE id_panne = p.id 
+                    ORDER BY date_intervention DESC 
+                    LIMIT 1
+                ) = 'en cours' THEN 2
+                ELSE 3
+            END ASC,
+
+            -- Urgence
+            CASE 
+                WHEN p.niveau_urgence = 'Élevée' THEN 1
+                WHEN p.niveau_urgence = 'Moyenne' THEN 2
+                WHEN p.niveau_urgence = 'Faible' THEN 3
+                ELSE 4
+            END ASC,
+
+            -- Date récente
             p.date_enregistrement DESC
+        LIMIT ? OFFSET ?
     ";
 
-    // Préparer la requête
+    // Lier les paramètres
     $stmt = $connexion->prepare($sql);
-
-    // Lier les paramètres si nécessaires
     if (!empty($params)) {
+        $types .= 'ii';
+        $params[] = $limit;
+        $params[] = $offset;
         $stmt->bind_param($types, ...$params);
+    } else {
+        $stmt->bind_param('ii', $limit, $offset);
     }
 
-    // Exécuter la requête
     $stmt->execute();
     $result = $stmt->get_result();
-    return $result->fetch_all(MYSQLI_ASSOC);
-}
-// ##################    FIN DE LA FONCTION      ####################
+    $pannes = $result->fetch_all(MYSQLI_ASSOC);
 
-//######################### DEBUT la fonction pour AllPAnnes() ####################################
-function allPannes($connexion, $page = 1, $limit = 10, $profil2 = null, $search = '', $isChefDst = false) {
-    $offset = ($page - 1) * $limit;
-
-    // Appeler la fonction de recherche
-    $pannesFiltrees = rechercherPannes($connexion, $profil2, $search, $isChefDst);
-
-    // Appliquer la pagination
-    $totalCount = count($pannesFiltrees);
-    $pannes = array_slice($pannesFiltrees, $offset, $limit);
-
-    // Calcul du nombre total de pages
+    // Total count (sans pagination)
+    $sqlCount = "SELECT COUNT(*) as total_count FROM Panne p $joinImputation $whereClause";
+    $stmtCount = $connexion->prepare($sqlCount);
+    if (!empty($params)) {
+        $countParams = array_slice($params, 0, count($params) - 2); // remove limit, offset
+        $countTypes = substr($types, 0, -2);
+        $stmtCount->bind_param($countTypes, ...$countParams);
+    }
+    $stmtCount->execute();
+    $resultCount = $stmtCount->get_result();
+    $totalCount = $resultCount->fetch_assoc()['total_count'];
     $totalPages = ceil($totalCount / $limit);
 
-    return ['pannes' => $pannes, 'total_count' => $totalCount, 'total_pages' => $totalPages, 'current_page' => $page];
+    return [
+        'pannes' => $pannes,
+        'total_count' => $totalCount,
+        'total_pages' => $totalPages,
+        'current_page' => $page
+    ];
 }
+
 // ###############       FIN DE LA FONCTION      ####################
 
 //######################### DEBUT la fonction pour enregistrer des interventions ####################################
@@ -738,7 +843,7 @@ function enregistrerUtilisateur($connexion, $username, $nom, $prenom, $email, $t
     return true;
 }
 // Fonction pour modifier un Utilisateur
-function updateUtilisateur($connexion, $id, $username, $nom, $prenom, $email, $telephone, $profil1, $profil2) {
+function updateUtilisateur($connexion, $id, $username, $nom, $prenom, $email, $telephone, $profil1, $profil2, $motDePasse = null) {
     // Vérifier si l'email existe déjà pour un autre utilisateur
     $sqlCheck = "SELECT COUNT(*) AS count FROM Utilisateur WHERE email = ? AND id != ?";
     $stmtCheck = $connexion->prepare($sqlCheck);
@@ -747,53 +852,51 @@ function updateUtilisateur($connexion, $id, $username, $nom, $prenom, $email, $t
         throw new Exception('Échec de la préparation de la requête : ' . $connexion->error);
     }
 
-    // Lier les paramètres email et id
     $stmtCheck->bind_param('si', $email, $id);
     $stmtCheck->execute();
     $resultCheck = $stmtCheck->get_result();
     $rowCheck = $resultCheck->fetch_assoc();
 
-    // Si l'email existe déjà pour un autre utilisateur, retourner une erreur
     if ($rowCheck['count'] > 0) {
         throw new Exception("Un autre utilisateur avec cet email existe déjà.");
     }
 
-    // Fermer la requête de vérification
     $stmtCheck->close();
 
+    // S'assurer que profil1 est bien renseigné
+    if (empty($profil1)) {
+        throw new Exception("Le champ profil1 ne peut pas être vide.");
+    }
+
     // Préparer la requête de mise à jour
-    if ($motDePasse !== null && $motDePasse !== '') {
-        // Si un nouveau mot de passe est fourni, le hacher avec SHA-1
+    if (!empty($motDePasse)) {
         $motDePasseHashe = sha1($motDePasse);
-        $sql = "UPDATE Utilisateur SET username = ?, nom = ?, prenom = ?, email = ?, telephone = ?, password = ?, profil1 = ?, profil2 = ? WHERE id = ?";
-    } else {
-        // Si aucun mot de passe n'est fourni, ne pas mettre à jour le champ password
-        $sql = "UPDATE Utilisateur SET username = ?, nom = ?, prenom = ?, email = ?, telephone = ?, profil1 = ?, profil2 = ? WHERE id = ?";
-    }
-
-    $stmt = $connexion->prepare($sql);
-
-    if ($stmt === false) {
-        throw new Exception('Échec de la préparation de la requête : ' . $connexion->error);
-    }
-
-    // Lier les paramètres en fonction de la présence du mot de passe
-    if ($motDePasse !== null && $motDePasse !== '') {
+        $sql = "UPDATE Utilisateur 
+                SET username = ?, nom = ?, prenom = ?, email = ?, telephone = ?, password = ?, profil1 = ?, profil2 = ?
+                WHERE id = ?";
+        $stmt = $connexion->prepare($sql);
         $stmt->bind_param('ssssssssi', $username, $nom, $prenom, $email, $telephone, $motDePasseHashe, $profil1, $profil2, $id);
     } else {
+        $sql = "UPDATE Utilisateur 
+                SET username = ?, nom = ?, prenom = ?, email = ?, telephone = ?, profil1 = ?, profil2 = ?
+                WHERE id = ?";
+        $stmt = $connexion->prepare($sql);
         $stmt->bind_param('sssssssi', $username, $nom, $prenom, $email, $telephone, $profil1, $profil2, $id);
     }
 
-    // Exécuter la requête
-    if ($stmt->execute() === false) {
-        throw new Exception('Échec de l\'exécution de la requête : ' . $stmt->error);
+    if ($stmt === false) {
+        throw new Exception('Erreur préparation requête : ' . $connexion->error);
     }
 
-    // Fermer la requête
+    if (!$stmt->execute()) {
+        throw new Exception('Erreur exécution requête : ' . $stmt->error);
+    }
+
     $stmt->close();
 
     return true;
 }
+
 
 function getChambresByCampusPavillon($connexion, $campusPavillon) {
     // Séparer le campus et le pavillon
@@ -1161,53 +1264,86 @@ function enregistrerArticles($connexion, $nom, $categorie, $description, $refere
 
 function listeSorties($connexion) {
     $sql = "SELECT 
-    s.id AS id,
-    a.nom AS article,
-    a.id AS article_id,
-    i.resultat AS intervention,
-    a.references,
-    s.quantite,
-    s.date_sortie,
-    s.remarque,
-    s.intervention_id
-FROM sortie_stock s
-JOIN articles a ON s.article_id = a.id
-JOIN intervention i ON s.intervention_id = i.id
-ORDER BY s.date_sortie DESC;
-";
-    
+        a.references,
+        a.id AS article_id,
+        a.nom AS article,
+        SUM(s.quantite) AS total_quantite,
+        MAX(s.date_sortie) AS derniere_sortie,
+        GROUP_CONCAT(s.remarque SEPARATOR ' | ') AS remarques
+    FROM sortie_stock s
+    JOIN articles a ON s.article_id = a.id
+    GROUP BY a.references, a.nom
+    ORDER BY derniere_sortie DESC;
+    ";
+
     $result = mysqli_query($connexion, $sql);
     $stocks = [];
-    
+
     while ($row = mysqli_fetch_assoc($result)) {
         $stocks[] = $row;
     }
-    
+
     return $stocks;
 }
 function listeEntrees($connexion) {
     $sql = "SELECT 
-    s.id AS id,
-    a.nom AS article,
-    a.id AS article_id,
-    a.references,
-    s.quantite,
-    s.date_entree,
-    s.remarque
-FROM entree_stock s
-JOIN articles a ON s.article_id = a.id
-ORDER BY s.date_entree DESC;
-";
-    
-    $result = mysqli_query($connexion, $sql);
-    $stocks = [];
-    
-    while ($row = mysqli_fetch_assoc($result)) {
-        $stocks[] = $row;
-    }
-    
-    return $stocks;
+        a.references,
+        a.nom AS article,
+        a.id AS article_id,
+        SUM(s.quantite) AS total_quantite,
+        MAX(s.date_entree) AS derniere_entree,
+        GROUP_CONCAT(s.remarque SEPARATOR ' | ') AS remarques
+    FROM entree_stock s
+    JOIN articles a ON s.article_id = a.id
+    GROUP BY a.references, a.nom
+    ORDER BY derniere_entree DESC;
+    ";
+
+    $result = $connexion->query($sql);
+    return $result->fetch_all(MYSQLI_ASSOC);
 }
+function getEntreesParReference($connexion, $reference) {
+    $sql = "SELECT 
+                s.id,
+                s.date_entree,
+                s.quantite,
+                s.remarque,
+                a.nom AS article
+            FROM entree_stock s
+            JOIN articles a ON s.article_id = a.id
+            WHERE a.references = ?
+            ORDER BY s.date_entree DESC";
+
+    $stmt = $connexion->prepare($sql);
+    $stmt->bind_param("s", $reference);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+}
+function getSortiesParReference($connexion, $reference) {
+    $sql = "SELECT 
+                s.id,
+                s.date_sortie,
+                s.quantite,
+                s.remarque,
+                a.nom AS article,
+                a.references,
+                i.id AS intervention_id,
+                i.date_intervention,
+                i.type_intervention,
+                i.description_action
+            FROM sortie_stock s
+            JOIN articles a ON s.article_id = a.id
+            JOIN intervention i ON s.intervention_id = i.id
+            WHERE a.references = ?
+            ORDER BY s.date_sortie DESC";
+
+    $stmt = $connexion->prepare($sql);
+    $stmt->bind_param("s", $reference);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+}
+
+
 
 function getStatsGlobales($connexion) {
     $stats = [
@@ -1475,3 +1611,49 @@ function notifierUrgence($connexion, $type_panne, $description, $localisation) {
 function envoyerEmail($to, $subject, $message) {
     mail($to, $subject, $message); // ou mieux, PHPMailer
 }
+function listeAgents($connexion, $section = null) {
+    $agents = [];
+
+    if ($section) {
+        $sql = "SELECT * FROM agent WHERE section = ?";
+        $stmt = mysqli_prepare($connexion, $sql);
+        mysqli_stmt_bind_param($stmt, "s", $section);
+    } else {
+        $sql = "SELECT * FROM agent ORDER BY section, nom";
+        $stmt = mysqli_prepare($connexion, $sql);
+    }
+
+    if ($stmt) {
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+
+        while ($row = mysqli_fetch_assoc($result)) {
+            $agents[] = $row;
+        }
+
+        mysqli_stmt_close($stmt);
+    }
+
+    return $agents;
+}
+function getAgentsParIntervention($connexion, $intervention_id) {
+    $agents = [];
+
+    $sql = "SELECT a.nom, a.prenom 
+            FROM agent a
+            INNER JOIN intervention_agent ia ON a.id = ia.agent_id
+            WHERE ia.intervention_id = ?";
+    
+    $stmt = mysqli_prepare($connexion, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $intervention_id);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    while ($row = mysqli_fetch_assoc($result)) {
+        $agents[] = $row['prenom'] . ' ' . $row['nom'];
+    }
+
+    mysqli_stmt_close($stmt);
+    return $agents;
+}
+

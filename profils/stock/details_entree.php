@@ -12,8 +12,8 @@ include('../../activite.php');
 // Afficher les messages de succès/erreur
 $success = $_GET['success'] ?? null;
 $error = $_GET['error'] ?? null;
-// Récupérer la liste des entrées
-$entrees = listeEntrees($connexion);
+$reference = $_GET['ref'] ?? '';
+$entrees = getEntreesParReference($connexion, $reference);
 ?>
 
 <!DOCTYPE html>
@@ -193,18 +193,12 @@ $entrees = listeEntrees($connexion);
         <div class="container">
             <div class="d-flex justify-content-between align-items-center flex-wrap">
                 <div class="mb-2 mb-md-0">
-                    <h1 class="page-title">
-                        <i class="fas fa-box me-2"></i>Gestion des Entrées
-                    </h1>
-                    <p class="text-muted mb-0">Historique des entrées en stock</p>
+                    <h2 class="my-3 page-title">Détails des entrées pour la référence :
+                        <?= htmlspecialchars($reference) ?></h2>
                 </div>
-                <?php if (isset($_SESSION['profil2']) && $_SESSION['profil2'] === 'atelier'): ?>
                 <div>
-                    <a href="nouvelle_entree.php" class="btn btn-add">
-                        <i class="fas fa-plus me-2"></i>Nouvelle Entrée
-                    </a>
+                    <a href="entree_stock.php" class="btn btn-secondary mb-3">← Retour</a>
                 </div>
-                <?php endif; ?>
             </div>
         </div>
     </div>
@@ -213,36 +207,41 @@ $entrees = listeEntrees($connexion);
     <div class="container mb-5">
         <div class="table-container">
             <div class="table-responsive">
-                <table id="articlesTable" class="table table-hover table-bordered" style="width:100%">
+                <table id="articlesTable" class="table table-bordered" style="width:100%">
                     <thead>
                         <tr>
-                            <th>#</th>
-                            <th>Date dernière entrée</th>
-                            <th>Référence</th>
+                            <th>N° Entrée</th>
+                            <th>Date</th>
                             <th>Article</th>
-                            <th>Quantité totale</th>
+                            <th>Quantité</th>
+                            <th>Remarque</th>
+                            <?php if (isset($_SESSION['profil2']) && $_SESSION['profil2'] === 'atelier'): ?>
                             <th>Actions</th>
+                            <?php endif; ?>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php $i = 1; foreach($entrees as $entree): ?>
+                        <?php foreach($entrees as $entree): ?>
                         <tr>
-                            <td><?= $i++ ?></td>
-                            <td><?= date('d/m/Y', strtotime($entree['derniere_entree'])) ?></td>
-                            <td><?= htmlspecialchars($entree['references']) ?></td>
+                            <td><?= $entree['id'] ?></td>
+                            <td><?= date('d/m/Y', strtotime($entree['date_entree'])) ?></td>
                             <td><?= htmlspecialchars($entree['article']) ?></td>
-                            <td><?= htmlspecialchars($entree['total_quantite']) ?></td>
+                            <td><?= htmlspecialchars($entree['quantite']) ?></td>
+                            <td><?= htmlspecialchars($entree['remarque']) ?></td>
+                            <?php if (isset($_SESSION['profil2']) && $_SESSION['profil2'] === 'atelier'): ?>
                             <td>
-                                <a href="details_entree.php?ref=<?= urlencode($entree['references']) ?>"
-                                    class="btn btn-sm btn-info">
-                                    <i class="fas fa-list"></i> Détails
+                                <a href="nouvelle_entree.php?id=<?= $entree['id'] ?>" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i> Modifier
+                                </a>
+                                <a href="suppr_entree.php?id=<?= $entree['id'] ?>" class="btn btn-sm btn-danger"
+                                    onclick="return confirm('Confirmer la suppression ?');">
+                                    <i class="fas fa-trash"></i> Supprimer
                                 </a>
                             </td>
+                            <?php endif; ?>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
-
-
                 </table>
             </div>
         </div>

@@ -11,7 +11,7 @@ require_once(__DIR__ . '/traitement/fonction.php');
 
 <head>
     <meta charset="utf-8">
-    <title>GESCOUD</title>
+    <title>COUD'MAINT</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="http://localhost/COUD/panne/assets/css/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -162,11 +162,7 @@ require_once(__DIR__ . '/traitement/fonction.php');
                 <li>
                     <a href="http://localhost/COUD/panne/profils/dasboard.php">
                         <i class="fa fa-home" aria-hidden="true"></i>Accueil
-                    </a>
-                </li>
-                <li><a href="http://localhost/COUD/panne/profils/stock/gestion.php">
-                        <i class="fas fa-warehouse" aria-hidden="true"></i> Stock</a>
-                </li>
+                    </a></li>
                 <li><a href="http://localhost/COUD/panne/profils/admin/users.php">
                         <i class="fa fa-users" aria-hidden="true"></i>Utilisateurs</a></li>
 
