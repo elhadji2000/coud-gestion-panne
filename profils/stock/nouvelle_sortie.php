@@ -19,11 +19,11 @@ if (isset($_GET['id'])) {
 
 //########################### pour Enregistrer ou Modifier une Sortie #######################################
 if ($_SERVER['REQUEST_METHOD'] == 'GET' &&
-    isset($_GET['article_id']) && isset($_GET['intervention_id']) &&
+    isset($_GET['article_id']) &&
     isset($_GET['quantite']) && isset($_GET['date_sortie']) && isset($_GET['remarque'])) {
 
     $article_id = $_GET['article_id'];
-    $intervention_id = $_GET['intervention_id'];
+    $intervention_id = null;
     $quantite = $_GET['quantite'];
     $date_sortie = $_GET['date_sortie'];
     $remarque = $_GET['remarque'];
@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' &&
     if (isset($_GET['id_delete'])) {
         // Modification d'une sortie existante
         $id = $_GET['id_delete'];
-        if (modifierSortie($connexion, $id, $article_id, $intervention_id, $quantite, $date_sortie, $remarque)) {
+        if (modifierSortie($connexion, $id, $article_id, $quantite, $date_sortie, $remarque)) {
             header('Location: sortie_stock.php?success=1');
             exit();
         } else {
@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' &&
         }
     } else {
         // Nouvelle sortie
-        if (enregistrerSortie($connexion, $article_id, $intervention_id, $quantite, $date_sortie, $remarque)) {
+        if (enregistrerSortie($connexion, $article_id, $quantite, $date_sortie, $remarque)) {
             header('Location: sortie_stock.php?success=2');
             exit();
         } else {
@@ -223,55 +223,24 @@ $interventions = getInterventions($connexion);
 
                 <hr class="section-divider">
 
-                <!-- Section Intervention -->
-                <div class="mb-4">
-                    <label for="intervention_id" class="form-label required-field">Intervention</label>
-                    <select class="form-select select2-intervention" id="intervention_id" name="intervention_id"
-                        required>
-                        <option value="">Sélectionner une intervention</option>
-                        <?php foreach ($interventions as $intervention): ?>
-                        <option value="<?= $intervention['id'] ?>"
-                            data-description="<?= htmlspecialchars($intervention['description_action']) ?>"
-                            data-resultat="<?= htmlspecialchars($intervention['resultat']) ?>"
-                            <?= (isset($sortie) && $sortie['intervention_id'] == $intervention['id']) ? 'selected' : '' ?>>
-                            Intervention #<?= $intervention['id'] ?> -
-                            <?= htmlspecialchars(substr($intervention['description_action'], 0, 30)) ?>...
-                        </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-
-                <div class="row g-3 mb-4">
-                    <div class="col-md-6">
-                        <label for="description_intervention" class="form-label">Description</label>
-                        <textarea class="form-control readonly-field" id="description_intervention" rows="3"
-                            readonly><?= isset($sortie) ? htmlspecialchars($sortie['description_intervention']) : '' ?></textarea>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="resultat_intervention" class="form-label">Résultat attendu</label>
-                        <textarea class="form-control readonly-field" id="resultat_intervention" rows="3"
-                            readonly><?= isset($sortie) ? htmlspecialchars($sortie['resultat_intervention']) : '' ?></textarea>
-                    </div>
-                </div>
-
                 <hr class="section-divider">
 
                 <!-- Section Sortie -->
                 <div class="row g-3">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label for="quantite" class="form-label required-field">Quantité</label>
                         <input type="number" class="form-control" id="quantite" name="quantite" min="1" required
                             value="<?= isset($sortie) ? htmlspecialchars($sortie['quantite']) : '' ?>">
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label for="date_sortie" class="form-label required-field">Date de sortie</label>
                         <input type="date" class="form-control" id="date_sortie" name="date_sortie" required
                             value="<?= isset($sortie) ? date('Y-m-d', strtotime($sortie['date_sortie'])) : date('Y-m-d') ?>">
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label for="remarque" class="form-label">Remarques</label>
-                        <input type="text" class="form-control" id="remarque" name="remarque" placeholder="Facultatif"
-                            value="<?= isset($sortie) ? htmlspecialchars($sortie['remarque']) : '' ?>">
+                        <textarea class="form-control" id="remarque" rows="2" placeholder="Facultatif"
+                            name="remarque"><?= isset($sortie) ? htmlspecialchars($sortie['remarque']) : '' ?></textarea>
                     </div>
                 </div>
 

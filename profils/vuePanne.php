@@ -22,7 +22,7 @@ foreach ($pannes as $row) {
                 'id' => $interventionId,
                 'date' => $row['date_intervention'],
                 'description' => $row['description_action'],
-                'responsable' => $row['personne_agent'],
+                'responsable' => $row['agents_intervention'],
                 'observations' => []
             ];
         }
@@ -168,6 +168,69 @@ foreach ($pannes as $row) {
         margin-bottom: 0;
         padding-bottom: 0;
     }
+
+    .detail-row {
+        margin-bottom: 0.75rem;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .detail-label {
+        font-weight: 600;
+        color: #444;
+        width: 30%;
+        max-width: 220px;
+    }
+
+    .detail-value {
+        width: 70%;
+        color: #222;
+    }
+
+    .description-box {
+        background-color: #f8f9fa;
+        padding: 8px 12px;
+        border-radius: 4px;
+    }
+
+    .badge-urgence,
+    .badge-etat {
+        padding: 4px 10px;
+        border-radius: 0.5rem;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .badge-faible {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .badge-moyenne {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .badge-elevee {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .badge-resolu {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .badge-encours {
+        background-color: #ffc107;
+        color: black;
+    }
+
+    .badge-nonresolu {
+        background-color: #dc3545;
+        color: white;
+    }
     </style>
 </head>
 
@@ -183,31 +246,31 @@ foreach ($pannes as $row) {
         </div>
 
         <div class="card mb-4">
-            <div class="card-header">
-                <h4 class="mb-0">Informations de base</h4>
+            <div class="card-header bg-secondary text-white">
+                <h4 class="mb-0"><i class="fas fa-info-circle me-2"></i>Informations de base</h4>
             </div>
             <div class="card-body">
                 <?php if ($pannes): ?>
-                <?php $panne = $pannes[0]; // Prendre la première ligne uniquement ?>
+                <?php $panne = $pannes[0]; ?>
 
-                <div class="row detail-row">
-                    <div class="col-md-3 detail-label">N° Panne</div>
-                    <div class="col-md-9"><?= htmlspecialchars($panne['panne_id']) ?></div>
+                <div class="detail-row">
+                    <div class="detail-label">N° Panne</div>
+                    <div class="detail-value"><?= htmlspecialchars($panne['panne_id']) ?></div>
                 </div>
 
-                <div class="row detail-row">
-                    <div class="col-md-3 detail-label">Type de Panne</div>
-                    <div class="col-md-9"><?= htmlspecialchars($panne['type_panne']) ?></div>
+                <div class="detail-row">
+                    <div class="detail-label">Type de Panne</div>
+                    <div class="detail-value"><?= htmlspecialchars($panne['type_panne']) ?></div>
                 </div>
 
-                <div class="row detail-row">
-                    <div class="col-md-3 detail-label">Localisation Exacte</div>
-                    <div class="col-md-9"><?= htmlspecialchars($panne['localisation']) ?></div>
+                <div class="detail-row">
+                    <div class="detail-label">Localisation</div>
+                    <div class="detail-value"><?= htmlspecialchars($panne['localisation']) ?></div>
                 </div>
 
-                <div class="row detail-row">
-                    <div class="col-md-3 detail-label">Niveau d'Urgence</div>
-                    <div class="col-md-9">
+                <div class="detail-row">
+                    <div class="detail-label">Niveau d'Urgence</div>
+                    <div class="detail-value">
                         <?php if ($panne['niveau_urgence'] == 'Faible'): ?>
                         <span class="badge-urgence badge-faible">Faible</span>
                         <?php elseif($panne['niveau_urgence'] == 'Moyenne'): ?>
@@ -218,27 +281,26 @@ foreach ($pannes as $row) {
                     </div>
                 </div>
 
-                <div class="row detail-row">
-                    <div class="col-md-3 detail-label">Date de Déclaration</div>
-                    <div class="col-md-9"><?= htmlspecialchars($panne['date_enregistrement']) ?></div>
+                <div class="detail-row">
+                    <div class="detail-label">Date de Déclaration</div>
+                    <div class="detail-value"><?= htmlspecialchars($panne['date_enregistrement']) ?></div>
                 </div>
 
-                <div class="row detail-row">
-                    <div class="col-md-3 detail-label">Description</div>
-                    <div class="col-md-9 description-box">
-                        <?= nl2br(htmlspecialchars($panne['panne_description'])) ?>
-                    </div>
+                <div class="detail-row">
+                    <div class="detail-label">Description</div>
+                    <div class="detail-value description-box">
+                        <?= nl2br(htmlspecialchars($panne['panne_description'])) ?></div>
                 </div>
 
-                <div class="row detail-row">
-                    <div class="col-md-3 detail-label">État</div>
-                    <div class="col-md-9">
+                <div class="detail-row">
+                    <div class="detail-label">État</div>
+                    <div class="detail-value">
                         <?php if ($panne['resultat'] == 'depanner'): ?>
                         <span class="badge-etat badge-resolu">Résolu</span>
                         <?php elseif ($panne['resultat'] == 'en cours'): ?>
                         <span class="badge-etat badge-encours">En cours</span>
                         <?php else: ?>
-                        <span class="badge-etat badge-nonresolu">Non Traite</span>
+                        <span class="badge-etat badge-nonresolu">Non Traité</span>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -246,25 +308,25 @@ foreach ($pannes as $row) {
                 <?php else: ?>
                 <div class="alert alert-warning">Aucune information trouvée pour cette panne.</div>
                 <?php endif; ?>
-
             </div>
         </div>
 
         <!-- Section Instructions Chef S.E.M -->
         <?php if ($_SESSION['profil'] != 'residence' && $_SESSION['profil'] != 'service' && !empty($panne['date_imputation'])): ?>
         <div class="card mb-4">
-            <div class="card-header">
-                <h4 class="mb-0">Instructions du Chef S.E.M</h4>
+            <div class="card-header bg-dark text-white">
+                <h4 class="mb-0"><i class="fas fa-user-shield me-2"></i>Instructions du Chef S.E.M</h4>
             </div>
             <div class="card-body">
-                <div class="row detail-row">
-                    <div class="col-md-3 detail-label">Date d'Imputation</div>
-                    <div class="col-md-9"><?= htmlspecialchars($panne['date_imputation']) ?></div>
+
+                <div class="detail-row">
+                    <div class="detail-label">Date d'Imputation</div>
+                    <div class="detail-value"><?= htmlspecialchars($panne['date_imputation']) ?></div>
                 </div>
 
-                <div class="row detail-row">
-                    <div class="col-md-3 detail-label">Instructions</div>
-                    <div class="col-md-9 description-box">
+                <div class="detail-row">
+                    <div class="detail-label">Instructions</div>
+                    <div class="detail-value  description-box">
                         <?= nl2br(htmlspecialchars($panne['instruction'])) ?>
                     </div>
                 </div>
@@ -272,20 +334,24 @@ foreach ($pannes as $row) {
                 <?php if ($_SESSION['profil2'] == 'S.E.M'): ?>
                 <div class="row mt-4">
                     <div class="col-12 text-end">
-                        <button class="btn btn-primary action-btn"
-                            onclick="checkPanneStatus('<?= $panne['resultat'] ?>', 'Modifier','<?= $panne['imputation_id'] ?>')">
-                            <i class="fas fa-edit me-2"></i>Modifier
-                        </button>
-                        <button class="btn btn-danger action-btn"
-                            onclick="checkPanneStatus('<?= $panne['resultat'] ?>', 'Supprimer','<?= $panne['imputation_id'] ?>')">
-                            <i class="fas fa-trash me-2"></i>Supprimer
-                        </button>
+                        <div class="btn-group">
+                            <button class="btn btn-primary btn-sm"
+                                onclick="checkPanneStatus('<?= $panne['resultat'] ?>', 'Modifier','<?= $panne['imputation_id'] ?>')">
+                                <i class="fas fa-edit me-1"></i>Modifier
+                            </button>
+                            <button class="btn btn-danger btn-sm"
+                                onclick="checkPanneStatus('<?= $panne['resultat'] ?>', 'Supprimer','<?= $panne['imputation_id'] ?>')">
+                                <i class="fas fa-trash me-1"></i>Supprimer
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <?php endif; ?>
+
             </div>
         </div>
         <?php endif; ?>
+
 
         <!-- Section Intervention Atelier -->
 
@@ -296,61 +362,26 @@ foreach ($pannes as $row) {
                 <h4 class="mb-0">Interventions Atelier</h4>
             </div>
             <div class="card-body">
-                <?php foreach ($interventions as $intervention): ?>
                 <?php
-                    $hasObservations = !empty($intervention['observations']) && count($intervention['observations']) > 0;
+                    $lastInterventionId = end($interventions)['id']; // ID de la dernière intervention
+                    foreach ($interventions as $intervention):
+                        $hasObservations = !empty($intervention['observations']) && count($intervention['observations']) > 0;
                 ?>
                 <div class="card mb-3 shadow-sm">
                     <div class="card-header bg-light">
                         <div class="d-flex justify-content-between align-items-center">
-                            <strong>Intervention #<?= htmlspecialchars($intervention['id']) ?> -
-                                <?= htmlspecialchars($intervention['date']) ?>
-                            </strong>
-                            <?php if ($_SESSION['profil'] == 'atelier'): ?>
-                            <div>
-                                <?php if (!$hasObservations): ?>
-                                <button class="btn btn-sm btn-primary me-1"
-                                    onclick="checkPanneStatus('', 'Modifier','<?= $intervention['id'] ?>')">
-                                    <i class="fas fa-edit me-1"></i>Modifier
-                                </button>
-                                <?php else: ?>
-                                <button class="btn btn-sm btn-secondary me-1" disabled
-                                    title="Impossible de modifier : des observations sont liées.">
-                                    <i class="fas fa-ban me-1"></i>Modifier
-                                </button>
-                                <?php endif; ?>
-                                <?php if (!$hasObservations): ?>
-                                <button class="btn btn-sm btn-danger"
-                                    onclick="checkPanneStatus('', 'Supprimer','<?= $intervention['id'] ?>')">
-                                    <i class="fas fa-trash me-1"></i>Supprimer
-                                </button>
-                                <?php else: ?>
-                                <button class="btn btn-sm btn-secondary" disabled
-                                    title="Impossible de supprimer : des observations sont liées.">
-                                    <i class="fas fa-ban me-1"></i>Supprimer
-                                </button>
-                                <?php endif; ?>
-
-                            </div>
-                            <?php endif; ?>
+                            <strong style="color:black;">Intervention #<?= htmlspecialchars($intervention['id']) ?> -
+                                <?= htmlspecialchars($intervention['date']) ?></strong>
                         </div>
                     </div>
                     <div class="card-body">
-                        <?php $agentsResponsables = getAgentsParIntervention($connexion, $intervention['id']);?>
-                        <?php if (!empty($agentsResponsables)): ?>
-                        <p><strong>Responsable(s) :</strong>
-                            <?= implode(', ', array_map('htmlspecialchars', $agentsResponsables)) ?></p>
-                        <?php else: ?>
-                        <p><strong>Responsable(s) :</strong> Non renseigné</p>
-                        <?php endif; ?>
-                        <p><strong>Description des actions :</strong><br>
-                            <?= nl2br(htmlspecialchars($intervention['description'])) ?>
-                        </p>
-
-                        <!-- Observations liées à cette intervention -->
+                        <h5 class="text-secondary">Responsable(s) :
+                            <?= htmlspecialchars($intervention['responsable'] ?? "non inscrit") ?></h5>
+                        <!-- Observations -->
                         <?php if (!empty($intervention['observations'])): ?>
                         <div class="table-responsive mt-3">
-                            <h6 class="text-secondary">Observations du Chef Résidence</h6>
+
+                            <h5 class="text-secondary">Observations du Chef Résidence</h5>
                             <table class="table table-bordered table-sm">
                                 <thead class="table-light">
                                     <tr>
@@ -364,7 +395,11 @@ foreach ($pannes as $row) {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php foreach ($intervention['observations'] as $obs): ?>
+                                    <?php
+                                        $observations = $intervention['observations'];
+                                        $lastObsId = end($observations)['id'];
+                                        foreach ($observations as $obs):
+                                    ?>
                                     <tr>
                                         <td><?= htmlspecialchars($obs['id']) ?></td>
                                         <td><?= htmlspecialchars($obs['date']) ?></td>
@@ -372,14 +407,17 @@ foreach ($pannes as $row) {
                                         <td><?= nl2br(htmlspecialchars($obs['commentaire'])) ?></td>
                                         <?php if ($_SESSION['profil'] == 'residence' || $_SESSION['profil'] == 'chef'): ?>
                                         <td>
+                                            <?php if ($intervention['id'] == $lastInterventionId && $obs['id'] == $lastObsId): ?>
                                             <button class="btn btn-sm btn-primary"
                                                 onclick="gererObservation('Modifier', '<?= $obs['id'] ?>','<?= $panne['panne_id'] ?>','<?= $intervention['id'] ?>')">
                                                 <i class="fas fa-edit me-1"></i>Modifier
                                             </button>
-                                            <!-- <button class="btn btn-sm btn-danger"
-                                                onclick="gererObservation('Supprimer', 'id')">
-                                                <i class="fas fa-trash me-1"></i>Supprimer
-                                            </button> -->
+                                            <?php else: ?>
+                                            <button class="btn btn-sm btn-secondary" disabled
+                                                title="Seule la dernière observation de la dernière intervention peut être modifiée.">
+                                                <i class="fas fa-lock me-1"></i>Modifier
+                                            </button>
+                                            <?php endif; ?>
                                         </td>
                                         <?php endif; ?>
                                     </tr>
@@ -393,6 +431,7 @@ foreach ($pannes as $row) {
                     </div>
                 </div>
                 <?php endforeach; ?>
+
             </div>
         </div>
         <?php endif; ?>
@@ -552,9 +591,9 @@ foreach ($pannes as $row) {
         chefAtelierDeleteModal.show();
     }
 
-    function gererObservation(action, id,idp,idInt) {
+    function gererObservation(action, id, idp, idInt) {
         if (action === 'Modifier') {
-            window.location.href = "residence/observation.php?idObservation=" + id+"&idp="+ idp+"&idInt="+ idInt;
+            window.location.href = "residence/observation.php?idObservation=" + id + "&idp=" + idp + "&idInt=" + idInt;
         } else if (action === 'Supprimer') {
             if (confirm("Confirmer la suppression de l'observation ?")) {
                 window.location.href = "supprimer_observation.php?id=" + id;

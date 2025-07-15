@@ -125,6 +125,14 @@ include('traitement/connect.php');
       margin-bottom: 1rem;
       text-align: center;
     }
+    .error-message2 {
+      color: var(--danger);
+      background:rgb(221, 248, 245);
+      padding: 0.75rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
     
     @media (max-width: 576px) {
       .login-container {
@@ -148,7 +156,9 @@ include('traitement/connect.php');
     <?php if (isset($_GET['error'])): ?>
       <div class="error-message"><?= htmlspecialchars($_GET['error']) ?></div>
     <?php endif; ?>
-    
+    <?php if (isset($_GET['warning'])): ?>
+      <div class="error-message2"><?= htmlspecialchars($_GET['warning']) ?></div>
+    <?php endif; ?>
     <form id="loginForm" action="/COUD/panne/traitement/connect.php" method="get">
       <div class="form-group">
         <input onkeydown="upperCaseF(this)" name="username_user" id="username" 
@@ -166,7 +176,7 @@ include('traitement/connect.php');
       </button>
       
       <div class="login-links">
-        <a href="mpo1">Mot de passe oublié ?</a>
+        <a href="mdp/mot_de_passe_oublie.php">Mot de passe oublié ?</a>
         <a href="index">Retour à l'accueil</a>
       </div>
     </form>

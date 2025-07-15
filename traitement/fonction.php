@@ -251,44 +251,53 @@ function obtenirPanneParId($connexion, $panneId) {
             p.description AS panne_description, 
             p.localisation, 
             p.niveau_urgence,
-            
+
             -- Chef de résidence
             u.nom AS declarant, 
             u.profil1 AS chef_role,
-            
+
             -- Intervention
             i.id AS intervention_id, 
             i.date_intervention, 
             i.description_action, 
             i.resultat, 
-            i.personne_agent,
-            
+
+            -- Liste des agents affectés à l’intervention
+            GROUP_CONCAT(DISTINCT CONCAT(a.prenom, ' ', a.nom) SEPARATOR ', ') AS agents_intervention,
+
             -- Observation (liée à l’intervention)
             o.id AS observation_id, 
             o.evaluation_qualite,
             o.date_observation, 
             o.commentaire_suggestion,
-            
-            -- Imputation (toujours liée à la panne)
+
+            -- Imputation
             m.id AS imputation_id,
             m.id_chef_dst,
             m.instruction,
             m.date_imputation
-            
+
         FROM Panne p
         LEFT JOIN Utilisateur u ON p.id_chef_residence = u.id
         LEFT JOIN Intervention i ON p.id = i.id_panne
         LEFT JOIN Observation o ON i.id = o.id_intervention
         LEFT JOIN Imputation m ON p.id = m.id_panne
+        LEFT JOIN intervention_agent ia ON i.id = ia.intervention_id
+        LEFT JOIN Agent a ON ia.agent_id = a.id
+
         WHERE p.id = ?
+        GROUP BY 
+            p.id, i.id, o.id, m.id, u.id
         ORDER BY i.date_intervention ASC, o.date_observation ASC
     ";
+
     $stmt = $connexion->prepare($sql);
     $stmt->bind_param('i', $panneId);
     $stmt->execute();
     $result = $stmt->get_result();
     return $result->fetch_all(MYSQLI_ASSOC);
 }
+
 
 //  ################# FIN DE LA  FONCTION  ##########################
 
@@ -457,7 +466,7 @@ function allPannes1($connexion, $page = 1, $limit = 10, $profil2 = null) {
 
 
 // ###############  DEBUT DE LA FONCTION  RECHERCHERPANNES()  #####################################
-function allPannes($connexion, $page = 1, $limit = 10, $profil2 = null, $isChefDst = false) {
+function allPannes($connexion, $page = 1, $limit = 200, $profil2 = null, $isChefDst=false) {
     $offset = ($page - 1) * $limit;
 
     // Clause WHERE
@@ -1224,13 +1233,13 @@ function getInterventions($connexion) {
     return $interventions;
 }
 
-function enregistrerSortie($connexion, $article_id, $intervention_id, $quantite, $date_sortie, $remarque) {
-    $sql = "INSERT INTO sortie_stock (article_id, intervention_id, quantite, date_sortie, remarque) 
-            VALUES (?, ?, ?, ?, ?)";
+function enregistrerSortie($connexion, $article_id, $quantite, $date_sortie, $remarque) {
+    $sql = "INSERT INTO sortie_stock (article_id, quantite, date_sortie, remarque) 
+            VALUES (?, ?, ?, ?)";
 
     $stmt = mysqli_prepare($connexion, $sql);
     if ($stmt) {
-        mysqli_stmt_bind_param($stmt, "iiiss", $article_id, $intervention_id, $quantite, $date_sortie, $remarque);
+        mysqli_stmt_bind_param($stmt, "iiss", $article_id, $quantite, $date_sortie, $remarque);
         return mysqli_stmt_execute($stmt);
     }
 
@@ -1333,7 +1342,7 @@ function getSortiesParReference($connexion, $reference) {
                 i.description_action
             FROM sortie_stock s
             JOIN articles a ON s.article_id = a.id
-            JOIN intervention i ON s.intervention_id = i.id
+            LEFT JOIN intervention i ON s.intervention_id = i.id
             WHERE a.references = ?
             ORDER BY s.date_sortie DESC";
 
@@ -1509,10 +1518,9 @@ function getSortieById($connexion, $id) {
     return null; // ou false si tu veux gérer une erreur
 }
 // Fonction pour modifier une sortie
-function modifierSortie($connexion, $id, $article_id, $intervention_id, $quantite, $date_sortie, $remarque) {
+function modifierSortie($connexion, $id, $article_id, $quantite, $date_sortie, $remarque) {
     $sql = "UPDATE sortie_stock SET 
                 article_id = ?, 
-                intervention_id = ?, 
                 quantite = ?, 
                 date_sortie = ?, 
                 remarque = ?,
@@ -1521,7 +1529,7 @@ function modifierSortie($connexion, $id, $article_id, $intervention_id, $quantit
 
     $stmt = mysqli_prepare($connexion, $sql);
     if ($stmt) {
-        mysqli_stmt_bind_param($stmt, 'iiissi', $article_id, $intervention_id, $quantite, $date_sortie, $remarque, $id);
+        mysqli_stmt_bind_param($stmt, 'iissi', $article_id, $quantite, $date_sortie, $remarque, $id);
         return mysqli_stmt_execute($stmt);
     } else {
         error_log("Erreur de préparation de la requête : " . mysqli_error($connexion));

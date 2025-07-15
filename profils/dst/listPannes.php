@@ -14,7 +14,7 @@ $isDst = ($profil2 === 'chef dst');
 $dst = ($profil1 === 'dst');
 
 // Récupérer toutes les pannes
-$result = allPannes($connexion, 1, 200, null, '', $dst);
+$result = allPannes($connexion, 1, 200, null, $dst);
 $allPannes = $result['pannes'];
 ?>
 
@@ -90,6 +90,23 @@ $allPannes = $result['pannes'];
         justify-content: center;
         padding: 0;
     }
+
+    .filter-section .form-select,
+    .filter-section .form-control {
+        min-width: 100%;
+        box-sizing: border-box;
+        height: 38px;
+        /* pour uniformiser la hauteur */
+        font-size: 0.875rem;
+        /* pour être cohérent avec form-select-sm */
+    }
+
+    .filter-section label {
+        font-weight: 500;
+        font-size: 0.875rem;
+        margin-bottom: 0.25rem;
+        display: block;
+    }
     </style>
 </head>
 
@@ -104,7 +121,7 @@ $allPannes = $result['pannes'];
         </div>
     </div>
 
-    <div class="container mb-4">
+    <div class="container-fluid mb-4">
         <!-- Filtres -->
         <div class="filter-section">
             <div class="row g-3">
@@ -135,7 +152,7 @@ $allPannes = $result['pannes'];
                         <option value="">Tous</option>
                         <option value="depanner">Résolu</option>
                         <option value="en cours">En cours</option>
-                        <option value="non resolu">Non résolu</option>
+                        <option value="Non Traité">Non Traité</option>
                     </select>
                 </div>
                 <div class="col-md-2 col-sm-6">
@@ -195,7 +212,7 @@ $allPannes = $result['pannes'];
                             <?php elseif ($panne['resultat'] == 'en cours'): ?>
                             <span class="badge bg-warning text-dark">En cours</span>
                             <?php else: ?>
-                            <span class="badge bg-danger">Non résolu</span>
+                            <span class="badge bg-danger">Non Traité</span>
                             <?php endif; ?>
                         </td>
                         <td>
@@ -236,8 +253,8 @@ $allPannes = $result['pannes'];
                                 <i class="fas fa-check"></i>
                             </button>
                             <?php else: ?>
-                            <a href="intervention?idp=<?= $panne['id'] ?>&type=<?= $panne['type_panne'] ?>" class="btn btn-primary btn-sm btn-action"
-                                title="Intervenir">
+                            <a href="intervention?idp=<?= $panne['id'] ?>&type=<?= $panne['type_panne'] ?>"
+                                class="btn btn-primary btn-sm btn-action" title="Intervenir">
                                 <i class="fas fa-wrench"></i>
                             </a>
                             <?php endif; ?>
@@ -306,7 +323,7 @@ $allPannes = $result['pannes'];
 
                 if (etat === 'depanner') etatMatch = rowEtat === 'Résolu';
                 else if (etat === 'en cours') etatMatch = rowEtat === 'En cours';
-                else if (etat === 'non resolu') etatMatch = rowEtat === 'Non résolu';
+                else if (etat === 'Non Traité') etatMatch = rowEtat === 'Non Traité';
 
                 const dateMatch = !date || formattedRowDate === date;
 

@@ -161,8 +161,8 @@ include('../../activite.php');
         $profil2 = $_SESSION['profil2'] ?? '';
         $profil1 = $_SESSION['profil'] ?? '';
 
-        // Pour les chefs de résidence : format "Campus|Pavillon"
-        if ($profil1 === 'residence') {
+        // Si c’est un chef de résidence
+        if ($profil1 === 'residence' && $profil2 != 'DE') {
             echo '<optgroup label="Chambres">';
             try {
                 $chambres = getChambresByCampusPavillon($connexion, $profil2);
@@ -183,16 +183,45 @@ include('../../activite.php');
             echo '</optgroup>';
         }
 
-        // Ajout générique pour tous : Couloirs, Toilettes, Autres
-        ?>
-                        <optgroup label="Couloirs">
-                            <option value="Couloir Nord">Couloir Nord</option>
-                            <option value="Couloir Sud">Couloir Sud</option>
-                            <option value="Couloir Est">Couloir Est</option>
-                            <option value="Couloir Ouest">Couloir Ouest</option>
-                            <option value="Couloir Central">Couloir Central</option>
-                        </optgroup>
+        // Si profil2 == SE (Environnement)
+        if ($profil2 === 'DE') {
+            echo '<optgroup label="Lieux Environnement (SE)">';
+            $lieux_se = [
+                "En face direction",
+                "En face pavillon B",
+                "Pavillon F",
+                "Pavillon E",
+                "Pavillon D",
+                "Pavillon G",
+                "Zone A",
+                "Pavillon U",
+                "Restaurant self et alentours",
+                "Pavillon L M",
+                "Restaurant Al mahdi",
+                "Pavillon J K",
+                "Pavillon Q",
+                "En face Pavillon Q",
+                "Restaurant Argentin",
+                "Ex salle Banquier",
+                "Pavillon P, O",
+                "Patiaux pavillon A",
+                "En face Pavillon AMSA",
+                "Jardin des Nations",
+                "Jardin du Livre",
+                "Porte Annexe (derrière DE)",
+                "Promenade des étudiants",
+                "Service médical",
+                "Derrière restaurant centrale"
+            ];
 
+            foreach ($lieux_se as $lieu) {
+                $lieu_clean = htmlspecialchars($lieu, ENT_QUOTES);
+                echo "<option value=\"$lieu_clean\">$lieu_clean</option>";
+            }
+
+            echo '</optgroup>';
+        }
+        ?>
                         <optgroup label="Toilettes">
                             <option value="Toilettes RDC">Toilettes RDC</option>
                             <option value="Toilettes 1er étage">Toilettes 1er étage</option>
@@ -200,7 +229,6 @@ include('../../activite.php');
                             <option value="Toilettes Nord">Toilettes Nord</option>
                             <option value="Toilettes Sud">Toilettes Sud</option>
                         </optgroup>
-
                         <optgroup label="Bureaux et Autres Espaces">
                             <option value="Cuisine">Cuisine</option>
                             <option value="Salle à manger">Salle à manger</option>
@@ -209,10 +237,10 @@ include('../../activite.php');
                             <option value="Secrétariat">Secrétariat</option>
                             <option value="Accueil">Accueil</option>
                             <option value="Hall d'entrée">Hall d'entrée</option>
+                            <option value="Autres">Autres..</option>
                         </optgroup>
                     </select>
                 </div>
-
                 <!-- Type de Panne -->
                 <div class="mb-4">
                     <label class="form-label required-field">Type de Panne</label>

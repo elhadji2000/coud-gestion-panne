@@ -197,7 +197,7 @@ $articles = listeArticles($connexion);
                     </h1>
                     <p class="text-muted mb-0">Liste complète des articles en stock</p>
                 </div>
-                <?php if (isset($_SESSION['profil2']) && $_SESSION['profil2'] === 'atelier'): ?>
+                <?php if (isset($_SESSION['profil2']) && $_SESSION['profil2'] === 'chef d\'atelier'): ?>
                 <div>
                     <a href="nouvel_article.php" class="btn btn-add">
                         <i class="fas fa-plus me-2"></i>Nouvel Article
@@ -210,31 +210,29 @@ $articles = listeArticles($connexion);
     </div>
 
     <!-- Contenu principal -->
-    <div class="container-fluid mb-5">
+    <div class="container mb-5">
         <div class="table-container">
             <div class="table-responsive">
                 <table id="articlesTable" class="table table-hover" style="width:100%">
                     <thead>
                         <tr>
                             <th>N°</th>
-                            <th>Référence</th>
-                            <th>Désignation</th>
                             <th>Nom</th>
                             <th>Catégorie</th>
-                            <?php if (isset($_SESSION['profil2']) && $_SESSION['profil2'] === 'atelier'): ?>
+                            <?php if (isset($_SESSION['profil2']) && $_SESSION['profil2'] === 'chef d\'atelier'): ?>
                             <th>Actions</th>
                             <?php endif; ?>
                         </tr>
                     </thead>
                     <tbody>
+                        <?php $n=0; ?>
                         <?php foreach($articles as $article): ?>
                         <tr>
-                            <td><?= htmlspecialchars($article['id']) ?></td>
-                            <td><?= htmlspecialchars($article['references']) ?></td>
-                            <td><?= htmlspecialchars($article['description']) ?></td>
+                            <?php $n++; ?>
+                            <td><?= htmlspecialchars($n) ?></td>
                             <td><?= htmlspecialchars($article['nom']) ?></td>
                             <td><?= htmlspecialchars($article['categorie']) ?></td>
-                            <?php if (isset($_SESSION['profil2']) && $_SESSION['profil2'] === 'atelier'): ?>
+                            <?php if (isset($_SESSION['profil2']) && $_SESSION['profil2'] === 'chef d\'atelier'): ?>
                             <td>
                                 <a href="nouvel_article.php?id=<?= $article['id'] ?>" class="action-link link-edit me-2"
                                     title="Modifier">

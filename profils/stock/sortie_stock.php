@@ -198,7 +198,7 @@ $sorties = listeSorties($connexion);
                     </h1>
                     <p class="text-muted mb-0">Historique des Sorties de stock</p>
                 </div>
-                <?php if (isset($_SESSION['profil2']) && $_SESSION['profil2'] === 'atelier'): ?>
+                <?php if (isset($_SESSION['profil2']) && $_SESSION['profil2'] === 'chef d\'atelier'): ?>
                 <div>
                     <a href="nouvelle_sortie.php" class="btn btn-add">
                         <i class="fas fa-plus me-2"></i>Nouvelle Sortie

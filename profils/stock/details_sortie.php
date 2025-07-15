@@ -215,7 +215,7 @@ $sorties = getSortiesParReference($connexion, $reference);
                             <th>Article</th>
                             <th>Quantité</th>
                             <th>Type Intervention</th>
-                            <?php if (isset($_SESSION['profil2']) && $_SESSION['profil2'] === 'atelier'): ?>
+                            <?php if (isset($_SESSION['profil2']) && $_SESSION['profil2'] === 'chef d\'atelier'): ?>
                             <th>Actions</th>
                             <?php endif; ?>
                         </tr>
@@ -227,8 +227,8 @@ $sorties = getSortiesParReference($connexion, $reference);
                             <td><?= date('d/m/Y', strtotime($sortie['date_sortie'])) ?></td>
                             <td><?= htmlspecialchars($sortie['article']) ?></td>
                             <td><?= htmlspecialchars($sortie['quantite']) ?></td>
-                            <td><?= htmlspecialchars($sortie['type_intervention']) ?></td>
-                            <?php if (isset($_SESSION['profil2']) && $_SESSION['profil2'] === 'atelier'): ?>
+                            <td><?= htmlspecialchars($sortie['type_intervention'] ?? "NaN") ?></td>
+                            <?php if (isset($_SESSION['profil2']) && $_SESSION['profil2'] === 'chef d\'atelier'): ?>
                             <td>
                                 <a href="nouvelle_sortie.php?id=<?= $sortie['id'] ?>" class="btn btn-sm btn-warning">
                                     <i class="fas fa-edit"></i> Modifier

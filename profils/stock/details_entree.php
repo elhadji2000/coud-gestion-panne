@@ -215,7 +215,7 @@ $entrees = getEntreesParReference($connexion, $reference);
                             <th>Article</th>
                             <th>Quantité</th>
                             <th>Remarque</th>
-                            <?php if (isset($_SESSION['profil2']) && $_SESSION['profil2'] === 'atelier'): ?>
+                            <?php if (isset($_SESSION['profil2']) && $_SESSION['profil2'] === 'chef d\'atelier'): ?>
                             <th>Actions</th>
                             <?php endif; ?>
                         </tr>
@@ -228,7 +228,7 @@ $entrees = getEntreesParReference($connexion, $reference);
                             <td><?= htmlspecialchars($entree['article']) ?></td>
                             <td><?= htmlspecialchars($entree['quantite']) ?></td>
                             <td><?= htmlspecialchars($entree['remarque']) ?></td>
-                            <?php if (isset($_SESSION['profil2']) && $_SESSION['profil2'] === 'atelier'): ?>
+                            <?php if (isset($_SESSION['profil2']) && $_SESSION['profil2'] === 'chef d\'atelier'): ?>
                             <td>
                                 <a href="nouvelle_entree.php?id=<?= $entree['id'] ?>" class="btn btn-sm btn-warning">
                                     <i class="fas fa-edit"></i> Modifier

@@ -151,7 +151,7 @@ require_once(__DIR__ . '/traitement/fonction.php');
     <header>
         <div class="logo-container">
             <img src="http://localhost/COUD/panne/assets/images/logo.png" alt="Logo">
-            <span>GESCOUD</span>
+            <span>COUD'MAINT</span>
         </div>
 
         <div class="hamburger" onclick="toggleMenu()">☰</div>
