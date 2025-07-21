@@ -158,7 +158,7 @@ require_once(__DIR__ . '/traitement/fonction.php');
 
         <nav class="desktop-nav">
             <ul>
-                <?php if ($_SESSION['profil'] == 'admin') { ?>
+                <?php if ($_SESSION['profil'] === 'admin') { ?>
                 <li>
                     <a href="http://localhost/COUD/panne/profils/dasboard.php">
                         <i class="fa fa-home" aria-hidden="true"></i>Accueil
@@ -166,13 +166,13 @@ require_once(__DIR__ . '/traitement/fonction.php');
                 <li><a href="http://localhost/COUD/panne/profils/admin/users.php">
                         <i class="fa fa-users" aria-hidden="true"></i>Utilisateurs</a></li>
 
-                <?php } elseif (($_SESSION['profil'] == 'residence') || ($_SESSION['profil'] == 'service')) { ?>
+                <?php } elseif (($_SESSION['profil'] === 'residence') || ($_SESSION['profil'] == 'service')) { ?>
                 <li><a href="http://localhost/COUD/panne/profils/dasboard.php">
                         <i class="fa fa-home" aria-hidden="true"></i>Accueil</a></li>
                 <li><a href="http://localhost/COUD/panne/profils/residence/listPannes.php">
                         <i class="fa fa-wrench" aria-hidden="true"></i>Déclarations</a></li>
 
-                <?php } elseif (($_SESSION['profil'] == 'dst') || ($_SESSION['profil'] == 'atelier')) { ?>
+                <?php } elseif (($_SESSION['profil'] === 'dst') || ($_SESSION['profil'] == 'atelier')) { ?>
                 <li>
                     <a href="http://localhost/COUD/panne/profils/dasboard.php">
                         <i class="fa fa-home" aria-hidden="true"></i>Accueil
@@ -184,7 +184,7 @@ require_once(__DIR__ . '/traitement/fonction.php');
                         <i class="fas fa-warehouse" aria-hidden="true"></i>Stock</a>
                 </li>
 
-                <?php } elseif ($_SESSION['profil'] == 'section') { ?>
+                <?php } elseif ($_SESSION['profil'] === 'section') { ?>
                 <li>
                     <a href="http://localhost/COUD/panne/profils/dasboard.php">
                         <i class="fa fa-home" aria-hidden="true"></i>Accueil
@@ -211,7 +211,7 @@ require_once(__DIR__ . '/traitement/fonction.php');
 
         <nav class="mobile-nav" id="mobileNav">
             <ul>
-                <?php if ($_SESSION['profil'] == 'admin') { ?>
+                <?php if ($_SESSION['profil'] === 'admin') { ?>
                 <li>
                     <a href="http://localhost/COUD/panne/profils/dasboard.php">
                         <i class="fa fa-home" aria-hidden="true"></i>Accueil
@@ -223,13 +223,13 @@ require_once(__DIR__ . '/traitement/fonction.php');
                 <li><a href="http://localhost/COUD/panne/profils/admin/users.php">
                         <i class="fa fa-users" aria-hidden="true"></i>Utilisateurs</a></li>
 
-                <?php } elseif (($_SESSION['profil'] == 'residence') || ($_SESSION['profil'] == 'service')) { ?>
+                <?php } elseif (($_SESSION['profil'] === 'residence') || ($_SESSION['profil'] === 'service')) { ?>
                 <li><a href="http://localhost/COUD/panne/profils/dasboard.php">
                         <i class="fa fa-home" aria-hidden="true"></i>Accueil</a></li>
                 <li><a href="http://localhost/COUD/panne/profils/residence/listPannes.php">
                         <i class="fa fa-wrench" aria-hidden="true"></i>Déclarations</a></li>
 
-                <?php } elseif (($_SESSION['profil'] == 'dst') || ($_SESSION['profil'] == 'atelier')) { ?>
+                <?php } elseif (($_SESSION['profil'] === 'dst') || ($_SESSION['profil'] === 'atelier')) { ?>
                 <li>
                     <a href="http://localhost/COUD/panne/profils/dasboard.php">
                         <i class="fa fa-home" aria-hidden="true"></i>Accueil
@@ -241,7 +241,7 @@ require_once(__DIR__ . '/traitement/fonction.php');
                         <i class="fas fa-warehouse" aria-hidden="true"></i>Stock</a>
                 </li>
 
-                <?php } elseif ($_SESSION['profil'] == 'section') { ?>
+                <?php } elseif ($_SESSION['profil'] === 'section') { ?>
                 <li>
                     <a href="http://localhost/COUD/panne/profils/dasboard.php">
                         <i class="fa fa-home" aria-hidden="true"></i>Accueil
