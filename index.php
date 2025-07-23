@@ -203,4 +203,8 @@ include('traitement/connect.php');
     });
   </script>
 </body>
+<?php 
+include('footer.php');
+?>
+
 </html>

@@ -8,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     //$intervention_id = mysqli_real_escape_string($connexion, $_GET['intervention_id']);
     $type_intervention = mysqli_real_escape_string($connexion, $_GET['type_intervention']);
     $description_action = mysqli_real_escape_string($connexion, $_GET['description_action']);
-    $date_intervention = mysqli_real_escape_string($connexion, $_GET['date_intervention']);
+    $date_intervention = date('d/m/y', strtotime($_GET['date_intervention']));
     $agents = $_GET['agents'] ?? [];
     $articles = $_GET['articles'] ?? [];
     $resultat="en cours";

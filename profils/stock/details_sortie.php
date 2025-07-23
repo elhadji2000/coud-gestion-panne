@@ -193,7 +193,7 @@ $sorties = getSortiesParReference($connexion, $reference);
         <div class="container">
             <div class="d-flex justify-content-between align-items-center flex-wrap">
                 <div class="mb-2 mb-md-0">
-                    <h2 class="my-3 page-title">Détails des sorties pour la référence :
+                    <h2 class="my-3 page-title">Détails des sorties de l'article N° :
                         <?= htmlspecialchars($reference) ?></h2>
                 </div>
                 <div>

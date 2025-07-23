@@ -29,7 +29,7 @@ if ($intervention_id) {
 }
 
 // Récupération des articles et agents
-$articles = listeArticles($connexion);
+$articles = listeArticlesByCategorie($connexion, $section);
 $agents = listeAgents($connexion, $section);
 ?>
 
@@ -240,9 +240,10 @@ $agents = listeAgents($connexion, $section);
                                 <label class="form-label required-field">Article</label>
                                 <select class="form-select" name="articles[0][article_id]" required>
                                     <option value="">Sélectionner un article...</option>
+                                    <?php $n=0; ?>
                                     <?php foreach ($articles as $article): ?>
                                     <option value="<?= $article['id'] ?>">
-                                        <?= htmlspecialchars($article['references']) ?> - <?= htmlspecialchars($article['nom']) ?>
+                                        <?= ++$n; ?> - <?= htmlspecialchars($article['nom']) ?>
                                     </option>
                                     <?php endforeach; ?>
                                 </select>

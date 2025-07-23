@@ -225,7 +225,6 @@ $statsGlobales = getStatsGlobales($connexion);
                         <thead>
                             <tr>
                                 <th>Article</th>
-                                <th>Référence</th>
                                 <th>Stock Initial</th>
                                 <th>Entrées</th>
                                 <th>Sorties</th>
@@ -238,7 +237,6 @@ $statsGlobales = getStatsGlobales($connexion);
                             ?>
                             <tr>
                                 <td><?= htmlspecialchars($article['nom']) ?></td>
-                                <td><?= htmlspecialchars($article['references']) ?></td>
                                 <td><?= $statsArticle['stock_initial'] ?></td>
                                 <td><span class="badge badge-entree">+<?= $statsArticle['total_entrees'] ?></span></td>
                                 <td><span class="badge badge-sortie">-<?= $statsArticle['total_sorties'] ?></span></td>
@@ -259,7 +257,6 @@ $statsGlobales = getStatsGlobales($connexion);
                             <tr>
                                 <th>#</th>
                                 <th>Date dernière entrée</th>
-                                <th>Référence</th>
                                 <th>Article</th>
                                 <th>Quantité totale</th>
                             </tr>
@@ -269,7 +266,6 @@ $statsGlobales = getStatsGlobales($connexion);
                             <tr>
                                 <td><?= $i++ ?></td>
                                 <td><?= date('d/m/Y', strtotime($entree['derniere_entree'])) ?></td>
-                                <td><?= htmlspecialchars($entree['references']) ?></td>
                                 <td><?= htmlspecialchars($entree['article']) ?></td>
                                 <td><?= htmlspecialchars($entree['total_quantite']) ?></td>
                             </tr>
@@ -288,7 +284,6 @@ $statsGlobales = getStatsGlobales($connexion);
                             <tr>
                                 <th>#</th>
                                 <th>Date dernière sortie</th>
-                                <th>Référence</th>
                                 <th>Article</th>
                                 <th>Quantité totale</th>
                             </tr>
@@ -298,7 +293,6 @@ $statsGlobales = getStatsGlobales($connexion);
                             <tr>
                                 <td><?= $i++ ?></td>
                                 <td><?= date('d/m/Y', strtotime($sortie['derniere_sortie'])) ?></td>
-                                <td><?= htmlspecialchars($sortie['references']) ?></td>
                                 <td><?= htmlspecialchars($sortie['article']) ?></td>
                                 <td><?= htmlspecialchars($sortie['total_quantite']) ?></td>
                             </tr>
@@ -327,7 +321,6 @@ $statsGlobales = getStatsGlobales($connexion);
                                 <th>Date</th>
                                 <th>Type</th>
                                 <th>Article</th>
-                                <th>Référence</th>
                                 <th>Quantité</th>
                                 <th style="display: none;">ArticleID</th> <!-- colonne cachée -->
                             </tr>
@@ -340,7 +333,6 @@ $statsGlobales = getStatsGlobales($connexion);
                                 <td><?= date('d/m/Y', strtotime($entree['derniere_entree'])) ?></td>
                                 <td><span class="badge badge-entree">Entrée</span></td>
                                 <td><?= htmlspecialchars($entree['article']) ?></td>
-                                <td><?= htmlspecialchars($entree['references']) ?></td>
                                 <td>+<?= $entree['total_quantite'] ?></td>
                                 <td style="display:none;"><?= $entree['article_id'] ?></td>
                             </tr>
@@ -351,7 +343,6 @@ $statsGlobales = getStatsGlobales($connexion);
                                 <td><?= date('d/m/Y', strtotime($sortie['derniere_sortie'])) ?></td>
                                 <td><span class="badge badge-sortie">Sortie</span></td>
                                 <td><?= htmlspecialchars($sortie['article']) ?></td>
-                                <td><?= htmlspecialchars($sortie['references']) ?></td>
                                 <td>-<?= $sortie['total_quantite'] ?></td>
                                 <td style="display:none;"><?= $sortie['article_id'] ?></td>
                             </tr>
@@ -413,7 +404,7 @@ $statsGlobales = getStatsGlobales($connexion);
             dom: 'Bfrtip',
             buttons: ['excel', 'pdf'],
             columnDefs: [{
-                targets: 5, // 7e colonne (index 6)
+                targets: 4, // 7e colonne (index 6)
                 visible: false,
                 searchable: true
             }]

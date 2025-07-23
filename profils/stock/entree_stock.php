@@ -218,7 +218,7 @@ $entrees = listeEntrees($connexion);
                         <tr>
                             <th>#</th>
                             <th>Date dernière entrée</th>
-                            <th>Référence</th>
+                            <!-- <th>Référence</th> -->
                             <th>Article</th>
                             <th>Quantité totale</th>
                             <th>Actions</th>
@@ -229,11 +229,11 @@ $entrees = listeEntrees($connexion);
                         <tr>
                             <td><?= $i++ ?></td>
                             <td><?= date('d/m/Y', strtotime($entree['derniere_entree'])) ?></td>
-                            <td><?= htmlspecialchars($entree['references']) ?></td>
+                            <!-- <td></td> -->
                             <td><?= htmlspecialchars($entree['article']) ?></td>
                             <td><?= htmlspecialchars($entree['total_quantite']) ?></td>
                             <td>
-                                <a href="details_entree.php?ref=<?= urlencode($entree['references']) ?>"
+                                <a href="details_entree.php?ref=<?= urlencode($entree['article_id']) ?>"
                                     class="btn btn-sm btn-info">
                                     <i class="fas fa-list"></i> Détails
                                 </a>

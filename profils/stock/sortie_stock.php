@@ -234,7 +234,7 @@ $sorties = listeSorties($connexion);
                             <td><?= htmlspecialchars($sortie['article']) ?></td>
                             <td><?= htmlspecialchars($sortie['total_quantite']) ?></td>
                             <td>
-                                <a href="details_sortie.php?ref=<?= urlencode($sortie['references']) ?>"
+                                <a href="details_sortie.php?ref=<?= urlencode($sortie['article_id']) ?>"
                                     class="btn btn-sm btn-info">
                                     <i class="fas fa-list"></i> Détails
                                 </a>

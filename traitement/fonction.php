@@ -1218,6 +1218,28 @@ function listeArticles($connexion) {
     
     return $stocks;
 }
+function listeArticlesByCategorie($connexion, $categorie) {
+    // Sécurisation contre les injections SQL
+    $categorie = mysqli_real_escape_string($connexion, $categorie);
+
+    $sql = "SELECT a.id, a.description, a.references, a.nom, a.categorie 
+            FROM articles a
+            WHERE a.categorie = '$categorie'
+            ORDER BY a.nom ASC";
+    
+    $result = mysqli_query($connexion, $sql);
+
+    $stocks = [];
+
+    if ($result) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            $stocks[] = $row;
+        }
+    }
+
+    return $stocks;
+}
+
 function getInterventions($connexion) {
     $sql = "SELECT i.id, i.description_action, i.resultat
             FROM intervention i
@@ -1320,11 +1342,11 @@ function getEntreesParReference($connexion, $reference) {
                 a.nom AS article
             FROM entree_stock s
             JOIN articles a ON s.article_id = a.id
-            WHERE a.references = ?
+            WHERE s.article_id = ?
             ORDER BY s.date_entree DESC";
 
     $stmt = $connexion->prepare($sql);
-    $stmt->bind_param("s", $reference);
+    $stmt->bind_param("i", $reference);
     $stmt->execute();
     return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 }
@@ -1343,7 +1365,7 @@ function getSortiesParReference($connexion, $reference) {
             FROM sortie_stock s
             JOIN articles a ON s.article_id = a.id
             LEFT JOIN intervention i ON s.intervention_id = i.id
-            WHERE a.references = ?
+            WHERE s.article_id = ?
             ORDER BY s.date_sortie DESC";
 
     $stmt = $connexion->prepare($sql);

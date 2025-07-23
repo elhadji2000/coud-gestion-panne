@@ -297,7 +297,7 @@ $countsPannes = $dataPannes['counts'];
                 <div class="stat-icon">
                     <i class="fas fa-times-circle"></i>
                 </div>
-                <div class="stat-title">Pannes Non Résolues</div>
+                <div class="stat-title">Pannes Non Traités</div>
                 <div class="stat-value"><?php echo $pannesNonResolues; ?></div>
                 <div class="stat-diff"><?php echo ($totalPannes > 0) ? round(($pannesNonResolues / $totalPannes) * 100, 2) : 0; ?>% du total</div>
                 <div class="progress">

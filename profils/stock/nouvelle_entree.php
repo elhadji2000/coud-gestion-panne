@@ -205,12 +205,13 @@ $articles = listeArticles($connexion);
                     <label for="article_id" class="form-label required-field">Article</label>
                     <select class="form-select select2-article" id="article_id" name="article_id" required>
                         <option value="">Sélectionner un article</option>
+                        <?php $n=0;?>
                         <?php foreach ($articles as $article): ?>
                         <option value="<?= $article['id'] ?>" data-nom="<?= htmlspecialchars($article['nom']) ?>"
                             data-reference="<?= htmlspecialchars($article['references']) ?>"
                             data-description="<?= htmlspecialchars($article['description']) ?>"
                             <?= ($mode_edition && $entree_data['article_id'] == $article['id']) ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($article['references']) ?> - <?= htmlspecialchars($article['nom']) ?>
+                            <?= ++$n;?> - <?= htmlspecialchars($article['nom']) ?>
                         </option>
                         <?php endforeach; ?>
                     </select>
@@ -222,7 +223,7 @@ $articles = listeArticles($connexion);
                         <input type="text" class="form-control readonly-field" id="nom_article" readonly
                             value="<?= $mode_edition ? htmlspecialchars($entree_data['nom_article']) : '' ?>">
                     </div>
-                    <div class="col-md-6">
+                    <!-- <div class="col-md-6">
                         <label for="reference_article" class="form-label">Référence</label>
                         <input type="text" class="form-control readonly-field" id="reference_article" readonly
                             value="<?= $mode_edition ? htmlspecialchars($entree_data['reference_article']) : '' ?>">
@@ -233,7 +234,7 @@ $articles = listeArticles($connexion);
                     <label for="description_article" class="form-label">Description</label>
                     <textarea class="form-control readonly-field" id="description_article" rows="2"
                         readonly><?= $mode_edition ? htmlspecialchars($entree_data['description_article']) : '' ?></textarea>
-                </div>
+                </div> -->
 
                 <hr class="section-divider">
 

@@ -185,7 +185,7 @@ include('../../activite.php');
 
         // Si profil2 == SE (Environnement)
         if ($profil2 === 'DE') {
-            echo '<optgroup label="Lieux Environnement (SE)">';
+            echo '<optgroup label="Lieux Environnement (DE)">';
             $lieux_se = [
                 "En face direction",
                 "En face pavillon B",
@@ -222,13 +222,6 @@ include('../../activite.php');
             echo '</optgroup>';
         }
         ?>
-                        <optgroup label="Toilettes">
-                            <option value="Toilettes RDC">Toilettes RDC</option>
-                            <option value="Toilettes 1er étage">Toilettes 1er étage</option>
-                            <option value="Toilettes 2ème étage">Toilettes 2ème étage</option>
-                            <option value="Toilettes Nord">Toilettes Nord</option>
-                            <option value="Toilettes Sud">Toilettes Sud</option>
-                        </optgroup>
                         <optgroup label="Bureaux et Autres Espaces">
                             <option value="Cuisine">Cuisine</option>
                             <option value="Salle à manger">Salle à manger</option>
@@ -237,6 +230,7 @@ include('../../activite.php');
                             <option value="Secrétariat">Secrétariat</option>
                             <option value="Accueil">Accueil</option>
                             <option value="Hall d'entrée">Hall d'entrée</option>
+                            <option value="Toilettes">Toilettes</option>
                             <option value="Autres">Autres..</option>
                         </optgroup>
                     </select>
