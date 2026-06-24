@@ -10,201 +10,127 @@ include('traitement/connect.php');
 <html lang="fr">
 
 <head>
-  <meta charset="utf-8">
-  <title>COUD'MAINT</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    :root {
-      --primary: #4361ee;
-      --primary-light: #eef2ff;
-      --secondary: #3f37c9;
-      --danger: #f72585;
-      --light: #f8f9fa;
-      --dark: #212529;
-    }
-    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COUD'MAINT - Connexion</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css">
+    <style>
     body {
-      font-family: 'Inter', sans-serif;
-      background-color: #f8fafc;
-      color: var(--dark);
-      line-height: 1.6;
+        background-color: #f4f6f9;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
     }
-    
-    .login-header {
-      background: #3777B0;
-      color: white;
-      padding: 1.5rem 0;
-      text-align: center;
+
+    .navbar {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        background-color: #3777B0;
     }
-    
+
     .login-container {
-      max-width: 500px;
-      margin: 2rem auto;
-      padding: 2rem;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
-    
-    .login-logo {
-      text-align: center;
-      margin-bottom: 0rem;
+
+    .login-card {
+        width: 100%;
+        max-width: 400px;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        padding: 30px;
     }
-    
-    .login-logo img {
-      height: 80px;
+
+    .login-card h3 {
+        text-align: center;
+        color: #3777B0;
+        margin-bottom: 25px;
+        font-weight: bold;
     }
-    
-    .login-title {
-      text-align: center;
-      margin-bottom: 1.5rem;
-      font-weight: 600;
-    }
-    
-    .form-group {
-      margin-bottom: 1.5rem;
-    }
-    
+
     .form-control {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      font-size: 1rem;
-      transition: border 0.3s;
+        border-radius: 8px;
     }
-    
-    .form-control:focus {
-      border-color: var(--primary);
-      outline: none;
-      box-shadow: 0 0 0 3px var(--primary-light);
-    }
-    
+
     .btn-login {
-      width: 100%;
-      padding: 0.75rem;
-      background: #3777B0;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 0.3s;
+        width: 100%;
+        background-color: #3777B0;
+        border: none;
+        border-radius: 8px;
+        color: white;
+        font-weight: bold;
+        transition: background-color 0.3s;
     }
-    
+
     .btn-login:hover {
-      background: var(--secondary);
+        background-color: #3777B0;
     }
-    
-    .login-links {
-      margin-top: 1.5rem;
-      text-align: center;
+
+    .forgot-link {
+        display: block;
+        text-align: right;
+        margin-top: 10px;
+        font-size: 14px;
     }
-    
-    .login-links a {
-      color: var(--primary);
-      text-decoration: none;
-      display: block;
-      margin-bottom: 0.5rem;
+
+    .forgot-link a {
+        color: #3777B0;
+        text-decoration: none;
     }
-    
-    .login-links a:hover {
-      text-decoration: underline;
+
+    .forgot-link a:hover {
+        text-decoration: underline;
     }
-    
-    .error-message {
-      color: var(--danger);
-      background: #ffebee;
-      padding: 0.75rem;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-      text-align: center;
-    }
-    .error-message2 {
-      color: var(--danger);
-      background:rgb(221, 248, 245);
-      padding: 0.75rem;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-      text-align: center;
-    }
-    
-    @media (max-width: 576px) {
-      .login-container {
-        margin: 1rem;
-        padding: 1.5rem;
-      }
-    }
-  </style>
+    </style>
 </head>
 
 <body>
-  <div class="login-header">
-    <div class="login-logo">
-      <img src="/COUD/panne/assets/images/logo.png" alt="COUD Logo">
-    </div>
-    <h2>Centre des Œuvres Universitaires de Dakar</h2>
-  </div>
-  <div class="login-container">
-    <h3 class="login-title">Connexion à COUD'MAINT</h3>
-    
-    <?php if (isset($_GET['error'])): ?>
-      <div class="error-message"><?= htmlspecialchars($_GET['error']) ?></div>
-    <?php endif; ?>
-    <?php if (isset($_GET['warning'])): ?>
-      <div class="error-message2"><?= htmlspecialchars($_GET['warning']) ?></div>
-    <?php endif; ?>
-    <form id="loginForm" action="/COUD/panne/traitement/connect.php" method="get">
-      <div class="form-group">
-        <input onkeydown="upperCaseF(this)" name="username_user" id="username" 
-               type="text" placeholder="Numéro de carte ou certificat d'inscription" 
-               required class="form-control">
-      </div>
-      
-      <div class="form-group">
-        <input name="password_user" type="password" id="password" 
-               placeholder="Mot de passe" required class="form-control">
-      </div>
-      
-      <button type="submit" class="btn-login">
-        <i class="fas fa-sign-in-alt"></i> Se connecter
-      </button>
-      
-      <div class="login-links">
-        <a href="mdp/mot_de_passe_oublie.php">Mot de passe oublié ?</a>
-        <a href="index">Retour à l'accueil</a>
-      </div>
-    </form>
-  </div>
 
-  <script>
-    function upperCaseF(a) {
-      setTimeout(function() {
-        a.value = a.value.toUpperCase();
-      }, 1);
-    }
-    
-    // Animation simple lors du chargement
-    document.addEventListener('DOMContentLoaded', function() {
-      const form = document.getElementById('loginForm');
-      form.style.opacity = '0';
-      form.style.transform = 'translateY(20px)';
-      form.style.transition = 'all 0.4s ease-out';
-      
-      setTimeout(function() {
-        form.style.opacity = '1';
-        form.style.transform = 'translateY(0)';
-      }, 100);
-    });
-  </script>
+    <!-- Barre de navigation -->
+    <nav class="navbar">
+        <a class="navbar-brand mx-auto" href="#">
+            <img src="assets/images/logo.png" width="200" height="90" alt="Logo COUD'MAINT">
+        </a>
+    </nav>
+
+    <!-- Conteneur principal -->
+    <div class="login-container">
+        <div class="login-card">
+            <h3>Connexion</h3>
+
+            <?php if (isset($_GET['error'])): ?>
+            <div class="alert alert-danger text-center" role="alert">
+                <?= htmlspecialchars($_GET['error'], ENT_QUOTES, 'UTF-8'); ?>
+            </div>
+            <?php endif; ?>
+
+            <?php if (isset($_GET['warning'])): ?>
+            <div class="alert alert-warning text-center" role="alert">
+                <?= htmlspecialchars($_GET['warning'], ENT_QUOTES, 'UTF-8'); ?>
+            </div>
+            <?php endif; ?>
+
+            <form action="traitement/connect.php" method="get">
+                <div class="form-group">
+                    <label for="login">Nom d'utilisateur</label>
+                    <input type="text" name="username_user" class="form-control" id="login"
+                        placeholder="Entrez votre identifiant" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Mot de passe</label>
+                    <input type="password" name="password_user" class="form-control" id="password"
+                        placeholder="Entrez votre mot de passe" required>
+                </div>
+                <button type="submit" class="btn btn-login mt-3">Se connecter</button>
+                <div class="forgot-link">
+                    <a href="mdp/mot_de_passe_oublie.php">Mot de passe oublié ?</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
 </body>
-<?php 
-include('footer.php');
-?>
 
 </html>

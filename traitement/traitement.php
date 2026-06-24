@@ -25,10 +25,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' &&
         if (strtolower($niveau_urgence) === 'Élevée') {
             notifierUrgence($connexion, $type_panne, $description, $localisation);
         }
-        header('Location: /COUD/panne/profils/residence/ajoutPanne?success=1');
+        header('Location: ../profils/residence/ajoutPanne?success=1');
         exit();
     } else {
-        header('Location: /COUD/panne/profils/residence/ajoutPanne');
+        header('Location: ../profils/residence/ajoutPanne');
         exit();
     }
 } 
@@ -49,10 +49,10 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'POST' &&
     $date_observation = date('d/m/Y'); // La date actuelle
 
     if (enregistrerObservation($connexion, $idPanne, $idUtilisateur, $idIntervention, $evaluationQualite, $date_observation, $commentaireSuggestion, $idObservation)) {
-        header('Location: /COUD/panne/profils/residence/listPannes?obs=1');
+        header('Location: ../profils/residence/listPannes?obs=1');
         exit();
     } else {
-        header('Location: /COUD/panne/profils/residence/observation');
+        header('Location: ../profils/residence/observation');
         exit();
     }
 }
@@ -86,8 +86,8 @@ if (
         : updateIntervention($connexion, $date_intervention, $description_action, $personne_agent, $date_sys, $resultat, $id_chef_atelier, $id_panne, $intervention_id);
 
     header('Location: ' . ($success
-        ? '/COUD/panne/profils/dst/listPannes'
-        : '/COUD/panne/profils/dst/intervention'));
+        ? '../profils/dst/listPannes'
+        : '../profils/dst/intervention'));
     exit();
 }
 //#################################### FIN Enregister une Intervention #####################################################
@@ -103,11 +103,11 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['intervention_id']) )
         $stmt->bind_param("i", $intervention_id);
         $stmt->execute();
         $stmt->close();
-        header('Location: /COUD/panne/profils/dst/listPannes');
+        header('Location: ../profils/dst/listPannes');
     exit();
     }
 
-    header('Location: /COUD/panne/profils/dst/listPannes?echec=');
+    header('Location: ../profils/dst/listPannes?echec=');
     exit();
 } 
 //########################### Fin pour supprimer Intervention #####################################################
@@ -122,11 +122,11 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['panneDelete'])) {
         $stmt->bind_param("i", $panne_id);
         $stmt->execute();
         $stmt->close();
-        header('Location: /COUD/panne/profils/residence/listPannes');
+        header('Location: ../profils/residence/listPannes');
     exit();
     }
 
-    header('Location: /COUD/panne/profils/residence/listPannes?echec='.$panne_id);
+    header('Location: ../profils/residence/listPannes?echec='.$panne_id);
     exit();
 } 
 
@@ -153,14 +153,14 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' &&
         $success = enregistrerImputation($connexion, $idPanne, $idChefDst, $instruction, $resultat, $dateImputation, $imputationId);
 
         if ($success) {
-            header("Location: /COUD/panne/profils/dst/listPannes?success=2&type_panne=" . urlencode($type_panne));
+            header("Location: ../profils/dst/listPannes?success=2&type_panne=" . urlencode($type_panne));
             exit();
         } else {
             throw new Exception("Échec de l'enregistrement de l'imputation.");
         }
     } catch (Exception $e) {
         // Tu peux enregistrer l’erreur dans un log ici si besoin
-        header("Location: /COUD/panne/profils/dst/imputation?error=" . urlencode($e->getMessage()));
+        header("Location: ../profils/dst/imputation?error=" . urlencode($e->getMessage()));
         exit();
     }
 } 
@@ -176,11 +176,11 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['imputation_id']) ) {
         $stmt->bind_param("i", $imputation_id);
         $stmt->execute();
         $stmt->close();
-        header('Location: /COUD/panne/profils/dst/listPannes');
+        header('Location: ../profils/dst/listPannes');
     exit();
     }
 
-    header('Location: /COUD/panne/profils/dst/listPannes?echec=');
+    header('Location: ../profils/dst/listPannes?echec=');
     exit();
 } 
 //############### Fin pour supprimer imputation ##################################
@@ -215,7 +215,7 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'POST' &&
 
         if ($stmt->num_rows > 0) {
             // Un autre utilisateur utilise déjà ce username ou cet email
-            header('Location: /COUD/panne/profils/admin/addUser?user_id=' . $id . '&erreur=exist');
+            header('Location: ../profils/admin/addUser?user_id=' . $id . '&erreur=exist');
             exit();
         }
 
@@ -223,10 +223,10 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'POST' &&
 
         // Mise à jour si OK
         if (updateUtilisateur($connexion, $id, $username, $nom, $prenom, $email, $telephone, $profil1, $profil2, $motDePasse)) {
-            header('Location: /COUD/panne/profils/admin/users?profil2='.$profil1);
+            header('Location: ../profils/admin/users?profil2='.$profil1);
             exit();
         } else {
-            header('Location: /COUD/panne/profils/admin/addUser?user_id=' . $id . '&erreur=save');
+            header('Location: ../profils/admin/addUser?user_id=' . $id . '&erreur=save');
             exit();
         }
 
@@ -242,7 +242,7 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'POST' &&
 
         if ($stmt->num_rows > 0) {
             // Username ou email déjà pris
-            header('Location: /COUD/panne/profils/admin/addUser?erreur=exist');
+            header('Location: ../profils/admin/addUser?erreur=exist');
             exit();
         }
 
@@ -250,10 +250,10 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'POST' &&
 
         // Enregistrement si OK
         if (enregistrerUtilisateur($connexion, $username, $nom, $prenom, $email, $telephone, $motDePasse, $profil1, $profil2)) {
-            header('Location: /COUD/panne/profils/admin/users');
+            header('Location: ../profils/admin/users');
             exit();
         } else {
-            header('Location: /COUD/panne/profils/admin/addUser?erreur=save');
+            header('Location: ../profils/admin/addUser?erreur=save');
             exit();
         }
     }
@@ -273,10 +273,10 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bind_param('ii', $newStatus, $userId);
         if ($stmt->execute()) {
             
-            header('Location: /COUD/panne/profils/admin/users?message=Statut modifié avec succès');
+            header('Location: ../profils/admin/users?message=Statut modifié avec succès');
             exit();
         } else {
-            header('Location: /COUD/panne/profils/admin/users?message=error');
+            header('Location: ../profils/admin/users?message=error');
             exit();
         }
         exit();
@@ -295,10 +295,10 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'POST' &&
     $remarque = $_POST['remarque'];
 
     if (enregistrerSortie($connexion, $article_id, $intervention_id, $quantite, $date_sortie, $remarque)) {
-        header('Location: /COUD/panne/profils/stock/nouvelle_sortie?success=2');
+        header('Location: ../profils/stock/nouvelle_sortie?success=2');
         exit();
     } else {
-        header('Location: /COUD/panne/profils/stock/nouvelle_sortie');
+        header('Location: ../profils/stock/nouvelle_sortie');
         exit();
     }
 }

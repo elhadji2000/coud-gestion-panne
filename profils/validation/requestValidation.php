@@ -2,7 +2,7 @@
 // Verifier la session si elle est actif, sinon on redirige vers la racine
 session_start();
 if (empty($_SESSION['username']) && empty($_SESSION['mdp'])) {
-    header('Location: /COUD/codif/');
+    header('Location: /COUD/panne/');
     exit();
 }
 // Verifier si la session stock toujours la valeur du niveau de la classe, sinon on l'initialise

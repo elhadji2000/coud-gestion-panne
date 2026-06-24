@@ -25,14 +25,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' &&
         $success = enregistrerImputation($connexion, $idPanne, $idChefDst, $instruction, $resultat, $dateImputation, $imputationId);
 
         if ($success) {
-            header("Location: /COUD/panne/profils/dst/listPannes?success=2&type_panne=" . urlencode($type_panne));
+            header("Location: ../../profils/dst/listPannes?success=2&type_panne=" . urlencode($type_panne));
             exit();
         } else {
             throw new Exception("Échec de l'enregistrement de l'imputation.");
         }
     } catch (Exception $e) {
         // Tu peux enregistrer l’erreur dans un log ici si besoin
-        header("Location: /COUD/panne/profils/dst/imputation?error=" . urlencode($e->getMessage()));
+        header("Location: ../../profils/dst/imputation?error=" . urlencode($e->getMessage()));
         exit();
     }
 } 

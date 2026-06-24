@@ -1638,9 +1638,48 @@ function notifierUrgence($connexion, $type_panne, $description, $localisation) {
     }
 }
 
-function envoyerEmail($to, $subject, $message) {
+function envoyerEmail2($to, $subject, $message) {
     mail($to, $subject, $message); // ou mieux, PHPMailer
 }
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+
+function envoyerEmail($to, $subject, $message) {
+    $mail = new PHPMailer(true);
+
+    try {
+        // Config SMTP
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com';  // serveur SMTP
+        $mail->SMTPAuth = true;
+        $mail->Username = 'diopelhadjimadiop@gmail.com';
+        $mail->Password = 'xfuy gpeo oisv gvya'; // pas le vrai mdp !
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = 587;
+
+        // Expéditeur
+        $mail->setFrom('diopelhadjimadiop@gmail.com', 'COUD\'MAINT');
+
+        // Destinataire
+        $mail->addAddress($to);
+
+        // Contenu
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body = $message;
+
+        // Envoi
+        $mail->send();
+        return true;
+
+    } catch (Exception $e) {
+        return "Erreur : " . $mail->ErrorInfo;
+    }
+}
+
 function listeAgents($connexion, $section = null) {
     $agents = [];
 

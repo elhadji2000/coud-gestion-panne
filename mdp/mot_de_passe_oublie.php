@@ -117,7 +117,7 @@ include('../traitement/fonction.php');
     <header
         style="display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #f8f9fa; border-bottom: 1px solid #ddd;">
         <div style="display: flex; align-items: center;">
-            <img src="http://localhost/COUD/panne/assets/images/logo.png" alt="Logo" style="height: 40px;">
+            <img src="../assets/images/logo.png" alt="Logo" style="height: 40px;">
             <span style="margin-left: 10px; font-weight: bold; font-size: 18px;">COUD'MAINT</span>
         </div>
     </header>

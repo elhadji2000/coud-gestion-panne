@@ -33,19 +33,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // Mode modification
             $id_entree = $_POST['id_entree'];
             if (modifierEntree($connexion, $id_entree, $article_id, $quantite, $date_entree, $remarque)) {
-                header('Location: /COUD/panne/profils/stock/nouvelle_entree?success=3&id='.$id_entree);
+                header('Location: ../profils/stock/nouvelle_entree?success=3&id='.$id_entree);
                 exit();
             } else {
-                header('Location: /COUD/panne/profils/stock/nouvelle_entree?error=2&id='.$id_entree);
+                header('Location: ../profils/stock/nouvelle_entree?error=2&id='.$id_entree);
                 exit();
             }
         } else {
             // Mode création
             if (enregistrerEntree($connexion, $article_id, $quantite, $date_entree, $remarque)) {
-                header('Location: /COUD/panne/profils/stock/nouvelle_entree?success=2');
+                header('Location: ../profils/stock/nouvelle_entree?success=2');
                 exit();
             } else {
-                header('Location: /COUD/panne/profils/stock/nouvelle_entree?error=1');
+                header('Location: ../profils/stock/nouvelle_entree?error=1');
                 exit();
             }
         }

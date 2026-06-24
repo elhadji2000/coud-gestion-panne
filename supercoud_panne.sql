@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Hôte : 127.0.0.1
--- Généré le : lun. 21 juil. 2025 à 13:33
--- Version du serveur : 10.4.32-MariaDB
--- Version de PHP : 8.2.12
+-- Hôte : 127.0.0.1:3306
+-- Généré le : jeu. 11 déc. 2025 à 13:30
+-- Version du serveur : 9.1.0
+-- Version de PHP : 8.3.14
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -27,14 +27,17 @@ SET time_zone = "+00:00";
 -- Structure de la table `agent`
 --
 
-CREATE TABLE `agent` (
-  `id` int(11) NOT NULL,
-  `nom` varchar(100) NOT NULL,
-  `prenom` varchar(100) NOT NULL,
-  `section` varchar(100) DEFAULT NULL,
+DROP TABLE IF EXISTS `agent`;
+CREATE TABLE IF NOT EXISTS `agent` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nom` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `prenom` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `section` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `date_naissance` date DEFAULT NULL,
-  `matricule` varchar(50) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `matricule` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `matricule` (`matricule`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `agent`
@@ -56,13 +59,15 @@ INSERT INTO `agent` (`id`, `nom`, `prenom`, `section`, `date_naissance`, `matric
 -- Structure de la table `articles`
 --
 
-CREATE TABLE `articles` (
-  `id` int(11) NOT NULL,
-  `nom` varchar(255) NOT NULL,
-  `categorie` varchar(50) NOT NULL,
-  `references` varchar(100) DEFAULT 'NaN',
-  `description` varchar(100) DEFAULT 'NaN'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+DROP TABLE IF EXISTS `articles`;
+CREATE TABLE IF NOT EXISTS `articles` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nom` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `categorie` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `references` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT 'NaN',
+  `description` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT 'NaN',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=945 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `articles`
@@ -505,16 +510,19 @@ INSERT INTO `articles` (`id`, `nom`, `categorie`, `references`, `description`) V
 -- Structure de la table `codif_lit_complet`
 --
 
-CREATE TABLE `codif_lit_complet` (
-  `id_lit` int(11) NOT NULL,
+DROP TABLE IF EXISTS `codif_lit_complet`;
+CREATE TABLE IF NOT EXISTS `codif_lit_complet` (
+  `id_lit` int NOT NULL AUTO_INCREMENT,
   `pavillon` varchar(10) NOT NULL,
   `chambre` varchar(10) NOT NULL,
   `lit` varchar(15) NOT NULL,
   `campus` varchar(15) NOT NULL,
   `campus2` varchar(15) DEFAULT NULL,
   `sexe` varchar(1) NOT NULL,
-  `indiv` tinyint(1) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+  `indiv` tinyint(1) NOT NULL,
+  PRIMARY KEY (`id_lit`),
+  UNIQUE KEY `lit` (`lit`)
+) ENGINE=InnoDB AUTO_INCREMENT=9695 DEFAULT CHARSET=latin1;
 
 --
 -- Déchargement des données de la table `codif_lit_complet`
@@ -10227,11 +10235,13 @@ INSERT INTO `codif_lit_complet` (`id_lit`, `pavillon`, `chambre`, `lit`, `campus
 -- Structure de la table `departement`
 --
 
-CREATE TABLE `departement` (
-  `id` int(11) NOT NULL,
-  `nom` varchar(50) NOT NULL,
-  `libelle` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+DROP TABLE IF EXISTS `departement`;
+CREATE TABLE IF NOT EXISTS `departement` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nom` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `libelle` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `departement`
@@ -10264,15 +10274,18 @@ INSERT INTO `departement` (`id`, `nom`, `libelle`) VALUES
 -- Structure de la table `entree_stock`
 --
 
-CREATE TABLE `entree_stock` (
-  `id` int(11) NOT NULL,
-  `article_id` int(11) NOT NULL,
-  `quantite` int(11) NOT NULL,
+DROP TABLE IF EXISTS `entree_stock`;
+CREATE TABLE IF NOT EXISTS `entree_stock` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `article_id` int NOT NULL,
+  `quantite` int NOT NULL,
   `date_entree` date NOT NULL,
-  `remarque` text DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `remarque` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `article_id` (`article_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `entree_stock`
@@ -10290,10 +10303,11 @@ INSERT INTO `entree_stock` (`id`, `article_id`, `quantite`, `date_entree`, `rema
 -- Structure de la table `feuil1`
 --
 
-CREATE TABLE `feuil1` (
+DROP TABLE IF EXISTS `feuil1`;
+CREATE TABLE IF NOT EXISTS `feuil1` (
   `nom` varchar(88) DEFAULT NULL,
   `categorie` varchar(21) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 --
 -- Déchargement des données de la table `feuil1`
@@ -10734,14 +10748,18 @@ INSERT INTO `feuil1` (`nom`, `categorie`) VALUES
 -- Structure de la table `imputation`
 --
 
-CREATE TABLE `imputation` (
-  `id` int(11) NOT NULL,
-  `id_chef_dst` int(11) NOT NULL,
-  `id_panne` int(11) NOT NULL,
-  `instruction` text NOT NULL,
-  `date_imputation` varchar(255) NOT NULL,
-  `resultat` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+DROP TABLE IF EXISTS `imputation`;
+CREATE TABLE IF NOT EXISTS `imputation` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `id_chef_dst` int NOT NULL,
+  `id_panne` int NOT NULL,
+  `instruction` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `date_imputation` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `resultat` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_chef_dst` (`id_chef_dst`),
+  KEY `id_panne` (`id_panne`)
+) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `imputation`
@@ -10764,17 +10782,21 @@ INSERT INTO `imputation` (`id`, `id_chef_dst`, `id_panne`, `instruction`, `date_
 -- Structure de la table `intervention`
 --
 
-CREATE TABLE `intervention` (
-  `id` int(11) NOT NULL,
-  `date_intervention` varchar(45) NOT NULL,
-  `date_sys` varchar(255) NOT NULL,
-  `description_action` text NOT NULL,
-  `resultat` text NOT NULL,
-  `type_intervention` varchar(50) NOT NULL DEFAULT 'NaN',
-  `personne_agent` varchar(255) NOT NULL,
-  `id_chef_atelier` int(11) DEFAULT NULL,
-  `id_panne` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+DROP TABLE IF EXISTS `intervention`;
+CREATE TABLE IF NOT EXISTS `intervention` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `date_intervention` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `date_sys` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `description_action` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `resultat` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `type_intervention` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'NaN',
+  `personne_agent` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `id_chef_atelier` int DEFAULT NULL,
+  `id_panne` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_chef_atelier` (`id_chef_atelier`),
+  KEY `intervention_ibfk_2` (`id_panne`)
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `intervention`
@@ -10797,9 +10819,12 @@ INSERT INTO `intervention` (`id`, `date_intervention`, `date_sys`, `description_
 -- Structure de la table `intervention_agent`
 --
 
-CREATE TABLE `intervention_agent` (
-  `intervention_id` int(11) NOT NULL,
-  `agent_id` int(11) NOT NULL
+DROP TABLE IF EXISTS `intervention_agent`;
+CREATE TABLE IF NOT EXISTS `intervention_agent` (
+  `intervention_id` int NOT NULL,
+  `agent_id` int NOT NULL,
+  PRIMARY KEY (`intervention_id`,`agent_id`),
+  KEY `agent_id` (`agent_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -10815,15 +10840,20 @@ INSERT INTO `intervention_agent` (`intervention_id`, `agent_id`) VALUES
 -- Structure de la table `observation`
 --
 
-CREATE TABLE `observation` (
-  `id` int(11) NOT NULL,
-  `evaluation_qualite` varchar(50) NOT NULL,
-  `date_observation` varchar(45) NOT NULL,
-  `commentaire_suggestion` text NOT NULL,
-  `id_chef_residence` int(11) DEFAULT NULL,
-  `id_panne` int(11) DEFAULT NULL,
-  `id_intervention` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+DROP TABLE IF EXISTS `observation`;
+CREATE TABLE IF NOT EXISTS `observation` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `evaluation_qualite` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `date_observation` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `commentaire_suggestion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `id_chef_residence` int DEFAULT NULL,
+  `id_panne` int DEFAULT NULL,
+  `id_intervention` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_chef_residence` (`id_chef_residence`),
+  KEY `id_intervention` (`id_intervention`),
+  KEY `observation_ibfk_2` (`id_panne`)
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `observation`
@@ -10844,15 +10874,18 @@ INSERT INTO `observation` (`id`, `evaluation_qualite`, `date_observation`, `comm
 -- Structure de la table `panne`
 --
 
-CREATE TABLE `panne` (
-  `id` int(11) NOT NULL,
-  `type_panne` varchar(255) NOT NULL,
-  `date_enregistrement` varchar(255) NOT NULL,
-  `description` text NOT NULL,
-  `localisation` varchar(255) NOT NULL,
-  `niveau_urgence` varchar(50) NOT NULL,
-  `id_chef_residence` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+DROP TABLE IF EXISTS `panne`;
+CREATE TABLE IF NOT EXISTS `panne` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `type_panne` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `date_enregistrement` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `localisation` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `niveau_urgence` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `id_chef_residence` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_chef_residence` (`id_chef_residence`)
+) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `panne`
@@ -10870,7 +10903,10 @@ INSERT INTO `panne` (`id`, `type_panne`, `date_enregistrement`, `description`, `
 (36, 'Électricité', '20/06/2025', 'prise défectueuse...', 'DI | Bureau', 'Élevée', 20),
 (37, 'Maçonnerie', '23/06/2025', 'neant....', 'A.S.J | B1 | Chambre 101B1', 'Élevée', 16),
 (38, 'Plomberie', '23/06/2025', 'tuyau défectueux', 'A.S.J | B1 | Toilettes RDC', 'Moyenne', 16),
-(39, 'Maçonnerie', '09/07/2025', 'bureau dtruit', 'A.S.J | B1 | Chambre 101B1', 'Faible', 16);
+(39, 'Maçonnerie', '09/07/2025', 'bureau dtruit', 'A.S.J | B1 | Chambre 101B1', 'Faible', 16),
+(41, 'Plomberie', '25/11/2025', 'fuite d\'eaux importante', 'DE | En face direction', 'Moyenne', 20),
+(43, 'Maçonnerie', '25/11/2025', 'chute du mur', 'DE | Zone A', 'Élevée', 20),
+(44, 'Plomberie', '25/11/2025', 'fuite d\'eaux', 'DACS | Toilettes', 'Élevée', 19);
 
 -- --------------------------------------------------------
 
@@ -10878,12 +10914,15 @@ INSERT INTO `panne` (`id`, `type_panne`, `date_enregistrement`, `description`, `
 -- Structure de la table `reset_tokens`
 --
 
-CREATE TABLE `reset_tokens` (
-  `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `token` varchar(255) NOT NULL,
-  `expires_at` datetime NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+DROP TABLE IF EXISTS `reset_tokens`;
+CREATE TABLE IF NOT EXISTS `reset_tokens` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `expires_at` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -10891,15 +10930,19 @@ CREATE TABLE `reset_tokens` (
 -- Structure de la table `sortie_stock`
 --
 
-CREATE TABLE `sortie_stock` (
-  `id` int(11) NOT NULL,
-  `article_id` int(11) NOT NULL,
-  `intervention_id` int(11) DEFAULT NULL,
-  `quantite` int(11) NOT NULL,
-  `date_sortie` datetime DEFAULT current_timestamp(),
-  `remarque` text DEFAULT NULL,
-  `updated_at` datetime NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+DROP TABLE IF EXISTS `sortie_stock`;
+CREATE TABLE IF NOT EXISTS `sortie_stock` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `article_id` int NOT NULL,
+  `intervention_id` int DEFAULT NULL,
+  `quantite` int NOT NULL,
+  `date_sortie` datetime DEFAULT CURRENT_TIMESTAMP,
+  `remarque` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `article_id` (`article_id`),
+  KEY `intervention_id` (`intervention_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `sortie_stock`
@@ -10908,7 +10951,7 @@ CREATE TABLE `sortie_stock` (
 INSERT INTO `sortie_stock` (`id`, `article_id`, `intervention_id`, `quantite`, `date_sortie`, `remarque`, `updated_at`) VALUES
 (3, 3, 14, 4, '2025-06-17 00:00:00', 'depanner', '2025-06-18 10:33:09'),
 (4, 4, 21, 12, '2025-06-29 00:00:00', NULL, '2025-06-29 13:43:25'),
-(5, 3, NULL, 7, '2025-07-02 00:00:00', 'des chose urgent qu\'on regler', '2025-07-02 15:09:05');
+(5, 3, NULL, 7, '2025-07-02 00:00:00', 'des chose urgent qu`on regler', '2025-07-02 15:09:05');
 
 -- --------------------------------------------------------
 
@@ -10916,218 +10959,47 @@ INSERT INTO `sortie_stock` (`id`, `article_id`, `intervention_id`, `quantite`, `
 -- Structure de la table `utilisateur`
 --
 
-CREATE TABLE `utilisateur` (
-  `id` int(11) NOT NULL,
-  `username` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `statut` tinyint(1) NOT NULL DEFAULT 1,
-  `email` varchar(70) NOT NULL,
-  `telephone` varchar(20) NOT NULL,
-  `nom` varchar(255) NOT NULL,
-  `prenom` varchar(255) NOT NULL,
-  `profil1` varchar(255) NOT NULL,
-  `profil2` varchar(50) NOT NULL,
-  `date_sys` date NOT NULL DEFAULT current_timestamp(),
-  `type_mdp` varchar(50) NOT NULL DEFAULT 'default',
-  `canal_notif` enum('email','sms','whatsapp') DEFAULT 'email',
-  `recevoir_alerte` tinyint(1) DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+DROP TABLE IF EXISTS `utilisateur`;
+CREATE TABLE IF NOT EXISTS `utilisateur` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `username` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `statut` tinyint(1) NOT NULL DEFAULT '1',
+  `email` varchar(70) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `telephone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `nom` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `prenom` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `profil1` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `profil2` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `date_sys` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `type_mdp` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'default',
+  `canal_notif` enum('email','sms','whatsapp') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT 'email',
+  `recevoir_alerte` tinyint(1) DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `utilisateur`
 --
 
 INSERT INTO `utilisateur` (`id`, `username`, `password`, `statut`, `email`, `telephone`, `nom`, `prenom`, `profil1`, `profil2`, `date_sys`, `type_mdp`, `canal_notif`, `recevoir_alerte`) VALUES
-(1, 'pavb', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'pavb@gmail.com', '767778899', 'DIOP', 'Madiop', 'residence', 'Grand_Campus | B', '2025-04-01', 'default', 'email', 0),
-(2, 'atelier', 'ac63f10d9cbef20bcfc0dd345dcee90058e0d2e4', 1, 'diopelhadjimadiop@gmail.com', '779099099', 'Faye', 'Waly', 'atelier', 'chef d\'atelier', '2025-04-06', 'updated', 'email', 1),
-(3, 'dst', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'dst@hotmail.com', '770010203', 'Fall', 'Ibrahima', 'dst', 'chef dst', '2025-04-21', 'updated', 'email', 0),
-(4, 'pavd', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'pavd@yahoo.com', '770090908', 'Ndiaye', 'Ndiaye', 'residence', 'Grand_Campus | D', '2025-04-07', 'updated', 'email', 0),
-(5, 'pavcEsp', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'pavcEsp@gmail.com', '77090989', 'DIOP', 'Moussa', 'residence', 'E.S.P | C(ESP)', '2025-04-06', 'default', 'email', 0),
-(7, 'section1', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'section1@gmail.com', '778834567', 'Sylla', 'Sylla', 'section', 'Menuserie_bois', '2025-04-06', 'default', 'email', 0),
-(8, 'chef_plomberie', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'plomberi@coud.sn', '756667788', 'Faye', 'Faye', 'section', 'Plomberie', '2025-05-11', 'updated', 'email', 0),
-(9, 'sem', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'hameth512@gmail.com', '776000203', 'Faye', 'Faye', 'dst', 'S.E.M', '2025-05-11', 'updated', 'email', 1),
-(10, 'chef_maçonnerie', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'maconnerie@coud.sn', '789000908', 'FAYE', 'Mor', 'section', 'maçonnerie', '2025-05-11', 'default', 'email', 0),
-(11, 'admin', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'admin@coud.sn', '765556677', 'sylla', 'babacar', 'admin', 'admin', '2025-05-11', 'updated', 'email', 0),
-(14, 'madiop', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 0, 'ass@gmail.com', '784413400', 'diop', 'elhadji', 'section', 'Électricité', '2025-05-11', 'default', 'email', 0),
-(16, '936076/M', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'eladji1.dg@coud.sn', '7844413400', 'diop', 'Elhadji', 'residence', 'A.S.J | B1', '2025-05-11', 'updated', 'email', 0),
-(17, 'pava', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'pava@coud.sn', '778889900', 'sarr', 'Issa', 'residence', 'Grand_Campus | A0', '2025-05-11', 'updated', 'email', 0),
-(18, '934837/C', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'admin789@coud.sn', '776668899', 'Diagne', 'Madiagne', 'residence', 'E.S.P | H(ESP)', '2025-05-12', 'default', 'email', 0),
-(19, 'daf', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'daf@coud.edu.sn', '789859809', 'seck', 'Moussa', 'service', 'DACS', '2025-06-19', 'updated', 'email', 0),
-(20, '934837/B', 'a10b65aeb7c72067ea89732bb371cafbfb501aa2', 1, 'madiagne35@gmail.com', '776267155', 'diagne', 'Madiagne', 'service', 'DE', '2025-06-20', 'updated', 'email', 1),
-(21, '883007/A', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'fayeass@coud.sn', '756678999', 'faye', 'elhadji', 'atelier', 'chef d\'atelier', '2025-06-29', 'default', 'email', 0);
-
---
--- Index pour les tables déchargées
---
-
---
--- Index pour la table `agent`
---
-ALTER TABLE `agent`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `matricule` (`matricule`);
-
---
--- Index pour la table `articles`
---
-ALTER TABLE `articles`
-  ADD PRIMARY KEY (`id`);
-
---
--- Index pour la table `codif_lit_complet`
---
-ALTER TABLE `codif_lit_complet`
-  ADD PRIMARY KEY (`id_lit`),
-  ADD UNIQUE KEY `lit` (`lit`);
-
---
--- Index pour la table `departement`
---
-ALTER TABLE `departement`
-  ADD PRIMARY KEY (`id`);
-
---
--- Index pour la table `entree_stock`
---
-ALTER TABLE `entree_stock`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `article_id` (`article_id`);
-
---
--- Index pour la table `imputation`
---
-ALTER TABLE `imputation`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `id_chef_dst` (`id_chef_dst`),
-  ADD KEY `id_panne` (`id_panne`);
-
---
--- Index pour la table `intervention`
---
-ALTER TABLE `intervention`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `id_chef_atelier` (`id_chef_atelier`),
-  ADD KEY `intervention_ibfk_2` (`id_panne`);
-
---
--- Index pour la table `intervention_agent`
---
-ALTER TABLE `intervention_agent`
-  ADD PRIMARY KEY (`intervention_id`,`agent_id`),
-  ADD KEY `agent_id` (`agent_id`);
-
---
--- Index pour la table `observation`
---
-ALTER TABLE `observation`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `id_chef_residence` (`id_chef_residence`),
-  ADD KEY `id_intervention` (`id_intervention`),
-  ADD KEY `observation_ibfk_2` (`id_panne`);
-
---
--- Index pour la table `panne`
---
-ALTER TABLE `panne`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `id_chef_residence` (`id_chef_residence`);
-
---
--- Index pour la table `reset_tokens`
---
-ALTER TABLE `reset_tokens`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `user_id` (`user_id`);
-
---
--- Index pour la table `sortie_stock`
---
-ALTER TABLE `sortie_stock`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `article_id` (`article_id`),
-  ADD KEY `intervention_id` (`intervention_id`);
-
---
--- Index pour la table `utilisateur`
---
-ALTER TABLE `utilisateur`
-  ADD PRIMARY KEY (`id`);
-
---
--- AUTO_INCREMENT pour les tables déchargées
---
-
---
--- AUTO_INCREMENT pour la table `agent`
---
-ALTER TABLE `agent`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
-
---
--- AUTO_INCREMENT pour la table `articles`
---
-ALTER TABLE `articles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=945;
-
---
--- AUTO_INCREMENT pour la table `codif_lit_complet`
---
-ALTER TABLE `codif_lit_complet`
-  MODIFY `id_lit` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9695;
-
---
--- AUTO_INCREMENT pour la table `departement`
---
-ALTER TABLE `departement`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
-
---
--- AUTO_INCREMENT pour la table `entree_stock`
---
-ALTER TABLE `entree_stock`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
-
---
--- AUTO_INCREMENT pour la table `imputation`
---
-ALTER TABLE `imputation`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
-
---
--- AUTO_INCREMENT pour la table `intervention`
---
-ALTER TABLE `intervention`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
-
---
--- AUTO_INCREMENT pour la table `observation`
---
-ALTER TABLE `observation`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
-
---
--- AUTO_INCREMENT pour la table `panne`
---
-ALTER TABLE `panne`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
-
---
--- AUTO_INCREMENT pour la table `reset_tokens`
---
-ALTER TABLE `reset_tokens`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- AUTO_INCREMENT pour la table `sortie_stock`
---
-ALTER TABLE `sortie_stock`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
-
---
--- AUTO_INCREMENT pour la table `utilisateur`
---
-ALTER TABLE `utilisateur`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+(1, 'pavb', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'pavb@gmail.com', '767778899', 'DIOP', 'Madiop', 'residence', 'Grand_Campus | B', '2025-04-01 00:00:00', 'default', 'email', 0),
+(2, 'atelier', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'diopelhadjimadiop@gmail.com', '779099099', 'Faye', 'Waly', 'atelier', 'chef d\'atelier', '2025-04-06 00:00:00', 'updated', 'email', 1),
+(3, 'dst', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'dst@hotmail.com', '770010203', 'Fall', 'Ibrahima', 'dst', 'chef dst', '2025-04-21 00:00:00', 'updated', 'email', 0),
+(4, 'pavd', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'pavd@yahoo.com', '770090908', 'Ndiaye', 'Ndiaye', 'residence', 'Grand_Campus | D', '2025-04-07 00:00:00', 'updated', 'email', 0),
+(5, 'pavcEsp', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'pavcEsp@gmail.com', '77090989', 'DIOP', 'Moussa', 'residence', 'E.S.P | C(ESP)', '2025-04-06 00:00:00', 'default', 'email', 0),
+(7, 'section1', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'section1@gmail.com', '778834567', 'Sylla', 'Sylla', 'section', 'Menuserie_bois', '2025-04-06 00:00:00', 'default', 'email', 0),
+(8, 'chef_plomberie', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'plomberi@coud.sn', '756667788', 'Faye', 'Faye', 'section', 'Plomberie', '2025-05-11 00:00:00', 'updated', 'email', 0),
+(9, 'sem', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'hameth512@gmail.com', '776000203', 'Faye', 'Faye', 'dst', 'S.E.M', '2025-05-11 00:00:00', 'updated', 'email', 1),
+(10, 'chef_maçonnerie', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'maconnerie@coud.sn', '789000908', 'FAYE', 'Mor', 'section', 'maçonnerie', '2025-05-11 00:00:00', 'default', 'email', 0),
+(11, 'admin', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'sarraseydinaissasarr@gmail.com', '765556677', 'sylla', 'babacar', 'admin', 'admin', '2025-05-11 00:00:00', 'updated', 'email', 1),
+(14, 'madiop', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 0, 'ass@gmail.com', '784413400', 'diop', 'elhadji', 'section', 'Électricité', '2025-05-11 00:00:00', 'default', 'email', 0),
+(16, '936076/M', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'eladji1.dg@coud.sn', '7844413400', 'diop', 'Elhadji', 'residence', 'A.S.J | B1', '2025-05-11 00:00:00', 'updated', 'email', 0),
+(17, 'pava', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'pava@coud.sn', '778889900', 'sarr', 'Issa', 'residence', 'Grand_Campus | A0', '2025-05-11 00:00:00', 'updated', 'email', 0),
+(18, '934837/C', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'admin789@coud.sn', '776668899', 'Diagne', 'Madiagne', 'residence', 'E.S.P | H(ESP)', '2025-05-12 00:00:00', 'default', 'email', 0),
+(19, 'dacs', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'daf@coud.edu.sn', '789859809', 'seck', 'Moussa', 'service', 'DACS', '2025-06-19 00:00:00', 'updated', 'email', 0),
+(20, 'DE', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'madiagne35@gmail.com', '776267155', 'diagne', 'Madiagne', 'service', 'DE', '2025-06-20 00:00:00', 'updated', 'email', 1),
+(21, '883007/A', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 1, 'fayeass@coud.sn', '756678999', 'faye', 'elhadji', 'atelier', 'chef d\'atelier', '2025-06-29 00:00:00', 'default', 'email', 0);
 
 --
 -- Contraintes pour les tables déchargées

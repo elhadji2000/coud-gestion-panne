@@ -33,6 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+$url_base = "http://localhost/COUD/panne";
 ?>
 
 <!DOCTYPE html>
@@ -137,8 +138,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <header
         style="display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #f8f9fa; border-bottom: 1px solid #ddd;">
         <div style="display: flex; align-items: center;">
-            <img src="http://localhost/COUD/panne/assets/images/logo.png" alt="Logo" style="height: 40px;">
-            <span style="margin-left: 10px; font-weight: bold; font-size: 18px;">GESCOUD</span>
+            <img src="../../assets/images/logo.png" alt="Logo" style="height: 40px;">
+            <span style="margin-left: 10px; font-weight: bold; font-size: 18px;">COUD'MAINT</span>
         </div>
     </header>
     <div class="container">
@@ -239,7 +240,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Lorsqu'il est fermé, rediriger vers index.php
         modalElement.addEventListener('hidden.bs.modal', function() {
-            window.location.href = 'http://localhost/COUD/panne/index.php'; // modifie si besoin
+            window.location.href = '../../index.php'; // modifie si besoin
         });
     });
     </script>

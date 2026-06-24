@@ -28,10 +28,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' &&
     $date_observation = date('d/m/Y'); // La date actuelle
 
     if (enregistrerObservation($connexion, $idPanne, $idUtilisateur, $idIntervention, $evaluationQualite, $date_observation, $commentaireSuggestion, $idObservation)) {
-        header('Location: /COUD/panne/profils/residence/listPannes?obs=1');
+        header('Location: ../profils/residence/listPannes?obs=1');
         exit();
     } else {
-        header('Location: /COUD/panne/profils/residence/observation');
+        header('Location: ../profils/residence/observation');
         exit();
     }
 }

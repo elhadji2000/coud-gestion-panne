@@ -8,7 +8,7 @@ include('../../activite.php');
 $idp = isset($_GET['idp']) ? (int)$_GET['idp'] : null;
 $intervention_id = (isset($_GET['intervention_id']) && is_numeric($_GET['intervention_id']) && $_GET['intervention_id'] > 0)
     ? (int)$_GET['intervention_id']
-    : null;
+    : "";
 $section = htmlspecialchars($_GET['type']);
 // Récupération des données existantes si modification
 $date_intervention = '';

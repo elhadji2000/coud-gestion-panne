@@ -4,7 +4,6 @@ session_start();
 include('../../traitement/fonction.php');
 include('../../traitement/requete.php');
 include('../../activite.php');
-
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if (isset($_GET['action']) && $_GET['action'] == 'changeUserStatus') {
         $userId = $_GET['userStatusChange'];
@@ -16,10 +15,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $stmt->bind_param('ii', $newStatus, $userId);
         if ($stmt->execute()) {
             
-            header('Location: /COUD/panne/profils/admin/users?message=Statut modifié avec succès');
+            header('Location: ../profils/admin/users?message=Statut modifié avec succès');
             exit();
         } else {
-            header('Location: /COUD/panne/profils/admin/users?message=error');
+            header('Location: ../profils/admin/users?message=error');
             exit();
         }
         exit();
@@ -109,13 +108,14 @@ $allUsers = allUtilisateurs($connexion);
         font-weight: 600;
         color: var(--secondary);
         text-transform: uppercase;
-        font-size: 0.8rem;
+        font-size: 0.6rem;
         letter-spacing: 0.5px;
         border-bottom: 2px solid #e9ecef;
     }
 
     .table td {
         vertical-align: middle;
+        font-size: 11px;
     }
 
     .status-badge2 {
@@ -125,13 +125,13 @@ $allUsers = allUtilisateurs($connexion);
         padding: 0.35rem 0.5rem;
         border-radius: 20px;
         font-weight: 500;
-        font-size: 0.75rem;
+        font-size: 0.5rem;
     }
 
     .status-badge {
         padding: 4px 8px;
         border-radius: 12px;
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 500;
         display: inline-block;
     }
@@ -170,7 +170,7 @@ $allUsers = allUtilisateurs($connexion);
         padding: 0.35rem 0.5rem;
         border-radius: 4px;
         font-weight: 500;
-        font-size: 0.75rem;
+        font-size: 0.5rem;
         color: white;
     }
 
@@ -180,7 +180,7 @@ $allUsers = allUtilisateurs($connexion);
         border-radius: 1rem;
         background: #dc3545;
         color: white;
-        font-size: 0.6rem;
+        font-size: 0.5rem;
         font-weight: bold;
         cursor: pointer;
         transition: all 0.3s ease;
@@ -226,8 +226,8 @@ $allUsers = allUtilisateurs($connexion);
                                         <th>Téléphone</th>
                                         <th>Prénom</th>
                                         <th>Nom</th>
-                                        <th>Profil Principal</th>
-                                        <th>Profil Secondaire</th>
+                                        <th>Profil 1</th>
+                                        <th>Profil 2</th>
                                         <th>Statut</th>
                                         <th>Alerte</th>
                                         <th>Type</th>

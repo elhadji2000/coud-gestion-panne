@@ -4,6 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 // 
 require_once(__DIR__ . '/traitement/fonction.php');
+$url_base = "http://localhost/COUD/panne";
 ?>
 
 <!DOCTYPE html>
@@ -13,7 +14,7 @@ require_once(__DIR__ . '/traitement/fonction.php');
     <meta charset="utf-8">
     <title>COUD'MAINT</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="http://localhost/COUD/panne/assets/css/main.css">
+    <link rel="stylesheet" href="<?= $url_base;?>/assets/css/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="icon" href="log.gif" type="image/x-icon">
     <style>
@@ -150,7 +151,7 @@ require_once(__DIR__ . '/traitement/fonction.php');
 <body>
     <header>
         <div class="logo-container">
-            <img src="http://localhost/COUD/panne/assets/images/logo.png" alt="Logo">
+            <img src="<?= $url_base;?>/assets/images/logo.png" alt="Logo">
             <span>COUD'MAINT</span>
         </div>
 
@@ -160,49 +161,49 @@ require_once(__DIR__ . '/traitement/fonction.php');
             <ul>
                 <?php if ($_SESSION['profil'] === 'admin') { ?>
                 <li>
-                    <a href="http://localhost/COUD/panne/profils/dasboard.php">
+                    <a href="<?= $url_base;?>/profils/dasboard.php">
                         <i class="fa fa-home" aria-hidden="true"></i>Accueil
                     </a></li>
-                <li><a href="http://localhost/COUD/panne/profils/admin/users.php">
+                <li><a href="<?= $url_base;?>/profils/admin/users.php">
                         <i class="fa fa-users" aria-hidden="true"></i>Utilisateurs</a></li>
 
                 <?php } elseif (($_SESSION['profil'] === 'residence') || ($_SESSION['profil'] == 'service')) { ?>
-                <li><a href="http://localhost/COUD/panne/profils/dasboard.php">
+                <li><a href="<?= $url_base;?>/profils/dasboard.php">
                         <i class="fa fa-home" aria-hidden="true"></i>Accueil</a></li>
-                <li><a href="http://localhost/COUD/panne/profils/residence/listPannes.php">
+                <li><a href="<?= $url_base;?>/profils/residence/listPannes.php">
                         <i class="fa fa-wrench" aria-hidden="true"></i>Déclarations</a></li>
 
                 <?php } elseif (($_SESSION['profil'] === 'dst') || ($_SESSION['profil'] == 'atelier')) { ?>
                 <li>
-                    <a href="http://localhost/COUD/panne/profils/dasboard.php">
+                    <a href="<?= $url_base;?>/profils/dasboard.php">
                         <i class="fa fa-home" aria-hidden="true"></i>Accueil
                     </a>
                 </li>
-                <li><a href="http://localhost/COUD/panne/profils/dst/listPannes.php">
+                <li><a href="<?= $url_base;?>/profils/dst/listPannes.php">
                         <i class="fa fa-wrench" aria-hidden="true"></i>Déclarations</a></li>
-                <li><a href="http://localhost/COUD/panne/profils/stock/gestion.php">
+                <li><a href="<?= $url_base;?>/profils/stock/gestion.php">
                         <i class="fas fa-warehouse" aria-hidden="true"></i>Stock</a>
                 </li>
 
                 <?php } elseif ($_SESSION['profil'] === 'section') { ?>
                 <li>
-                    <a href="http://localhost/COUD/panne/profils/dasboard.php">
+                    <a href="<?= $url_base;?>/profils/dasboard.php">
                         <i class="fa fa-home" aria-hidden="true"></i>Accueil
                     </a>
                 </li>
                 <li>
-                    <a href="http://localhost/COUD/panne/profils/section/listPannes.php">
+                    <a href="<?= $url_base;?>/profils/section/listPannes.php">
                         <i class="fa fa-wrench" aria-hidden="true"></i>Déclarations
                     </a>
                 </li>
                 <?php } ?>
                 <li>
-                    <a href="/COUD/panne/profils/admin/update_mdp.php">
+                    <a href="<?= $url_base;?>/profils/admin/update_mdp.php">
                         <i class="fa fa-lock" aria-hidden="true"></i>Mot de passe
                     </a>
                 </li>
                 <li>
-                    <a href="/COUD/panne/logout.php" onclick="return confirm('Êtes-vous sûr de vouloir deconnecter ?')">
+                    <a href="<?= $url_base;?>/logout.php" onclick="return confirm('Êtes-vous sûr de vouloir deconnecter ?')">
                         <i class="fa fa-sign-out"></i>Déconnexion
                     </a>
                 </li>
@@ -213,53 +214,53 @@ require_once(__DIR__ . '/traitement/fonction.php');
             <ul>
                 <?php if ($_SESSION['profil'] === 'admin') { ?>
                 <li>
-                    <a href="http://localhost/COUD/panne/profils/dasboard.php">
+                    <a href="<?= $url_base;?>/profils/dasboard.php">
                         <i class="fa fa-home" aria-hidden="true"></i>Accueil
                     </a>
                 </li>
-                <li><a href="http://localhost/COUD/panne/profils/stock/gestion.php">
+                <li><a href="<?= $url_base;?>/profils/stock/gestion.php">
                         <i class="fas fa-warehouse" aria-hidden="true"></i> Stock</a>
                 </li>
-                <li><a href="http://localhost/COUD/panne/profils/admin/users.php">
+                <li><a href="<?= $url_base;?>/profils/admin/users.php">
                         <i class="fa fa-users" aria-hidden="true"></i>Utilisateurs</a></li>
 
                 <?php } elseif (($_SESSION['profil'] === 'residence') || ($_SESSION['profil'] === 'service')) { ?>
-                <li><a href="http://localhost/COUD/panne/profils/dasboard.php">
+                <li><a href="<?= $url_base;?>/profils/dasboard.php">
                         <i class="fa fa-home" aria-hidden="true"></i>Accueil</a></li>
-                <li><a href="http://localhost/COUD/panne/profils/residence/listPannes.php">
+                <li><a href="<?= $url_base;?>/profils/residence/listPannes.php">
                         <i class="fa fa-wrench" aria-hidden="true"></i>Déclarations</a></li>
 
                 <?php } elseif (($_SESSION['profil'] === 'dst') || ($_SESSION['profil'] === 'atelier')) { ?>
                 <li>
-                    <a href="http://localhost/COUD/panne/profils/dasboard.php">
+                    <a href="<?= $url_base;?>/profils/dasboard.php">
                         <i class="fa fa-home" aria-hidden="true"></i>Accueil
                     </a>
                 </li>
-                <li><a href="http://localhost/COUD/panne/profils/dst/listPannes.php">
+                <li><a href="<?= $url_base;?>/profils/dst/listPannes.php">
                         <i class="fa fa-wrench" aria-hidden="true"></i>Déclarations</a></li>
-                <li><a href="http://localhost/COUD/panne/profils/stock/gestion.php">
+                <li><a href="<?= $url_base;?>/profils/stock/gestion.php">
                         <i class="fas fa-warehouse" aria-hidden="true"></i>Stock</a>
                 </li>
 
                 <?php } elseif ($_SESSION['profil'] === 'section') { ?>
                 <li>
-                    <a href="http://localhost/COUD/panne/profils/dasboard.php">
+                    <a href="<?= $url_base;?>/profils/dasboard.php">
                         <i class="fa fa-home" aria-hidden="true"></i>Accueil
                     </a>
                 </li>
                 <li>
-                    <a href="http://localhost/COUD/panne/profils/section/listPannes.php">
+                    <a href="<?= $url_base;?>/profils/section/listPannes.php">
                         <i class="fa fa-wrench" aria-hidden="true"></i>Déclarations
                     </a>
                 </li>
                 <?php } ?>
                 <li>
-                    <a href="/COUD/panne/profils/admin/update_mdp.php">
+                    <a href="<?= $url_base;?>/profils/admin/update_mdp.php">
                         <i class="fa fa-lock" aria-hidden="true"></i>Mot de passe
                     </a>
                 </li>
                 <li>
-                    <a href="/COUD/panne/logout.php" onclick="return confirm('Êtes-vous sûr de vouloir deconnecter ?')">
+                    <a href="<?= $url_base;?>/logout.php" onclick="return confirm('Êtes-vous sûr de vouloir deconnecter ?')">
                         <i class="fa fa-sign-out"></i>Déconnexion
                     </a>
                 </li>

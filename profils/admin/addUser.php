@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (empty($_SESSION['username']) && empty($_SESSION['mdp'])) {
-    header('Location: /COUD/codif/');
+    header('Location: /COUD/panne/');
     exit();
 }
 
